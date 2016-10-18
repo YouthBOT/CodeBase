@@ -1,0 +1,17 @@
+D:\YBOT\Software\Software\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBOT Field Control 2016.exe.config
+D:\YBOT\Software\Software\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.exe
+D:\YBOT\Software\Software\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.pdb
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBOT Field Control 2016.exe.config
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.exe
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.pdb
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control.csprojResolveAssemblyReference.cache
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.GameDisplay.resources
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.GameControl.resources
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.OneWire_Locate_Nodes.resources
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.CANRawData.resources
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.Score.resources
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.YBOT_Main.resources
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.Properties.Resources.resources
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control.csproj.GenerateResource.Cache
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBOT Field Control 2016.exe
+D:\YBOT\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBOT Field Control 2016.pdb
