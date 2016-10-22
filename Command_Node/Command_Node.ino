@@ -3,11 +3,13 @@
 /// Used to control the command node and send data to the Tower Nodes
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <SoftwareSerial.h>
 #include <mcp_can.h>
 #include <SPI.h>
 #include <string.h>
 #include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +90,9 @@ uint8_t buzzerPin = 5;
 byte index = 0;		//Counter for serial data
 char inData[16];	//Incoming serial data
 boolean newserial = false;
+int xbRX = 2;		//xb RX pin
+int xbTX = 3;		//xb TX pin
+SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <summary> Program Flags Variables </summary>
@@ -109,6 +114,8 @@ int toPC = 0;
 void setup()
 {
 	Serial.begin(115200);	//Start serial communication
+	xbSerial.begin(9600);	//Start xb serial communication
+
 	Serial.print("Node ID: ");
 	Serial.println(nodeID);
 
@@ -196,6 +203,10 @@ START_INIT:
 	//Check to see if we can talk to the command node	
 	Serial.println("CAN-BUS Communication: Command Node");
 
+	Serial.println("-----XBee-----");
+	xbSerial.println("");
+
+
 	delay(2000); //Visual Delay
 
 	solidColor(off, 0, 0, stripLength);	//Turn off light
@@ -230,6 +241,14 @@ void loop()
 			}
 			execute();					//Execute Command
 		}
+		else if (destNode > 19)			//It's an xbee node
+		{
+			for (uint8_t i = 0; i < sizeof(canIn); i++)
+			{
+				xbSerial.print(canOut[i]);	//send data
+			}
+			xbSerial.println();
+		}
 		else							//Else send it out
 		{
 			messagesSent++;
@@ -239,6 +258,35 @@ void loop()
 	}
 
 	while (Serial.available())
+	{
+		char aChar = Serial.read();		//Read data
+
+		if (aChar == '$')
+		{
+			inData[0] = aChar;
+			index = 1;
+		}
+		else								//If no new line keep collecting the serial data
+		{
+			if (inData[0] = '$')
+			{
+				if (aChar == '\n')				//If there is a new line
+				{
+					fromPC++;
+					parseData();				//Parse the data that was received
+					newserial = true;
+				}
+				else
+				{
+					inData[index] = aChar;			//Add next character received to the buffer
+					index++;						//Increment index
+					inData[index] = '\0';			//Keep NULL Terminated as last the last character
+				}
+			}
+		}
+	}
+
+	while (xbSerial.available())
 	{
 		char aChar = Serial.read();		//Read data
 

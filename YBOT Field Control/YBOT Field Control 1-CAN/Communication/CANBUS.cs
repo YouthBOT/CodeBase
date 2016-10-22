@@ -463,7 +463,7 @@ namespace YBOT_Field_Control_2016
 
         public void StartFosCalibration(int _nodeAddress)
         {
-            string s = string.Format("{0},7", _nodeAddress);
+            string s = string.Format("{0},7,1,9,", _nodeAddress);
             this.Send(s);
         }
         #endregion

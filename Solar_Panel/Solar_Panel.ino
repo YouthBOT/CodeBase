@@ -1,13 +1,15 @@
-//YBOT Tower Node Code
-//Uses Neo-Pixel for LEDS
-//Uses Audino CAN-Shield for CAN-BUS
-//1-wire for relay control
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// YBOT Comamnd Node Program
+/// Used to control the command node and send data to the Tower Nodes
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <SoftwareSerial.h>
 #include <mcp_can.h>
 #include <SPI.h>
 #include <string.h>
 #include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +23,7 @@ uint8_t stripLength = 32;
 //Pixels per ring
 uint8_t pixPerRing = 8;
 //Defines how bright each pixel should be.
-uint8_t brt = 50;
+uint8_t brt = 25;
 
 //Start NeoPixel library
 Adafruit_NeoPixel light = Adafruit_NeoPixel(stripLength, neoPixPin, NEO_GRB + NEO_KHZ800);
@@ -40,16 +42,13 @@ uint32_t off = light.Color(0, 0, 0);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region CANBUS Variables
 //Can-bus pin (Uno Shield pin 9 ; Leonardo Boards pin 17)
-uint8_t canPin = 17;
+uint8_t canPin = 9;
 //Can-bus Interrupt Pin (Uno Shield 0 ; Leonardo 4)
-uint8_t canIntrPin = 4;
+uint8_t canIntrPin = 0;
 //Tower Node Number
-//uint32_t nodeID = 10;
-uint32_t nodeID = (uint32_t)EEPROM.read(0);
-//Default Team's color is set automatically
-uint32_t defaultColor = red;
-//Red Side = 21 Green Side = 22 set automatically
-uint32_t defaultSide = 21;		
+uint32_t nodeID = 21;//(uint32_t)EEPROM.read(0);
+
+//uint32_t nodeID = 31;
 //Command Node Number
 uint32_t commandNode = 31;
 
@@ -64,7 +63,7 @@ uint8_t canLength = 0;
 //Read Buffer
 byte canIn[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 //Destination Node
-uint8_t destNode = 0;
+uint32_t destNode = 0;
 //Tower Node status 
 byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -75,11 +74,9 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
-uint8_t inputPins[6] = { 11, 10, 99, 99, 99, 99 };	//Green 10, Red 11
-//Output Pin number - Pin# of Output - 99 if not used
-uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
-//LED Pin number (Uno 13, Leonardo 23)
-uint8_t ledPin = 23;
+uint8_t inputPins[6] = { 10, 99, 99, 99, 99, 99 };
+//LED Pin number - 13 Uno - 23 Leonardo
+uint8_t ledPin = 13;
 //Button State of the Filtered Digital Inputs - 0 = open; 1 = closed
 byte inputStates[6] = { 0, 0, 0, 0, 0, 0 };
 byte outputState[6] = { 0, 0, 0, 0, 0, 0 };
@@ -88,6 +85,17 @@ uint8_t manPin = 6;
 uint8_t manTonPin = 4;
 int manTonState = 1;
 
+#pragma endregion
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// <summary> EEPROM Variables </summary>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma region EEPROM Variables
+
+const int CAN_NODE_ID_EEPROM_ADDRESS = 0;
+
+const int analog_MIN_RAW_EEPROM_ADDRESS = CAN_NODE_ID_EEPROM_ADDRESS + sizeof(byte);
+const int analog_MAX_RAW_EEPROM_ADDRESS = analog_MIN_RAW_EEPROM_ADDRESS + sizeof(int);
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,16 +113,14 @@ boolean fullPull = false;					//If Max pull was acheived
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-/// <summary> EEPROM Variables </summary>
+/// <summary> Serial Input Variables </summary>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma region EEPROM Variables
-
-const int CAN_NODE_ID_EEPROM_ADDRESS = 0;
-
-const int analog_MIN_RAW_EEPROM_ADDRESS = CAN_NODE_ID_EEPROM_ADDRESS + sizeof(byte);
-const int analog_MAX_RAW_EEPROM_ADDRESS = analog_MIN_RAW_EEPROM_ADDRESS + sizeof(int);
-#pragma endregion
-
+byte index = 0;		//Counter for serial data
+char inData[16];	//Incoming serial data
+boolean newserial = false;
+int xbRX = 2;		//xb RX pin
+int xbTX = 3;		//xb TX pin
+SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <summary> Program Flags Variables </summary>
@@ -130,41 +136,41 @@ uint8_t delayMultiplier = 0;		//Report Delay Multiplier
 int messagesSent = 0;
 int messagesRecieved = 0;
 
-
 boolean sunState = false;			//Sun's state True = on, False = off
-boolean alarmState = false;			//Alarm state True = on, False = off
+boolean alarmState = false;			//Alarm state True = on, False = offF
 boolean testedState = false;		//Tower's teseted state True = tested, False = not tested
+
+int currentLocation = 0;			//Current panel location in steps
+int sunTower = 0;					//Sun's tower number
+int sunLocation = 0;				//Sun's location in steps
+int alignment = 0;					//0 = not aligned, 1 = 10 degrees, 2 = 5 degrees, 3 = aligned
+int maxSteps = 400;					//Steps in 360 degrees
+int angle_1 = 11;					//First angle to start scoring 
+int angle_2 = 5;					//Second angle to score
+int angle_3 = 1;					//Aligned angle
+int maxSpeed = 5;					//Max speed delay (smaller = faster)
+int minSpeed = 100;					//Min speed delay (larger = slower)
+int dirPin = 8;						//Stepper Direction Pin
+int stepPin = 9;					//Stepper step Pin
+int potInputL = A1;					//Left Pot pin
+int potInputR = A2;					//Right Pot pin
+int potValL = 0;
+int potValR = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <method> Ardiuno Setup Method</method>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
-	int d = nodeID * 100; //stagger startup time
 	Serial.begin(115200);	//Start serial communication
-	delay(1000 + d); // Wait for power
+	xbSerial.begin(9600);	//Start xb serial communication
+
 	Serial.print("Node ID: ");
 	Serial.println(nodeID);
-
-	randomSeed(analogRead(1));
-
-	defaultColor = getDefaultColor();
-	if (defaultColor == red) defaultSide = 21;
-	else defaultSide = 22;
 
 	//Setup up and turn on the onboard LED to indicated power
 	pinMode(ledPin, OUTPUT);
 	digitalWrite(ledPin, HIGH);
-	//Set up Auto and Manual Pins
-	if ((nodeID == 3) || (nodeID == 8))
-	{
-		pinMode(autoPin, OUTPUT);
-		pinMode(manPin, OUTPUT);
-		digitalWrite(autoPin, LOW);
-		digitalWrite(manPin, LOW);
-		pinMode(manTonPin, INPUT_PULLUP);
-
-	}
 
 	//Setup NeoPixels and test them
 	Serial.println("Neopixel Test");
@@ -173,7 +179,7 @@ void setup()
 	testPattern();						//Test Neopixels
 	solidColor(red, 0, 0, stripLength); //Set all red to begin self check
 
-	//Setup up Inputs and test to see if they are in desired state
+	//Setup Inputs and test to see if they are in desired state
 	Serial.println("-----Inputs----");
 	for (int i = 0; i < sizeof(inputPins); i++)
 	{
@@ -193,7 +199,6 @@ void setup()
 			{
 				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));	//If okay light ring green
 				Serial.println(" - OK");
-
 			}
 			else
 			{
@@ -225,166 +230,144 @@ START_INIT:
 		goto START_INIT;												//If startup failed try again
 	}
 
-	attachInterrupt(canIntrPin, MCP2515_ISR, FALLING); // start interrupt for can-bus
-
 	// There are 2 mask in mcp2515
 	// Set both Masks
 	CAN.init_Mask(0, 0, 0x1f);
 	CAN.init_Mask(1, 0, 0x1f);
 
-	// set filter, we can receive id
-	CAN.init_Filt(0, 0, nodeID);                          // there are 6 filter in mcp2515
-	CAN.init_Filt(1, 0, 0x00);                            // there are 6 filter in mcp2515
+	// set filter, we can receive
+	CAN.init_Filt(0, 0, nodeID);							// there are 6 filter in mcp2515
+	//CAN.init_Filt(1, 0, 0x00);                            // there are 6 filter in mcp2515
 
-	CAN.init_Filt(2, 0, nodeID);                          // there are 6 filter in mcp2515
-	CAN.init_Filt(3, 0, 0x00);							  // there are 6 filter in mcp2515
-	CAN.init_Filt(4, 0, defaultSide);                          // there are 6 filter in mcp2515
-	CAN.init_Filt(5, 0, nodeID);                          // there are 6 filter in mcp2515
+	CAN.init_Filt(2, 0, nodeID);							// there are 6 filter in mcp2515
+	//CAN.init_Filt(3, 0, 0x00);							// there are 6 filter in mcp2515
+	//CAN.init_Filt(4, 0, 0x08);							// there are 6 filter in mcp2515
+	//CAN.init_Filt(5, 0, 0x09);							// there are 6 filter in mcp2515
 
-														  //Check to see if we can talk to the command node
-	delay(1000 * nodeID);								//Delay so all nodes don't talk at the same time				
-	uint32_t dA = address(commandNode, nodeID);		//create an unique address
-	CAN.sendMsgBuf(dA, 0, sizeof(canOut), canOut, 2); 	//Send a blank message
-	delay(100);										//Give the command node time to send it back
+	//Check to see if we can talk to the command node	
+	Serial.println("CAN-BUS Communication: Command Node");
 
-	if (canRecv)// check if get data
-	{
-		canRecv = 0;                   // clear flag
+	Serial.println("-----XBee-----");
+	xbSerial.println("");
 
-									   // iterate over all pending messages
-									   // If either the bus is saturated or the MCU is busy,
-									   // both RX buffers may be in use and reading a single
-									   // message does not clear the IRQ condition.
-		while (CAN_MSGAVAIL == CAN.checkReceive())
-		{
-			// read data,  canLength: data length, canIn: data incoming
-			CAN.readMsgBuf(&canLength, canIn);
-		}
-		wipeColor(green, 0, 0, firstPixel(3), lastPixel(3));	//If okay light ring green
-		Serial.println("Message Received");
-	}
-	else
-	{
-		wipeColor(yellow, 0, 0, firstPixel(3), lastPixel(3));  //If not okay light ring yellow
-		Serial.println("Nothing Received");
-	}
+	//Solar Panel Pins
+	pinMode(dirPin, OUTPUT);
+	pinMode(stepPin, OUTPUT);
+	pinMode(ledPin, OUTPUT);
 
-	delay(10000); //Visual Delay
+
+	delay(2000); //Visual Delay
 
 	solidColor(off, 0, 0, stripLength);	//Turn off light
 
-	
-	//Calibrate Tower
-	Serial.println("-----Calibrate Tower----");
-
-	pinMode(analog_PIN, INPUT);            //Set analog pin
-	Serial.println("Calibration");
-
-	EEPROM.get(analog_MIN_RAW_EEPROM_ADDRESS, minRaw);
-	EEPROM.get(analog_MAX_RAW_EEPROM_ADDRESS, maxRaw);
-
-	//values in EEPROM are uninitialized
-	if ((maxRaw == 0.0) || (minRaw == 0.0))
-	{
-		solidColor(yellow, 0, 0, stripLength); //Light tower yellow to indicate calibration is needed
-		scaleFactor = 0.0f;
-		calibrate(maxRange);
-	}
-	else
-	{
-		scaleFactor = (float)maxRange / (float)(maxRaw - minRaw);
-		wipeColor(green, 0, 0, 0, stripLength);   //Light tower green to show tower is calibrated         
-		delay(1000);                    //Visual Delay
-		wipeColor(green, 0, 0, 0, stripLength);                
-	}
-	//Output for debugging
-	Serial.println(minRaw);
-	Serial.println(maxRaw);
-	Serial.println(scaleFactor);
-	Serial.println("Finished Calibration");
-
-	analogMaxPulled = 0;                    //Reset max pull
-
+	homePanel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-/// <method> Ardiuno Main Loop Method</method>
+/// <method> Main Loop </method>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
-	//While there is data in the buffers
+	//While there is CANBUS data available
 	while (CAN_MSGAVAIL == CAN.checkReceive())
 	{
-		// read data,  canLength: data length, canIn: data incoming
+		// read data,  len: data length, incoming: data incoming
 		CAN.readMsgBuf(&canLength, canIn);
 		messagesRecieved++;
-		//Process incoming data
-		execute();
+		execute();				//Execute new message
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// Main Game Code Bellow
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	if (function == 8)
+	if (newserial)
 	{
-		if (functionMode == 1) gamePlayRandomTest();
-		else if (functionMode == 2) gamePlaySpeedTest();
-	}
-	if (function == 9)
-	{
-		if (functionMode == 1) NetworkResponseTest();
-		else if (functionMode == 2) NetworkSpeedTest();
-	}
-	else gamePlayCanbus();
+		newserial = false;
 
-	//Watch for Player station button
-	if (gameMode == 3)
-	{
-		if  ((nodeID == 3) || (nodeID == 8))
+		//If message is for the command node process the data
+		if (destNode == nodeID)
 		{
-			int oldState = manTonState;
-			manTonState = digitalRead(manTonPin);
-
-			//If Pressed Start Mantonomous Mode for that side of the field
-			if (oldState != manTonState)
+			for (uint8_t i = 0; i < sizeof(canIn); i++)
 			{
-				Serial.println(manTonState);
+				canIn[i] = canOut[i];	//Move message to canIn
+			}
+			execute();					//Execute Command
+		}
+		else if (destNode > 19)			//It's an xbee node
+		{
+			for (uint8_t i = 0; i < sizeof(canIn); i++)
+			{
+				xbSerial.print(canOut[i]);	//send data
+			}
+			xbSerial.println();
+		}
+		else							//Else send it out
+		{
+			messagesSent++;
+			uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
+			CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
+		}
+	}
 
-				if (manTonState == 0)
+	while (Serial.available())
+	{
+		char aChar = Serial.read();		//Read data
+
+		if (aChar == '$')
+		{
+			inData[0] = aChar;
+			index = 1;
+		}
+		else								//If no new line keep collecting the serial data
+		{
+			if (inData[0] = '$')
+			{
+				if (aChar == '\n')				//If there is a new line
 				{
-					nodeStatus[3] = 4;
-					report(0, commandNode);
-					StartManTon();
-					gameModeChanged = true;
-					gameMode = 4;
+					parseData();				//Parse the data that was received
+					newserial = true;
+				}
+				else
+				{
+					inData[index] = aChar;			//Add next character received to the buffer
+					index++;						//Increment index
+					inData[index] = '\0';			//Keep NULL Terminated as last the last character
 				}
 			}
 		}
 	}
-}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/// <method>Mcp2515isr()</method>
-///
-/// <summary>	YBOT, 11/20/2015. </summary>
-////////////////////////////////////////////////////////////////////////////////////////////////////
-void MCP2515_ISR()
-{
-	canRecv = 1;	//Set Receive Flag to one when interrupt is triggered
-}
+	while (xbSerial.available())
+	{
+		char aChar = Serial.read();		//Read data
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/// <method>getDefaultColor()</method>
-///
-/// <summary>	returns the color of the tower </summary>
-////////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t getDefaultColor()
-{
-	uint32_t color;
-	if (nodeID < 6) color = red;
-	else color = green;
+		if (aChar == '$')
+		{
+			inData[0] = aChar;
+			index = 1;
+		}
+		else								//If no new line keep collecting the serial data
+		{
+			if (inData[0] = '$')
+			{
+				if (aChar == '\n')				//If there is a new line
+				{
+					parseData();				//Parse the data that was received
+					newserial = true;
+				}
+				else
+				{
+					inData[index] = aChar;			//Add next character received to the buffer
+					index++;						//Increment index
+					inData[index] = '\0';			//Keep NULL Terminated as last the last character
+				}
+			}
+		}
+	}
 
-	return color;
+	if (function == 9)
+	{
+		if (functionMode == 5) NetworkResponseTest();
+		else if (functionMode == 6) NetworkSpeedTest();
+	}
+	else gamePlayCanbus();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -462,22 +445,30 @@ void execute()
 		{
 			towerSelected = true;
 			selectedState = canIn[2];
-			if (selectedState == 1)
+			if (selectedState = 1)
 			{
 				wipeColor(yellow, 0, 1, firstPixel(3), lastPixel(4));
 				sunState = true;
 			}
-			else if (selectedState == 2)
+			else if (selectedState = 2)
 			{
 				wipeColor(red, 0, 1, firstPixel(2), lastPixel(2));
 				alarmState = true;
 			}
-			else if (selectedState == 9)
+			else if (selectedState = 3)
+			{
+				homePanel();
+			}
+			else if (selectedState = 4)
+			{
+				towerLocation(canIn[3]);
+			}
+			else if (selectedState = 9)
 			{
 				//Don't calibrate FoS in game
 				if ((gameMode != 2) && (gameMode != 3) && (gameMode != 4) && (gameMode != 5))
 				{
-					calibrate(maxRange);			// Calibrate and set range
+					//calibrate(maxRange);			// Calibrate and set range
 				}
 			}
 			else
@@ -499,12 +490,70 @@ void execute()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+/// <method>parseData() </method>
+///
+/// <summary>Used to Parse Incoming Serial Data </summary>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void parseData()
+{
+	char *token = NULL;		//Set pointer
+
+	int counter = 0;
+
+
+	//If not NULL
+	if (inData[0] == '$')
+	{ 
+		//Break data at commas
+		token = strtok(inData, ",");
+		token = strtok(NULL, ",");	//Break at the next comma
+
+		destNode = atoi(token);		//Convert message to number: First message is Destination Node
+		token = strtok(NULL, ",");	//Break at the next comma
+									//Iterate through the message storing each part of the message in the canOut buffer
+		for (uint8_t i = 0; i < sizeof(canOut); i++)
+		{
+			//If token is not NULL
+			if (token != NULL)
+			{
+				canOut[i] = atoi(token);		//Store this part in the current canOut byte
+				token = strtok(NULL, ",");		//Break at the next comma
+			}
+			else
+			{
+				canOut[i] = 0;					//If the message is Null set to zero
+			}
+		}
+
+		//Use for debugging
+		//Serial.print("Destination Node#");
+		//Serial.print(destNode);
+		//Serial.print(" : Message = ");
+		//for (int i = 0; i < 8; i++)
+		//{
+		//	Serial.print(canOut[i]);
+		//	Serial.print("|");
+		//}
+		//Serial.println();
+	}
+
+	index = 0;
+
+	for (uint8_t i = 0; i < sizeof(inData); i++)
+	{
+		inData[i] = '\0';
+	}
+
+
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <method>Change Game Modes </method>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-//Game Mode for Canbus only
 void gamePlayCanbus()
 {
-	if (gameMode == 1)	//Ready
+	if (gameMode == 1)	//Standby
 	{
 		if (gameModeChanged)
 		{
@@ -512,7 +561,6 @@ void gamePlayCanbus()
 			wipeColor(off, 0, 1, 0, stripLength);
 			gameModeChanged = false;
 			fullPull = false;
-			defaultColor = getDefaultColor();
 			nodeStatus[6] = 0;
 			nodeStatus[7] = 0;
 			complete = false;
@@ -520,144 +568,36 @@ void gamePlayCanbus()
 	}
 	else if (gameMode == 2)	//Start
 	{
-		//not used at this time
+		homePanel();
 	}
 	else if (gameMode == 3)	//Autonomous
 	{
 		if (gameModeChanged)
 		{
-			wipeColor(blue, 0, 1, 0, stripLength);
-
 			gameModeChanged = false;
 			complete = false;
 			fullPull = false;
 			nodeStatus[6] = 0;
 			nodeStatus[7] = 0;
 			//nodeStatus[4] = 0;
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, LOW);
-			}
 		}
 
 		if (!complete)
 		{
-			if (testedState)
-			{
-				getScaledAnalog();
-				if (fullPull)
-				{
-					nodeStatus[7] = 0;
-					alarmState = false;
-					report(0, commandNode);
-					wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
-					complete = true;
-				}
-			}
-			else
-			{
-				//If beam is broken
-				byte oldState = inputStates[0];
-				updateInputs();
 
-				if (oldState != inputStates[0])
-				{
-					if (checkInput(0))
-					{
-						nodeStatus[7] = 8;
-						report(0, commandNode);
-						testedState = true;
-						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
-					}
-				}
-			}
 		}
 	}
 	else if (gameMode == 4)	//Man-Tonomous
 	{
-		if (gameModeChanged)
-		{
-			gameModeChanged = false;
-			complete = false;
 
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
-		}
-
-		if (!complete)
-		{
-			//ManTonomous Code Here
-		}
 	}
 	else if (gameMode == 5)	//Manual Mode
 	{
-		if (gameModeChanged)
-		{
-			wipeColor(blue, 0, 1, 0, stripLength);
 
-			gameModeChanged = false;
-			complete = false;
-			fullPull = false;
-			nodeStatus[6] = 0;
-			nodeStatus[7] = 0;
-			//nodeStatus[4] = 0;
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, LOW);
-			}
-		}
-
-		if (!complete)
-		{
-			if (testedState)
-			{
-				getScaledAnalog();
-				if (fullPull)
-				{
-					nodeStatus[7] = 0;
-					alarmState = false;
-					report(0, commandNode);
-					wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
-					complete = true;
-				}
-			}
-			else
-			{
-				//If beam is broken
-				byte oldState = inputStates[0];
-				updateInputs();
-
-				if (oldState != inputStates[0])
-				{
-					if (checkInput(0))
-					{
-						nodeStatus[7] = 8;
-						report(0, commandNode);
-						testedState = true;
-						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
-					}
-				}
-			}
-		}
 	}
 	else if (gameMode == 6)	//End
 	{
-		if (gameModeChanged)
-		{
-			gameModeChanged = false;
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, LOW);
-				digitalWrite(manPin, LOW);
-			}
-		}
+
 	}
 	else if (gameMode == 7)	//Field Off
 	{
@@ -671,7 +611,6 @@ void gamePlayCanbus()
 				digitalWrite(manPin, LOW);
 			}
 		}
-
 	}
 	else if (gameMode == 8)	//Debug Mode
 	{
@@ -679,319 +618,104 @@ void gamePlayCanbus()
 		{
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(blue, 0, 1, 0, stripLength);
+			wipeColor(off, 0, 1, 0, stripLength);
 			gameModeChanged = false;
+		}
 
-			if ((nodeID == 3) || (nodeID == 8))
+		if (!complete)
+		{
+			potValL = analogRead(potInputL);
+			potValR = analogRead(potInputR);
+
+			int potVal = 0;
+			if (potValL > 600 || potVal < 500) potVal = potValL;
+			else potVal = potValR;
+
+			if (potVal > 600)
 			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
+				digitalWrite(dirPin, HIGH);
+				if (potVal > 950) potVal = 1000;
+
+				int stepDelay = map(potVal, 600, 1000, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation++;
+				if (currentLocation > maxSteps) currentLocation = 1;
+
 			}
-		}
-		int pullValue = getScaledAnalog();
-		if (pullValue >= (maxRange-1)) fullPull = true;
-
-		if (fullPull)
-		{
-			nodeStatus[7] = 0;
-			alarmState = false;
-			report(0, commandNode);
-			wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
-			fullPull = false;
-			delay(10);
-		}
-		else
-		{
-			nodeStatus[7] = 1;
-			alarmState = true;
-			report(0, commandNode);
-			wipeColor(red, 0, 0, firstPixel(2), lastPixel(2));
-		}
-
-
-		//If beam is broken
-		byte oldState = inputStates[0];
-		updateInputs();
-
-		if (oldState != inputStates[0])
-		{
-			if (checkInput(0))
+			else if (potVal < 500)
 			{
-				nodeStatus[7] = 8;
-				report(0, commandNode);
-				testedState = true;
-				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+				digitalWrite(dirPin, LOW);
+				if (potVal < 100)potVal = 0;
+				int stepDelay = map(potVal, 500, 0, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation--;
+				if (currentLocation < 1) currentLocation = maxSteps;
+			}
+
+			int max = sunLocation + angle_1;
+			int min = sunLocation - angle_1;
+
+			if (max > maxSteps)
+			{
+				int limitShift = max - maxSteps;
+
+				if (currentLocation < limitShift)
+				{
+					int delta = abs((currentLocation + maxSteps) - sunLocation);
+					int ledPower = map(delta, 0, angle_1, 255, 0);
+					analogWrite(ledPin, ledPower);
+				}
+				else if (currentLocation > min)
+				{
+					int delta = abs(sunLocation - currentLocation);
+					int ledPower = map(delta, 0, angle_1, 255, 0);
+					analogWrite(ledPin, ledPower);
+				}
+				else
+				{
+					analogWrite(ledPin, LOW);
+				}
+			}
+			else if ((currentLocation > min) && (currentLocation < max))
+			{
+				int delta = abs(sunLocation - currentLocation);
+				int ledPower = map(delta, 0, solarViewSteps, 255, 0);
+				analogWrite(ledPin, ledPower);
 			}
 			else
 			{
-				nodeStatus[7] = 9;
-				report(0, commandNode);
-				testedState = false;
-				wipeColor(red, 0, 0, firstPixel(1), lastPixel(1));
+				analogWrite(ledPin, LOW);
 			}
 		}
+
 	}
 	else  //Reset	
 	{
 		fieldReset();
-	}
-}
-
-//Game Play Test Mode - All towers randomly respond 
-void gamePlayRandomTest()
-{
-	if (gameMode == 1)	//Ready
-	{
 		if (gameModeChanged)
 		{
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
-			gameModeChanged = false;
-			complete = false;
-		}
-	}
-	else if (gameMode == 2)	//Start
-	{
-		//not used at this time
-	}
-	else if (gameMode == 3)	//Autonomous
-	{
-		if (gameModeChanged)
-		{
-			solidColor(blue, 0, 0, stripLength);
-			gameModeChanged = false;
+			messagesRecieved = 0;
+			messagesSent = 0;
 
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, LOW);
-			}
-		}
-
-
-		if (!complete)
-		{
-			//Auto Test Code
-		}
-	}
-	else if (gameMode == 4)	//Man-Tonomous
-	{
-		if (gameModeChanged)
-		{
-			gameModeChanged = false;
-			complete = false;
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
-		}
-
-		if (!complete)
-		{
-			//ManTon Test Code
-		}
-	}
-	else if (gameMode == 5)	//Manual Mode
-	{
-		if (gameModeChanged)
-		{
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
-			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
-			gameModeChanged = false;
-			complete = false;
-		}
-
-		if (!complete)
-		{
-			//Manual Test Coe
-		}
-	}
-	else if (gameMode == 6)	//End
-	{
-		if (gameModeChanged)
-		{
-			gameModeChanged = false;
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, LOW);
-				digitalWrite(manPin, LOW);
-			}
-		}
-	}
-	else if (gameMode == 7)	//Field Off
-	{
-		if (gameModeChanged)
-		{
 			solidColor(off, 0, 0, stripLength);
+			towerSelected = false;
+			updateInputs();
 			gameModeChanged = false;
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, LOW);
-				digitalWrite(manPin, LOW);
-			}
 		}
+	}
 
-	}
-	else if (gameMode == 8)	//Debug Mode
-	{
-		if (gameModeChanged)
-		{
-			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
-			gameModeChanged = false;
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
-		}
-		
-		//Debug Test code
-	}
-	else  //Reset	
-	{
-		fieldReset();
-	}
-}
-
-//Game Play Test Mode - All Towers Respond at the same time with default color
-void gamePlaySpeedTest()
-{
-	if (gameMode == 1)	//Ready
-	{
-		if (gameModeChanged)
-		{
-			wipeColor(red, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
-			gameModeChanged = false;
-			complete = false;
-		}
-	}
-	else if (gameMode == 2)	//Start
-	{
-		//not used at this time
-	}
-	else if (gameMode == 3)	//Autonomous
-	{
-		if (gameModeChanged)
-		{
-			solidColor(blue, 0, 0, stripLength);
-			gameModeChanged = false;
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, LOW);
-			}
-		}
-		if (!complete)
-		{
-			//Auto Test Coe
-		}
-	}
-	else if (gameMode == 4)	//Man-Tonomous
-	{
-		if (gameModeChanged)
-		{
-			gameModeChanged = false;
-			complete = false;
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
-		}
-		if (!complete) 
-		{
-			//Auto Test Code
-		}
-	}
-	else if (gameMode == 5)	//Manual Mode
-	{
-		if (gameModeChanged)
-		{
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
-			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
-			gameModeChanged = false;
-			complete = false;
-		}
-
-		if (!complete)
-		{
-			//Manual Test Code
-		}
-	}
-	else if (gameMode == 6)	//End
-	{
-		if (gameModeChanged)
-		{
-			gameModeChanged = false;
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, LOW);
-				digitalWrite(manPin, LOW);
-			}
-		}
-	}
-	else if (gameMode == 7)	//Field Off
-	{
-		if (gameModeChanged)
-		{
-			solidColor(off, 0, 0, stripLength);
-			gameModeChanged = false;
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, LOW);
-				digitalWrite(manPin, LOW);
-			}
-		}
-
-	}
-	else if (gameMode == 8)	//Debug Mode
-	{
-		if (gameModeChanged)
-		{
-			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
-			gameModeChanged = false;
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
-		}
-		//Debug Code
-	}
-	else  //Reset	
-	{
-		fieldReset();
-	}
-}
-
-//Starts Mantonomous Mode on default Color's Side of the field
-void StartManTon()
-{
-	Serial.println("Monton Message Sent");
-	int r = random(1, 51);
-	uint32_t dA = address(defaultSide, nodeID);
-	byte message[8] = { 2, 4, 0, 0, 0, 0, 0, 0 };	//Change Game Mode on all tower on this side of the field
-	delay(r * delayMultiplier);
-	CAN.sendMsgBuf(dA, 0, sizeof(message), message, 2);	//Send message
 }
 
 //Sends out one message when placed in Start
@@ -1034,8 +758,8 @@ void NetworkResponseTest()
 	{
 		if (gameModeChanged)
 		{
-			messagesSent = 0;
 			messagesRecieved = 0;
+			messagesSent = 0;
 			nodeStatus[7] = messagesSent;
 			nodeStatus[6] = messagesRecieved;
 
@@ -1069,7 +793,7 @@ void NetworkSpeedTest()
 			complete = false;
 		}
 
-		if(messagesSent < 255)
+		if (messagesSent < 255)
 		{
 			messagesSent++;
 			nodeStatus[7] = messagesSent;
@@ -1091,8 +815,8 @@ void NetworkSpeedTest()
 	{
 		if (gameModeChanged)
 		{
-			messagesSent = 0;
 			messagesRecieved = 0;
+			messagesSent = 0;
 			nodeStatus[7] = messagesSent;
 			nodeStatus[6] = messagesRecieved;
 
@@ -1155,6 +879,9 @@ void neoPix()
 	{
 		testPattern();														//Run Test Pattern
 	}
+
+	nodeStatus[1] = _color;													//Update color status
+	nodeStatus[2] = _mode;													//Update mode status
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1267,7 +994,7 @@ void wipeColor(uint32_t _color, uint8_t _wait, uint8_t _times, uint8_t _startPix
 	nodeStatus[2] = 4;
 
 	//If wait is zero set to defualt
-	if (_wait == 0) _wait = 10;
+	if (_wait == 0) _wait = 20;
 
 	//if time is zero set to 1 so it will at least do it once
 	if (_times == 0) _times = 1;
@@ -1400,22 +1127,33 @@ void flashColorLatch(uint32_t _color, uint8_t _wait, uint8_t _times, uint8_t _st
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void report(uint8_t check, uint32_t dAddress)
 {
-	int r = random(1, 11);
 	if (check) updateInputs();									//Update Inputs
 	uint32_t dA = address(dAddress, nodeID);					//Get address
-	//delay(r * delayMultiplier);									//Delay a random amount of time
-	delay(delayMultiplier);
 	int stat = CAN_FAIL;
 	int timeOut = 0;
 
-	do
+	if (dAddress != nodeID)
 	{
-		timeOut++;
+		uint32_t dA = address(dAddress, nodeID);				//Get address
 		stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus, 2);	//Send message using only one buffer
-		//Serial.print(messagesSent);
-		//Serial.print(" - Stat = ");
-		//Serial.println(stat);
-	} while ((stat != CAN_OK) && (timeOut < 5));
+
+		//do
+		//{
+		//	timeOut++;
+		//	stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus);	//Send message using only one buffer
+		//} while ((stat != CAN_OK) && (timeOut < TIMEOUTVALUE));
+	}
+	else
+	{
+		Serial.print(commandNode);
+		Serial.print(",");
+		for (int i = 0; i < sizeof(nodeStatus); i++)
+		{
+			Serial.print(nodeStatus[i]);
+			Serial.print(",");
+		}
+		Serial.println();
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1490,6 +1228,11 @@ void fieldReset()
 		updateInputs();
 		gameModeChanged = false;
 
+		currentLocation = 0;			//Current panel location in steps
+		sunTower = 0;					//Sun's tower number
+		sunLocation = 0;				//Sun's location in steps
+		alignment = 0;					//0 = not aligned, 1 = 10 degrees, 2 = 5 degrees, 3 = aligned
+
 		alarmState = false;
 		sunState = false;
 		testedState = false;
@@ -1532,9 +1275,12 @@ uint32_t address(uint32_t _destination, uint32_t _id)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 uint32_t sendingNode()
 {
-	uint32_t node = CAN.getCanId();	//Get whole ID
-	node = (node >> 5);
-	return node;				//Last 5 bits are the sending nodes ID
+	if (destNode != nodeID)
+	{
+		uint32_t node = CAN.getCanId();	//Get whole ID
+		return node >> 5;				//Last 5 bits are the sending nodes ID
+	}
+	else return nodeID;
 }
 
 void ChangeBaudRate(byte rate)
@@ -1557,115 +1303,52 @@ void ChangeBaudRate(byte rate)
 #pragma endregion
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-/// <method>analog Methods - Code from Rick Hayie's Example</method>
+/// <method>Solar Panel</method>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma region analog Methods
+#pragma region Solar Panel
 
-//******************************************************************
-// Method:		calibrate()
-//
-// Description:	Determine the minimum and maximum readings obtained 
-//				from the feat of strength and scale to the desired range
-// 
-// rangeMax:	The high end of the desired range
-//******************************************************************
-void calibrate(byte rangeMax)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// <method>	homePanel() </method>
+///
+/// <summary>	used to home the solar panel </summary>
+///
+/// <returns>	nothing </returns>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void homePanel()
 {
-	int current = getRawanalog();		// Digitized reading from the analog
-	long start;						// Beginning of calibration periods
-	wipeColor(yellow, 0, 0, 0, stripLength);		//Light Yellow to show calibration is needed
-
-	minRaw = 325;
-	maxRaw = 325;
-	scaleFactor = 0;
-
-	while (current > 300)			// Wait here until for ring to be pulled
+	do
 	{
-		current = getRawanalog();
-	}
-	Serial.println("Start Calibration");
+		digitalWrite(dirPin, HIGH);
 
-	while (current < 325)			// Pull ring fully then let go
-	{								// to establish minimum value
-		current = getRawanalog();
-		// Keep track of the lowest reading
-		// Reading is inversely proportional to extension
-		if (current < minRaw)		// If reading is smaller, save it
-		{
-			minRaw = current;
-			//Serial.print("minRaw = ");
-			//Serial.println(minRaw);
-		}
-	}
+		digitalWrite(stepPin, HIGH);
+		delay(20);
 
-	start = millis() + 1000;
-	while (start > millis())		// Allow time to establish maximum value
-	{
-		current = getRawanalog();		// Ring should be released by this point
-		if (current > maxRaw)
-		{
-			maxRaw = current;		// If reading is larger, save it
-									//Serial.print("maxRaw = ");
-									//Serial.println(minRaw);
-		}
-	}
+		digitalWrite(stepPin, LOW);
+		delay(20);
 
-	maxRaw -= 30;	                //Reduced to help with jitter.
+	} while (checkInput(0));
 
-	scaleFactor = (float)rangeMax / (float)(maxRaw - minRaw);	// Make a scale factor
-																// Output for debugging
-
-	wipeColor(off, 0, 0, 0, stripLength);              //wipe analog gauge off to show that calibration is complete
-
-	EEPROM.put(analog_MIN_RAW_EEPROM_ADDRESS, minRaw);
-	EEPROM.put(analog_MAX_RAW_EEPROM_ADDRESS, maxRaw);
-
-	// Output for debugging
-	Serial.println(minRaw);
-	Serial.println(maxRaw);
-	Serial.println(scaleFactor);
-	Serial.println("Finished Calibration");
+	currentLocation = 0;
+	
 }
 
-//*****************************************************
-// Method:		getRawanalog()
-//
-// Description:	gets and averages unscaled readings
-// 
-// Returns:		The average of several readings
-//*****************************************************
-int getRawanalog()
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// <method>	towerLocation() </method>
+///
+/// <summary>	used to home the solar panel </summary>
+///
+/// <returns>	tower location in steps </returns>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+int towerLocation(int towerNum)
 {
-	float total = 0;	// Accumulation of readings
-	byte result;		// Average of readings
-	byte count = 20;	// Number of readings to take
-
-	for (int i = 0; i<count; i++)
-	{
-		total += (float)analogRead(analog_PIN);
-	}
-	total = total / (float)(count - 1);
-	return (int)total;
-}
-
-//*****************************************************
-// Method:		getScaledanalog()
-//
-// Description:	Converts the raw digitized position of
-//				the ring pull to begin at zero and end
-//				at the predetermined maximum value with
-//				zero being the relaxed position
-//
-// Returns:		The scaled and translated value
-//*****************************************************
-int getScaledAnalog()
-{
-	int result = (maxRaw - getRawanalog())*scaleFactor;
-	if (result<1) result = 0;	// No negative values
-	return result;
+	sunLocation = towerNum / maxSteps;
+	return sunLocation;
 }
 
 #pragma endregion
 
 
 
+/*********************************************************************************************************
+END FILE
+*********************************************************************************************************/

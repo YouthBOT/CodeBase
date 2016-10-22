@@ -730,7 +730,7 @@
             this.btnFunction_1.Name = "btnFunction_1";
             this.btnFunction_1.Size = new System.Drawing.Size(90, 50);
             this.btnFunction_1.TabIndex = 2;
-            this.btnFunction_1.Text = "Not Assigned";
+            this.btnFunction_1.Text = "Calibrate";
             this.btnFunction_1.UseVisualStyleBackColor = true;
             this.btnFunction_1.Click += new System.EventHandler(this.btnCalibrateFos_Click);
             // 
