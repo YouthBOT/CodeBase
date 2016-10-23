@@ -74,7 +74,7 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
-uint8_t inputPins[6] = { 10, 99, 99, 99, 99, 99 };
+uint8_t inputPins[6] = { 12, 99, 99, 99, 99, 99 };
 //LED Pin number - 13 Uno - 23 Leonardo
 uint8_t ledPin = 13;
 //Button State of the Filtered Digital Inputs - 0 = open; 1 = closed
@@ -150,8 +150,8 @@ int angle_2 = 5;					//Second angle to score
 int angle_3 = 1;					//Aligned angle
 int maxSpeed = 5;					//Max speed delay (smaller = faster)
 int minSpeed = 100;					//Min speed delay (larger = slower)
-int dirPin = 8;						//Stepper Direction Pin
-int stepPin = 9;					//Stepper step Pin
+int dirPin = 10;						//Stepper Direction Pin
+int stepPin = 11;					//Stepper step Pin
 int potInputL = A1;					//Left Pot pin
 int potInputR = A2;					//Right Pot pin
 int potValL = 0;
@@ -691,7 +691,7 @@ void gamePlayCanbus()
 			else if ((currentLocation > min) && (currentLocation < max))
 			{
 				int delta = abs(sunLocation - currentLocation);
-				int ledPower = map(delta, 0, solarViewSteps, 255, 0);
+				int ledPower = map(delta, 0, angle_1, 255, 0);
 				analogWrite(ledPin, ledPower);
 			}
 			else

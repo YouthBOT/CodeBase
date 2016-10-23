@@ -527,6 +527,7 @@ void gamePlayCanbus()
 		if (gameModeChanged)
 		{
 			wipeColor(blue, 0, 1, 0, stripLength);
+			solidColor(red, 0, firstPixel(1), lastPixel(1));
 
 			gameModeChanged = false;
 			complete = false;
@@ -544,9 +545,14 @@ void gamePlayCanbus()
 
 		if (!complete)
 		{
+			//If the tower has been tested look to see if the valve has opened.
 			if (testedState)
 			{
-				getScaledAnalog();
+				//Get value of Pot
+				int pullValue = getScaledAnalog();
+				if (pullValue >= (maxRange - 1)) fullPull = true;
+
+				//If valve is fully opened
 				if (fullPull)
 				{
 					nodeStatus[7] = 0;
@@ -558,12 +564,13 @@ void gamePlayCanbus()
 			}
 			else
 			{
-				//If beam is broken
+				//Recored old state and check current state
 				byte oldState = inputStates[0];
 				updateInputs();
-
+				//If state has changed
 				if (oldState != inputStates[0])
 				{
+					//If beam is broken
 					if (checkInput(0))
 					{
 						nodeStatus[7] = 8;
@@ -596,16 +603,28 @@ void gamePlayCanbus()
 	}
 	else if (gameMode == 5)	//Manual Mode
 	{
+		int oldPull = 0;
 		if (gameModeChanged)
 		{
 			wipeColor(blue, 0, 1, 0, stripLength);
 
+			//If tower has been tested set ring to green else set it to red
+			if(testedState) solidColor(green, 0, firstPixel(1), lastPixel(1));
+			else solidColor(red, 0, firstPixel(1), lastPixel(1));
+
+			//Reset flags
 			gameModeChanged = false;
 			complete = false;
-			fullPull = false;
 			nodeStatus[6] = 0;
 			nodeStatus[7] = 0;
 			//nodeStatus[4] = 0;
+
+			//Get current pull value so we can see if it has been moved
+			int pullValue = getScaledAnalog();
+			if (pullValue >= (maxRange - 1)) fullPull = true;
+			else fullPull = false;
+			oldPull = pullValue;
+
 
 			if ((nodeID == 3) || (nodeID == 8))
 			{
@@ -618,14 +637,23 @@ void gamePlayCanbus()
 		{
 			if (testedState)
 			{
-				getScaledAnalog();
-				if (fullPull)
+				int pullValue = getScaledAnalog();
+
+				//If the device has moved
+				if (pullValue != oldPull)
 				{
-					nodeStatus[7] = 0;
-					alarmState = false;
-					report(0, commandNode);
-					wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
-					complete = true;
+					//If it has been moved to a full pull 
+					if (pullValue >= (maxRange - 1)) fullPull = true;
+
+					//Report if full pull
+					if (fullPull)
+					{
+						nodeStatus[7] = 0;
+						alarmState = false;
+						report(0, commandNode);
+						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+						complete = true;
+					}
 				}
 			}
 			else
@@ -639,7 +667,7 @@ void gamePlayCanbus()
 					if (checkInput(0))
 					{
 						nodeStatus[7] = 8;
-						report(0, commandNode);
+						//report(0, commandNode);
 						testedState = true;
 						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
 					}
