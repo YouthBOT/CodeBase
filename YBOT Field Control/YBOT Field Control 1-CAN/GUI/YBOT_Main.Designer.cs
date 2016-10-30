@@ -100,6 +100,7 @@
             this.lblDelayMultiplier = new System.Windows.Forms.Label();
             this.tbDelayMultiplier = new System.Windows.Forms.TextBox();
             this.displayUpdateTimer = new System.Windows.Forms.Timer(this.components);
+            this.btnSetSunLocation = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDG)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDS)).BeginInit();
             this.cmGridRightClick.SuspendLayout();
@@ -206,12 +207,12 @@
             this.tsmDeleteRow,
             this.setTypeToolStripMenuItem});
             this.cmGridRightClick.Name = "cmGridRightClick";
-            this.cmGridRightClick.Size = new System.Drawing.Size(134, 48);
+            this.cmGridRightClick.Size = new System.Drawing.Size(120, 48);
             // 
             // tsmDeleteRow
             // 
             this.tsmDeleteRow.Name = "tsmDeleteRow";
-            this.tsmDeleteRow.Size = new System.Drawing.Size(133, 22);
+            this.tsmDeleteRow.Size = new System.Drawing.Size(119, 22);
             this.tsmDeleteRow.Text = "Delete Row";
             this.tsmDeleteRow.Click += new System.EventHandler(this.tsmDeleteRow_Click);
             // 
@@ -222,26 +223,26 @@
             this.xBeeToolStripMenuItem,
             this.wiFiToolStripMenuItem});
             this.setTypeToolStripMenuItem.Name = "setTypeToolStripMenuItem";
-            this.setTypeToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.setTypeToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
             this.setTypeToolStripMenuItem.Text = "Set Type";
             // 
             // cANBUSToolStripMenuItem
             // 
             this.cANBUSToolStripMenuItem.Name = "cANBUSToolStripMenuItem";
-            this.cANBUSToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.cANBUSToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.cANBUSToolStripMenuItem.Text = "CANBUS";
             this.cANBUSToolStripMenuItem.Click += new System.EventHandler(this.cANBUSToolStripMenuItem_Click);
             // 
             // xBeeToolStripMenuItem
             // 
             this.xBeeToolStripMenuItem.Name = "xBeeToolStripMenuItem";
-            this.xBeeToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.xBeeToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.xBeeToolStripMenuItem.Text = "XBee";
             // 
             // wiFiToolStripMenuItem
             // 
             this.wiFiToolStripMenuItem.Name = "wiFiToolStripMenuItem";
-            this.wiFiToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.wiFiToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.wiFiToolStripMenuItem.Text = "WiFi";
             // 
             // gbLightControls
@@ -661,6 +662,7 @@
             // 
             // gbFieldFunctions
             // 
+            this.gbFieldFunctions.Controls.Add(this.btnSetSunLocation);
             this.gbFieldFunctions.Controls.Add(this.btnTransmitterOff);
             this.gbFieldFunctions.Controls.Add(this.btnTransmitterAuto);
             this.gbFieldFunctions.Controls.Add(this.btnTransmitterManual);
@@ -864,6 +866,16 @@
             this.displayUpdateTimer.Interval = 11;
             this.displayUpdateTimer.Tick += new System.EventHandler(this.displayUpdateTimer_Tick);
             // 
+            // btnSetSunLocation
+            // 
+            this.btnSetSunLocation.Location = new System.Drawing.Point(112, 131);
+            this.btnSetSunLocation.Name = "btnSetSunLocation";
+            this.btnSetSunLocation.Size = new System.Drawing.Size(90, 50);
+            this.btnSetSunLocation.TabIndex = 8;
+            this.btnSetSunLocation.Text = "Set Sun Location";
+            this.btnSetSunLocation.UseVisualStyleBackColor = true;
+            this.btnSetSunLocation.Click += new System.EventHandler(this.btnSetSunLocation_Click);
+            // 
             // YBOT_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -972,6 +984,7 @@
         private System.Windows.Forms.Button btnLogData;
         private System.Windows.Forms.CheckBox cbRTSenable;
         private System.Windows.Forms.CheckBox cbDTRenable;
+        private System.Windows.Forms.Button btnSetSunLocation;
     }
 }
 

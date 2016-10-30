@@ -722,6 +722,10 @@ namespace YBOT_Field_Control_2016
             this.fc.writeLogs();
         }
 
- 
+        private void btnSetSunLocation_Click(object sender, EventArgs e)
+        {
+            string str = ("7,1,4," + this.selectedTower);
+            this.fc.SendMessage(11, str);
+        }
     }
 }

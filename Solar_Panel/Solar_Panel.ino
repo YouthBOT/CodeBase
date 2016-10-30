@@ -42,7 +42,7 @@ uint32_t off = light.Color(0, 0, 0);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region CANBUS Variables
 //Can-bus pin (Uno Shield pin 9 ; Leonardo Boards pin 17)
-uint8_t canPin = 9;
+uint8_t canPin = 4;
 //Can-bus Interrupt Pin (Uno Shield 0 ; Leonardo 4)
 uint8_t canIntrPin = 0;
 //Tower Node Number
@@ -74,9 +74,10 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
-uint8_t inputPins[6] = { 12, 99, 99, 99, 99, 99 };
+uint8_t inputPins[6] = { 8, 99, 99, 99, 99, 99 };
 //LED Pin number - 13 Uno - 23 Leonardo
 uint8_t ledPin = 13;
+uint8_t solarLED = 9; //Solar Panels LED
 //Button State of the Filtered Digital Inputs - 0 = open; 1 = closed
 byte inputStates[6] = { 0, 0, 0, 0, 0, 0 };
 byte outputState[6] = { 0, 0, 0, 0, 0, 0 };
@@ -102,7 +103,7 @@ const int analog_MAX_RAW_EEPROM_ADDRESS = analog_MIN_RAW_EEPROM_ADDRESS + sizeof
 /// <summary> analog Variables </summary>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region analog Variables
-#define analog_PIN A0                       // Pin connected to analog signal
+#define analog_PIN A1                       // Pin connected to analog signal
 int maxRaw = 325;							// Uncalibrated maximum reading
 int minRaw = 325;							// Uncalibrated minimum reading
 float scaleFactor = 0;						// Adjusts output to desired range
@@ -118,8 +119,8 @@ boolean fullPull = false;					//If Max pull was acheived
 byte index = 0;		//Counter for serial data
 char inData[16];	//Incoming serial data
 boolean newserial = false;
-int xbRX = 2;		//xb RX pin
-int xbTX = 3;		//xb TX pin
+int xbRX = 3;		//xb RX pin
+int xbTX = 2;		//xb TX pin
 SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,16 +145,16 @@ int currentLocation = 0;			//Current panel location in steps
 int sunTower = 0;					//Sun's tower number
 int sunLocation = 0;				//Sun's location in steps
 int alignment = 0;					//0 = not aligned, 1 = 10 degrees, 2 = 5 degrees, 3 = aligned
-int maxSteps = 400;					//Steps in 360 degrees
-int angle_1 = 11;					//First angle to start scoring 
-int angle_2 = 5;					//Second angle to score
-int angle_3 = 1;					//Aligned angle
-int maxSpeed = 5;					//Max speed delay (smaller = faster)
-int minSpeed = 100;					//Min speed delay (larger = slower)
-int dirPin = 10;						//Stepper Direction Pin
-int stepPin = 11;					//Stepper step Pin
-int potInputL = A1;					//Left Pot pin
-int potInputR = A2;					//Right Pot pin
+int maxSteps = 1600;					//Steps in 360 degrees
+int angle_1 = 44;					//First angle to start scoring 
+int angle_2 = 22;					//Second angle to score
+int angle_3 = 4;					//Aligned angle
+int maxSpeed = 2;					//Max speed delay (smaller = faster)
+int minSpeed = 50;					//Min speed delay (larger = slower)
+int dirPin = 11;						//Stepper Direction Pin
+int stepPin = 10;					//Stepper step Pin
+int potInputL = A2;					//Left Pot pin
+int potInputR = A0;					//Right Pot pin
 int potValL = 0;
 int potValR = 0;
 
@@ -172,12 +173,13 @@ void setup()
 	pinMode(ledPin, OUTPUT);
 	digitalWrite(ledPin, HIGH);
 
-	//Setup NeoPixels and test them
-	Serial.println("Neopixel Test");
-	light.begin();						//Start NeoPixel light
-	light.show();						// Initialize all pixels to 'off'
-	testPattern();						//Test Neopixels
-	solidColor(red, 0, 0, stripLength); //Set all red to begin self check
+
+	////Setup NeoPixels and test them
+	//Serial.println("Neopixel Test");
+	//light.begin();						//Start NeoPixel light
+	//light.show();						// Initialize all pixels to 'off'
+	//testPattern();						//Test Neopixels
+	//solidColor(red, 0, 0, stripLength); //Set all red to begin self check
 
 	//Setup Inputs and test to see if they are in desired state
 	Serial.println("-----Inputs----");
@@ -211,56 +213,70 @@ void setup()
 	}
 
 
-	//Start CAN BUS
-	Serial.println("-----Can Bus----");
-START_INIT:
-
-	Serial.print("CAN-BUS Startup: ");
-	//If CANBUS begins 
-	if (CAN_OK == CAN.begin(CAN_50KBPS))						// init can bus : baudrate = 50k
-	{
-		wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));	//If okay light ring green
-		Serial.println("OK");									//Report Okay
-
-	}
-	else
-	{
-		Serial.println("Not Good, check your pin# and connections");	//Report a problem
-		wipeColor(yellow, 0, 0, firstPixel(2), lastPixel(2));			//If not okay light ring yellow
-		goto START_INIT;												//If startup failed try again
-	}
-
-	// There are 2 mask in mcp2515
-	// Set both Masks
-	CAN.init_Mask(0, 0, 0x1f);
-	CAN.init_Mask(1, 0, 0x1f);
-
-	// set filter, we can receive
-	CAN.init_Filt(0, 0, nodeID);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(1, 0, 0x00);                            // there are 6 filter in mcp2515
-
-	CAN.init_Filt(2, 0, nodeID);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(3, 0, 0x00);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(4, 0, 0x08);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(5, 0, 0x09);							// there are 6 filter in mcp2515
-
-	//Check to see if we can talk to the command node	
-	Serial.println("CAN-BUS Communication: Command Node");
+//	//Start CAN BUS
+//	Serial.println("-----Can Bus----");
+//START_INIT:
+//
+//	Serial.print("CAN-BUS Startup: ");
+//	//If CANBUS begins 
+//	if (CAN_OK == CAN.begin(CAN_50KBPS))						// init can bus : baudrate = 50k
+//	{
+//		wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));	//If okay light ring green
+//		Serial.println("OK");									//Report Okay
+//
+//	}
+//	else
+//	{
+//		Serial.println("Not Good, check your pin# and connections");	//Report a problem
+//		wipeColor(yellow, 0, 0, firstPixel(2), lastPixel(2));			//If not okay light ring yellow
+//		goto START_INIT;												//If startup failed try again
+//	}
+//
+//	// There are 2 mask in mcp2515
+//	// Set both Masks
+//	CAN.init_Mask(0, 0, 0x1f);
+//	CAN.init_Mask(1, 0, 0x1f);
+//
+//	// set filter, we can receive
+//	CAN.init_Filt(0, 0, nodeID);							// there are 6 filter in mcp2515
+//	//CAN.init_Filt(1, 0, 0x00);                            // there are 6 filter in mcp2515
+//
+//	CAN.init_Filt(2, 0, nodeID);							// there are 6 filter in mcp2515
+//	//CAN.init_Filt(3, 0, 0x00);							// there are 6 filter in mcp2515
+//	//CAN.init_Filt(4, 0, 0x08);							// there are 6 filter in mcp2515
+//	//CAN.init_Filt(5, 0, 0x09);							// there are 6 filter in mcp2515
+//
+//	//Check to see if we can talk to the command node	
+//	Serial.println("CAN-BUS Communication: Command Node");
 
 	Serial.println("-----XBee-----");
-	xbSerial.println("");
+	xbSerial.println("31,0,0");
 
 	//Solar Panel Pins
+	Serial.println("-----Solar Panel-----");
 	pinMode(dirPin, OUTPUT);
 	pinMode(stepPin, OUTPUT);
-	pinMode(ledPin, OUTPUT);
+	pinMode(solarLED, OUTPUT);
+	//pinMode(potInputL, INPUT);
+	//pinMode(potInputR, INPUT);
+
+	//Blink LEDs 
+	digitalWrite(solarLED, HIGH);
+	delay(1000);
+	digitalWrite(solarLED, LOW);
+	delay(1000);
+	digitalWrite(solarLED, HIGH);
+	delay(1000);
+	digitalWrite(solarLED, LOW);
 
 
-	delay(2000); //Visual Delay
+	//delay(2000); //Visual Delay
 
-	solidColor(off, 0, 0, stripLength);	//Turn off light
+	//solidColor(off, 0, 0, stripLength);	//Turn off light
 
+	Serial.println("-----Home Panel-----");
 	homePanel();
+	Serial.println("-----Setup Complete-----");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,14 +284,14 @@ START_INIT:
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
-	//While there is CANBUS data available
-	while (CAN_MSGAVAIL == CAN.checkReceive())
-	{
-		// read data,  len: data length, incoming: data incoming
-		CAN.readMsgBuf(&canLength, canIn);
-		messagesRecieved++;
-		execute();				//Execute new message
-	}
+	////While there is CANBUS data available
+	//while (CAN_MSGAVAIL == CAN.checkReceive())
+	//{
+	//	// read data,  len: data length, incoming: data incoming
+	//	CAN.readMsgBuf(&canLength, canIn);
+	//	messagesRecieved++;
+	//	execute();				//Execute new message
+	//}
 
 	if (newserial)
 	{
@@ -288,9 +304,20 @@ void loop()
 			{
 				canIn[i] = canOut[i];	//Move message to canIn
 			}
+
+			Serial.print("Destination Node#");
+			Serial.print(destNode);
+			Serial.print(" : Message = ");
+			for (int i = 0; i < 8; i++)
+			{
+				Serial.print(canIn[i]);
+				Serial.print("|");
+			}
+			Serial.println();
+
 			execute();					//Execute Command
 		}
-		else if (destNode > 19)			//It's an xbee node
+		else if (destNode == commandNode)			//It's an xbee node
 		{
 			for (uint8_t i = 0; i < sizeof(canIn); i++)
 			{
@@ -298,12 +325,12 @@ void loop()
 			}
 			xbSerial.println();
 		}
-		else							//Else send it out
-		{
-			messagesSent++;
-			uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
-			CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
-		}
+		//else							//Else send it out
+		//{
+		//	messagesSent++;
+		//	uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
+		//	CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
+		//}
 	}
 
 	while (Serial.available())
@@ -336,7 +363,9 @@ void loop()
 
 	while (xbSerial.available())
 	{
-		char aChar = Serial.read();		//Read data
+		//Serial.println("Enter XB");
+
+		char aChar = xbSerial.read();		//Read data
 
 		if (aChar == '$')
 		{
@@ -445,25 +474,25 @@ void execute()
 		{
 			towerSelected = true;
 			selectedState = canIn[2];
-			if (selectedState = 1)
+			if (selectedState == 1)
 			{
 				wipeColor(yellow, 0, 1, firstPixel(3), lastPixel(4));
 				sunState = true;
 			}
-			else if (selectedState = 2)
+			else if (selectedState == 2)
 			{
 				wipeColor(red, 0, 1, firstPixel(2), lastPixel(2));
 				alarmState = true;
 			}
-			else if (selectedState = 3)
+			else if (selectedState == 3)
 			{
 				homePanel();
 			}
-			else if (selectedState = 4)
+			else if (selectedState == 4)
 			{
 				towerLocation(canIn[3]);
 			}
-			else if (selectedState = 9)
+			else if (selectedState == 9)
 			{
 				//Don't calibrate FoS in game
 				if ((gameMode != 2) && (gameMode != 3) && (gameMode != 4) && (gameMode != 5))
@@ -526,15 +555,15 @@ void parseData()
 		}
 
 		//Use for debugging
-		//Serial.print("Destination Node#");
-		//Serial.print(destNode);
-		//Serial.print(" : Message = ");
-		//for (int i = 0; i < 8; i++)
-		//{
-		//	Serial.print(canOut[i]);
-		//	Serial.print("|");
-		//}
-		//Serial.println();
+		Serial.print("Destination Node#");
+		Serial.print(destNode);
+		Serial.print(" : Message = ");
+		for (int i = 0; i < 8; i++)
+		{
+			Serial.print(canOut[i]);
+			Serial.print("|");
+		}
+		Serial.println();
 	}
 
 	index = 0;
@@ -616,27 +645,51 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
+			Serial.println("DEBUG MODE");
+			digitalWrite(solarLED, HIGH);
+			delay(500);
+			digitalWrite(solarLED, LOW);
+			delay(500);
+			digitalWrite(solarLED, HIGH);
+			delay(500);
+			digitalWrite(solarLED, LOW);
 			gameModeChanged = false;
+			complete = false;
 		}
 
 		if (!complete)
 		{
+			
 			potValL = analogRead(potInputL);
+			//delay(10);
 			potValR = analogRead(potInputR);
+			//delay(10);
+
+			
+			//Serial.print("Left = ");
+			//Serial.println(potValL);
+			//Serial.print("Right = ");
+			//Serial.println(potValR);
+
 
 			int potVal = 0;
-			if (potValL > 600 || potVal < 500) potVal = potValL;
-			else potVal = potValR;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
 
-			if (potVal > 600)
+			//Serial.print("Pot Value = ");
+			//Serial.println(potVal);
+			//delay(100);
+
+			if (potVal > 550)
 			{
 				digitalWrite(dirPin, HIGH);
-				if (potVal > 950) potVal = 1000;
+				if (potVal > 800) potVal = 1000;
 
-				int stepDelay = map(potVal, 600, 1000, minSpeed, maxSpeed);
+				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
+
+				//Serial.println("Direction = CCW");
+				//Serial.print("Delay = ");
+				//Serial.println(stepDelay);
 
 				digitalWrite(stepPin, HIGH);
 				delay(stepDelay);
@@ -645,14 +698,18 @@ void gamePlayCanbus()
 				delay(stepDelay);
 
 				currentLocation++;
-				if (currentLocation > maxSteps) currentLocation = 1;
+				if (currentLocation > maxSteps) currentLocation = 0;
 
 			}
-			else if (potVal < 500)
+			else if (potVal < 450)
 			{
 				digitalWrite(dirPin, LOW);
-				if (potVal < 100)potVal = 0;
-				int stepDelay = map(potVal, 500, 0, minSpeed, maxSpeed);
+				if (potVal < 200)potVal = 0;
+				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
+
+				//Serial.println("Direction = CW");
+				//Serial.print("Delay = ");
+				//Serial.println(stepDelay);
 
 				digitalWrite(stepPin, HIGH);
 				delay(stepDelay);
@@ -661,7 +718,7 @@ void gamePlayCanbus()
 				delay(stepDelay);
 
 				currentLocation--;
-				if (currentLocation < 1) currentLocation = maxSteps;
+				if (currentLocation < 0) currentLocation = (maxSteps-1);
 			}
 
 			int max = sunLocation + angle_1;
@@ -675,28 +732,28 @@ void gamePlayCanbus()
 				{
 					int delta = abs((currentLocation + maxSteps) - sunLocation);
 					int ledPower = map(delta, 0, angle_1, 255, 0);
-					analogWrite(ledPin, ledPower);
+					analogWrite(solarLED, ledPower);
 				}
 				else if (currentLocation > min)
 				{
 					int delta = abs(sunLocation - currentLocation);
 					int ledPower = map(delta, 0, angle_1, 255, 0);
-					analogWrite(ledPin, ledPower);
+					analogWrite(solarLED, ledPower);
 				}
 				else
 				{
-					analogWrite(ledPin, LOW);
+					analogWrite(solarLED, LOW);
 				}
 			}
 			else if ((currentLocation > min) && (currentLocation < max))
 			{
 				int delta = abs(sunLocation - currentLocation);
 				int ledPower = map(delta, 0, angle_1, 255, 0);
-				analogWrite(ledPin, ledPower);
+				analogWrite(solarLED, ledPower);
 			}
 			else
 			{
-				analogWrite(ledPin, LOW);
+				analogWrite(solarLED, LOW);
 			}
 		}
 
@@ -1316,19 +1373,56 @@ void ChangeBaudRate(byte rate)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void homePanel()
 {
-	do
+	if (checkInput(0))
 	{
-		digitalWrite(dirPin, HIGH);
+		for (int i = 0; i < 200; i++)
+		{
+			//Serial.println(checkInput(0));
+			digitalWrite(dirPin, LOW); //High = CCW
+
+			digitalWrite(stepPin, HIGH);
+			delay(3);
+
+			digitalWrite(stepPin, LOW);
+			delay(3);
+
+		}
+	}
+
+	delay(100);
+
+
+	while (!checkInput(0))
+	{
+		//Serial.println(checkInput(0));
+		digitalWrite(dirPin, HIGH); //High = CCW
 
 		digitalWrite(stepPin, HIGH);
-		delay(20);
+		delay(3);
 
 		digitalWrite(stepPin, LOW);
-		delay(20);
+		delay(3);
 
-	} while (checkInput(0));
+		currentLocation = 90;
+	};
 
-	currentLocation = 0;
+	delay(500);
+
+	while (currentLocation != 0)
+	{
+		digitalWrite(dirPin, HIGH); //High = CCW
+
+		digitalWrite(stepPin, HIGH);
+		delay(10);
+
+		digitalWrite(stepPin, LOW);
+		delay(10);
+
+		currentLocation--;
+	}
+
+	
+	Serial.println("-----Panel Homed-----");
 	
 }
 
@@ -1341,7 +1435,44 @@ void homePanel()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 int towerLocation(int towerNum)
 {
-	sunLocation = towerNum / maxSteps;
+	homePanel();
+
+	if (towerNum == 1) sunLocation = 1318;
+	else if (towerNum == 2) sunLocation = 1450;
+	else if (towerNum == 3) sunLocation = 0;
+	else if (towerNum == 4) sunLocation = 150;
+	else if (towerNum == 5) sunLocation = 282;
+	else if (towerNum == 6) sunLocation = 518;
+	else if (towerNum == 7) sunLocation = 650;
+	else if (towerNum == 8) sunLocation = 800;
+	else if (towerNum == 9) sunLocation = 950;
+	else sunLocation = 1082;
+
+	Serial.print("Sun Location = ");
+	Serial.println(sunLocation);
+
+	int half = 800;
+	if(sunLocation >= 800) half = sunLocation - 800;
+	else half = sunLocation + 800;
+
+	Serial.print("Half = ");
+	Serial.println(half);
+
+	while (currentLocation != half)
+	{
+		digitalWrite(dirPin, LOW); //High = CCW
+
+		digitalWrite(stepPin, HIGH);
+		delay(2);
+
+		digitalWrite(stepPin, LOW);
+		delay(2);
+
+		currentLocation--;
+		if (currentLocation < 0) currentLocation = (maxSteps - 1) ;
+		//Serial.println(currentLocation);
+	}
+	
 	return sunLocation;
 }
 

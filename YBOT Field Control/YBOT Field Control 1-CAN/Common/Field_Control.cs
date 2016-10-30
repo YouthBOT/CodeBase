@@ -303,6 +303,11 @@ namespace YBOT_Field_Control_2016
             {
                 case ComModes.canBus:
                     if (this.node[_nodeID].id == 0) address = this.cb.commandNode.ToString();
+                    else if (this.node[_nodeID].id > 10)
+                    {
+                        int temp = this.node[_nodeID].id + 10;
+                        address = temp.ToString();
+                    }
                     else address = this.node[_nodeID].id.ToString();
                     return address;
 

@@ -204,7 +204,9 @@ START_INIT:
 	Serial.println("CAN-BUS Communication: Command Node");
 
 	Serial.println("-----XBee-----");
-	xbSerial.println("");
+	String text = "$,21,7,1,3,";
+	xbSerial.println(text);
+	Serial.println(text);
 
 
 	delay(2000); //Visual Delay
@@ -241,13 +243,23 @@ void loop()
 			}
 			execute();					//Execute Command
 		}
-		else if (destNode > 19)			//It's an xbee node
+		else if (destNode > 20)			//It's an xbee node
 		{
-			for (uint8_t i = 0; i < sizeof(canIn); i++)
+			//xbSerial.println("$,21,7,1,4,7,");
+
+			String stringOut = String("$,");
+			String dest = String(destNode);
+			stringOut = (stringOut + dest);
+			stringOut = (stringOut + ",");
+
+			for (uint8_t i = 0; i < sizeof(canOut); i++)
 			{
-				xbSerial.print(canOut[i]);	//send data
+				stringOut = (stringOut + (canOut[i]));	//send data
+				stringOut = (stringOut + ",");
 			}
-			xbSerial.println();
+			xbSerial.println(stringOut);
+			delay(10);
+			Serial.println(stringOut);
 		}
 		else							//Else send it out
 		{
@@ -288,7 +300,7 @@ void loop()
 
 	while (xbSerial.available())
 	{
-		char aChar = Serial.read();		//Read data
+		char aChar = xbSerial.read();		//Read data
 
 		if (aChar == '$')
 		{

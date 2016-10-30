@@ -29,3 +29,17 @@ D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Cont
 D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control.csproj.GenerateResource.Cache
 D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.exe
 D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.pdb
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBOT Field Control 2016.exe.config
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.exe
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control 2016.pdb
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBOT Field Control 2016.exe
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBOT Field Control 2016.pdb
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control.csprojResolveAssemblyReference.cache
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.GameDisplay.resources
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.GameControl.resources
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.OneWire_Locate_Nodes.resources
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.CANRawData.resources
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.Score.resources
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.YBOT_Main.resources
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.Properties.Resources.resources
+C:\Users\YBOT CONTROL\Desktop\YBOT-10-29-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control.csproj.GenerateResource.Cache
