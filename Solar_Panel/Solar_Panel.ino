@@ -117,7 +117,7 @@ boolean fullPull = false;					//If Max pull was acheived
 /// <summary> Serial Input Variables </summary>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 byte index = 0;		//Counter for serial data
-char inData[16];	//Incoming serial data
+char inData[32];	//Incoming serial data
 boolean newserial = false;
 int xbRX = 3;		//xb RX pin
 int xbTX = 2;		//xb TX pin
@@ -363,9 +363,9 @@ void loop()
 
 	while (xbSerial.available())
 	{
-		//Serial.println("Enter XB");
-
 		char aChar = xbSerial.read();		//Read data
+
+		//Serial.print(aChar);
 
 		if (aChar == '$')
 		{
@@ -378,6 +378,7 @@ void loop()
 			{
 				if (aChar == '\n')				//If there is a new line
 				{
+					//Serial.println();
 					parseData();				//Parse the data that was received
 					newserial = true;
 				}
@@ -529,6 +530,13 @@ void parseData()
 
 	int counter = 0;
 
+	//Serial.print("Pre-parse");
+	//for (int i = 0; i < sizeof(inData); i++)
+	//{
+	//	Serial.print(inData[i]);
+	//	Serial.print("|");
+	//}
+	//Serial.println();
 
 	//If not NULL
 	if (inData[0] == '$')
@@ -555,15 +563,15 @@ void parseData()
 		}
 
 		//Use for debugging
-		Serial.print("Destination Node#");
-		Serial.print(destNode);
-		Serial.print(" : Message = ");
-		for (int i = 0; i < 8; i++)
-		{
-			Serial.print(canOut[i]);
-			Serial.print("|");
-		}
-		Serial.println();
+		//Serial.print("Destination Node#");
+		//Serial.print(destNode);
+		//Serial.print(" : Message = ");
+		//for (int i = 0; i < 8; i++)
+		//{
+		//	Serial.print(canOut[i]);
+		//	Serial.print("|");
+		//}
+		//Serial.println();
 	}
 
 	index = 0;

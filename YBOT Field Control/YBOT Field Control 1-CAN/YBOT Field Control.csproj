@@ -85,6 +85,12 @@
     <Compile Include="GUI\CanbusRawData.Designer.cs">
       <DependentUpon>CanbusRawData.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\SqlConnectWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\SqlConnectWindow.Designer.cs">
+      <DependentUpon>SqlConnectWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\YBOT_Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -113,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Score.resx">
       <DependentUpon>Score.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\SqlConnectWindow.resx">
+      <DependentUpon>SqlConnectWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\YBOT_Main.resx">
       <DependentUpon>YBOT_Main.cs</DependentUpon>
@@ -143,6 +152,12 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\YBotSqlWrapper\YBotSqlWrapper.csproj">
+      <Project>{69853328-129f-4e06-acf0-46d035daed7a}</Project>
+      <Name>YBotSqlWrapper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

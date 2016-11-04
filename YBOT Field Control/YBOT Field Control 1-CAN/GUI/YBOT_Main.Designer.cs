@@ -82,6 +82,7 @@
             this.btnLaunchGame = new System.Windows.Forms.Button();
             this.btnMonitorNodes = new System.Windows.Forms.Button();
             this.gbFieldFunctions = new System.Windows.Forms.GroupBox();
+            this.btnSetSunLocation = new System.Windows.Forms.Button();
             this.btnTransmitterOff = new System.Windows.Forms.Button();
             this.btnTransmitterAuto = new System.Windows.Forms.Button();
             this.btnTransmitterManual = new System.Windows.Forms.Button();
@@ -100,7 +101,9 @@
             this.lblDelayMultiplier = new System.Windows.Forms.Label();
             this.tbDelayMultiplier = new System.Windows.Forms.TextBox();
             this.displayUpdateTimer = new System.Windows.Forms.Timer(this.components);
-            this.btnSetSunLocation = new System.Windows.Forms.Button();
+            this.sqlConnectButton = new System.Windows.Forms.Button();
+            this.testSqlButton = new System.Windows.Forms.Button();
+            this.btnDeselect = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDG)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDS)).BeginInit();
             this.cmGridRightClick.SuspendLayout();
@@ -642,7 +645,7 @@
             // 
             // btnLaunchGame
             // 
-            this.btnLaunchGame.Location = new System.Drawing.Point(1074, 579);
+            this.btnLaunchGame.Location = new System.Drawing.Point(1076, 585);
             this.btnLaunchGame.Name = "btnLaunchGame";
             this.btnLaunchGame.Size = new System.Drawing.Size(100, 50);
             this.btnLaunchGame.TabIndex = 14;
@@ -662,6 +665,7 @@
             // 
             // gbFieldFunctions
             // 
+            this.gbFieldFunctions.Controls.Add(this.btnDeselect);
             this.gbFieldFunctions.Controls.Add(this.btnSetSunLocation);
             this.gbFieldFunctions.Controls.Add(this.btnTransmitterOff);
             this.gbFieldFunctions.Controls.Add(this.btnTransmitterAuto);
@@ -675,6 +679,16 @@
             this.gbFieldFunctions.TabIndex = 14;
             this.gbFieldFunctions.TabStop = false;
             this.gbFieldFunctions.Text = "Field Functions";
+            // 
+            // btnSetSunLocation
+            // 
+            this.btnSetSunLocation.Location = new System.Drawing.Point(112, 131);
+            this.btnSetSunLocation.Name = "btnSetSunLocation";
+            this.btnSetSunLocation.Size = new System.Drawing.Size(90, 50);
+            this.btnSetSunLocation.TabIndex = 8;
+            this.btnSetSunLocation.Text = "Set Sun Location";
+            this.btnSetSunLocation.UseVisualStyleBackColor = true;
+            this.btnSetSunLocation.Click += new System.EventHandler(this.btnSetSunLocation_Click);
             // 
             // btnTransmitterOff
             // 
@@ -866,21 +880,43 @@
             this.displayUpdateTimer.Interval = 11;
             this.displayUpdateTimer.Tick += new System.EventHandler(this.displayUpdateTimer_Tick);
             // 
-            // btnSetSunLocation
+            // sqlConnectButton
             // 
-            this.btnSetSunLocation.Location = new System.Drawing.Point(112, 131);
-            this.btnSetSunLocation.Name = "btnSetSunLocation";
-            this.btnSetSunLocation.Size = new System.Drawing.Size(90, 50);
-            this.btnSetSunLocation.TabIndex = 8;
-            this.btnSetSunLocation.Text = "Set Sun Location";
-            this.btnSetSunLocation.UseVisualStyleBackColor = true;
-            this.btnSetSunLocation.Click += new System.EventHandler(this.btnSetSunLocation_Click);
+            this.sqlConnectButton.Location = new System.Drawing.Point(1076, 529);
+            this.sqlConnectButton.Name = "sqlConnectButton";
+            this.sqlConnectButton.Size = new System.Drawing.Size(100, 50);
+            this.sqlConnectButton.TabIndex = 17;
+            this.sqlConnectButton.Text = "Connect to SQL Server";
+            this.sqlConnectButton.UseVisualStyleBackColor = true;
+            this.sqlConnectButton.Click += new System.EventHandler(this.sqlConnectButton_Click);
+            // 
+            // testSqlButton
+            // 
+            this.testSqlButton.Location = new System.Drawing.Point(970, 529);
+            this.testSqlButton.Name = "testSqlButton";
+            this.testSqlButton.Size = new System.Drawing.Size(100, 50);
+            this.testSqlButton.TabIndex = 18;
+            this.testSqlButton.Text = "Send Test SQL Log";
+            this.testSqlButton.UseVisualStyleBackColor = true;
+            this.testSqlButton.Click += new System.EventHandler(this.testSqlButton_Click);
+            // 
+            // btnDeselect
+            // 
+            this.btnDeselect.Location = new System.Drawing.Point(112, 188);
+            this.btnDeselect.Name = "btnDeselect";
+            this.btnDeselect.Size = new System.Drawing.Size(90, 50);
+            this.btnDeselect.TabIndex = 9;
+            this.btnDeselect.Text = "Deselect Tower";
+            this.btnDeselect.UseVisualStyleBackColor = true;
+            this.btnDeselect.Click += new System.EventHandler(this.btnDeselect_Click);
             // 
             // YBOT_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1186, 641);
+            this.Controls.Add(this.testSqlButton);
+            this.Controls.Add(this.sqlConnectButton);
             this.Controls.Add(this.gbTesting);
             this.Controls.Add(this.gbFieldFunctions);
             this.Controls.Add(this.btnLaunchGame);
@@ -985,6 +1021,9 @@
         private System.Windows.Forms.CheckBox cbRTSenable;
         private System.Windows.Forms.CheckBox cbDTRenable;
         private System.Windows.Forms.Button btnSetSunLocation;
+        private System.Windows.Forms.Button sqlConnectButton;
+        private System.Windows.Forms.Button testSqlButton;
+        private System.Windows.Forms.Button btnDeselect;
     }
 }
 

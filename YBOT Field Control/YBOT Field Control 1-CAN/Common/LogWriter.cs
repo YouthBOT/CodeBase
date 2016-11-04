@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using YBotSqlWrapper;
 
 namespace YBOT_Field_Control_2016
 {
     class LogWriter
     {
         fileStructure fs = new fileStructure();     //Create a fileStructure
+
         //Directory path for YBOT 1 on the user's desktop
         private string YBOTpath
         {
@@ -19,6 +21,7 @@ namespace YBOT_Field_Control_2016
                 return path;
             }
         }
+
         /// <summary>
         /// Path used for YBOT feild control files
         /// </summary>
@@ -29,7 +32,7 @@ namespace YBOT_Field_Control_2016
             string date = DateTime.Today.ToLongDateString();
 
             //Path for todays date
-            string path = string.Format("{0}\\{1}", YBOTpath, date);
+            string path = string.Format(@"{0}\{1}", YBOTpath, date);
 
 
             //Check to see if folder exists if not then make it; fail no path is created
@@ -54,6 +57,7 @@ namespace YBOT_Field_Control_2016
             return path;
         }
 
+        /*
         public void WriteLog(string text)
         {
             string path = string.Format("{0}\\Logs", YBOTFilePath());
@@ -76,9 +80,15 @@ namespace YBOT_Field_Control_2016
             {
                 return;
             }
+        }
+        */
 
+        public void WriteLog(string text)
+        {
+            WriteLog(text, "YBOT_Field_Control_Log", "Logs");
         }
 
+        /*
         public void WriteLog(string text, string fileName)
         {
             string path = string.Format("{0}\\Logs", YBOTFilePath());
@@ -104,11 +114,17 @@ namespace YBOT_Field_Control_2016
             }
 
         }
+        */
 
-        public void WriteLog(string text, string fileName, string _path)
+        public void WriteLog(string text, string fileName)
         {
-            string path = string.Format("{0}\\{1}", YBOTFilePath(), _path);
-            string file = string.Format("\\{0}.txt", fileName);
+            WriteLog(text, fileName, "Logs");
+        }
+
+        public void WriteLog(string text, string fileName, string filePath)
+        {
+            string file = string.Format(@"\{0}.txt", fileName);
+            string path = string.Format(@"{0}\{1}", YBOTFilePath(), filePath);
             DateTime now = DateTime.Now;
 
             //Try and write data to file, return if fail
@@ -123,14 +139,16 @@ namespace YBOT_Field_Control_2016
                 StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
                 sw.WriteLine(text);
                 sw.Close();
+
+                YbotSql.Instance.AddLog(text, fileName);
             }
             catch
             {
                 return;
             }
-
         }
 
+        /*
         public void Log(string text)
         {
             string path = string.Format("{0}\\Logs", YBOTFilePath());
@@ -150,9 +168,15 @@ namespace YBOT_Field_Control_2016
             {
                 return;
             }
+        }
+        */
 
+        public void Log(string text)
+        {
+            Log(text, "YBOT_Field_Control_Log", "Logs");
         }
 
+        /*
         public void Log(string text, string fileName)
         {
             string path = string.Format("{0}\\Logs", YBOTFilePath());
@@ -175,13 +199,18 @@ namespace YBOT_Field_Control_2016
             {
                 return;
             }
+        }
+        */
 
+        public void Log(string text, string fileName)
+        {
+            Log(text, fileName, "Logs");
         }
 
-        public void Log(string text, string fileName, string _path)
+        public void Log(string text, string fileName, string filePath)
         {
-            string path = string.Format("{0}\\{1}", YBOTFilePath(), _path);
-            string file = string.Format("\\{0}.txt", fileName);
+            string file = string.Format(@"\{0}.txt", fileName);
+            string path = string.Format(@"{0}\{1}", YBOTFilePath(), filePath);
 
             //Try and write data to file, return if fail
             try
@@ -193,13 +222,13 @@ namespace YBOT_Field_Control_2016
                 StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
                 sw.WriteLine(text);
                 sw.Close();
+
+                YbotSql.Instance.AddLog(text, fileName);
             }
             catch
             {
                 return;
             }
-
         }
-
     }
 }

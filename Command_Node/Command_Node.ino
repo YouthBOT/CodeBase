@@ -88,7 +88,7 @@ uint8_t buzzerPin = 5;
 /// <summary> Serial Input Variables </summary>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 byte index = 0;		//Counter for serial data
-char inData[16];	//Incoming serial data
+char inData[32];	//Incoming serial data
 boolean newserial = false;
 int xbRX = 2;		//xb RX pin
 int xbTX = 3;		//xb TX pin
@@ -204,9 +204,8 @@ START_INIT:
 	Serial.println("CAN-BUS Communication: Command Node");
 
 	Serial.println("-----XBee-----");
-	String text = "$,21,7,1,3,";
-	xbSerial.println(text);
-	Serial.println(text);
+	//xbSerial.println("$,21,7,1,3,");
+	//Serial.println("$,21,7,1,3,");
 
 
 	delay(2000); //Visual Delay
@@ -245,21 +244,17 @@ void loop()
 		}
 		else if (destNode > 20)			//It's an xbee node
 		{
-			//xbSerial.println("$,21,7,1,4,7,");
-
-			String stringOut = String("$,");
+			String stringOut = "$,";
 			String dest = String(destNode);
-			stringOut = (stringOut + dest);
-			stringOut = (stringOut + ",");
+			stringOut += dest;
+			stringOut += ",";
 
 			for (uint8_t i = 0; i < sizeof(canOut); i++)
 			{
-				stringOut = (stringOut + (canOut[i]));	//send data
-				stringOut = (stringOut + ",");
+					stringOut += String(canOut[i]);	//send data
+					stringOut += ",";
 			}
 			xbSerial.println(stringOut);
-			delay(10);
-			Serial.println(stringOut);
 		}
 		else							//Else send it out
 		{

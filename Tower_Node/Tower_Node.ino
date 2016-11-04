@@ -49,7 +49,7 @@ uint32_t nodeID = (uint32_t)EEPROM.read(0);
 //Default Team's color is set automatically
 uint32_t defaultColor = red;
 //Red Side = 21 Green Side = 22 set automatically
-uint32_t defaultSide = 21;		
+uint32_t defaultSide = 21;
 //Command Node Number
 uint32_t commandNode = 31;
 
@@ -94,6 +94,7 @@ int manTonState = 1;
 /// <summary> Program Flags Variables </summary>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 boolean towerSelected = false;		//If the tower is selected
+uint8_t selectedState = 0;			//Selected state of tower
 boolean gameModeChanged = true;		//If mode is changed
 boolean complete = false;			//If task is complete
 uint8_t function = 0;				//Function Type
@@ -102,6 +103,10 @@ uint8_t gameMode = 8;				//Game Mode Value - starts in Debug mode
 uint8_t delayMultiplier = 0;		//Report Delay Multiplier
 int messagesSent = 0;
 int messagesRecieved = 0;
+
+boolean sunState = false;			//Sun's state True = on, False = off
+boolean alarmState = false;			//Alarm state True = on, False = off
+boolean testedState = false;		//Tower's teseted state True = tested, False = not tested
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +245,12 @@ START_INIT:
 
 	delay(10000); //Visual Delay
 
+	wipeColor(green, 0, 0, firstPixel(4), lastPixel(4));	//If okay light ring green
+
+	delay(500);
+
 	solidColor(off, 0, 0, stripLength);	//Turn off light
+
 
 
 }
@@ -278,7 +288,7 @@ void loop()
 	//Watch for Player station button
 	if (gameMode == 3)
 	{
-		if  ((nodeID == 3) || (nodeID == 8))
+		if ((nodeID == 3) || (nodeID == 8))
 		{
 			int oldState = manTonState;
 			manTonState = digitalRead(manTonPin);
@@ -396,8 +406,38 @@ void execute()
 	}
 	else if (msgType == 7)
 	{
-		if (canIn[1] == 1) towerSelected = true;
-		else towerSelected = false;
+		if (canIn[1] == 1)
+		{
+			towerSelected = true;
+			selectedState = canIn[2];
+			if (selectedState == 1)
+			{
+				wipeColor(yellow, 0, 1, firstPixel(3), lastPixel(4));
+				sunState = true;
+			}
+			else if (selectedState == 2)
+			{
+				wipeColor(red, 0, 1, firstPixel(2), lastPixel(2));
+				alarmState = true;
+			}
+
+		}
+		else
+		{
+			towerSelected = false;
+
+			if (sunState)
+			{
+				sunState = false;
+				solidColor(blue, 0, firstPixel(3), lastPixel(4));
+			}
+			if (alarmState)
+			{
+				alarmState = false;
+				solidColor(blue, 0, firstPixel(2), lastPixel(2));
+			}
+
+		}
 	}
 }
 
@@ -435,7 +475,7 @@ void gamePlayCanbus()
 			}
 		}
 
-		if (!complete)
+		/*if (!complete)
 		{
 			if (towerSelected)
 			{
@@ -445,7 +485,7 @@ void gamePlayCanbus()
 			{
 				solidColor(blue, 0, 0, stripLength);
 			}
-		}
+		}*/
 	}
 	else if (gameMode == 4)	//Man-Tonomous
 	{
@@ -461,17 +501,17 @@ void gamePlayCanbus()
 			}
 		}
 
-		if (!complete)
-		{
-			if (towerSelected)
-			{
-				solidColor(yellow, 0, 0, stripLength);
-			}
-			else
-			{
-				solidColor(blue, 0, 0, stripLength);
-			}
-		}
+		//if (!complete)
+		//{
+		//	if (towerSelected)
+		//	{
+		//		solidColor(yellow, 0, 0, stripLength);
+		//	}
+		//	else
+		//	{
+		//		solidColor(blue, 0, 0, stripLength);
+		//	}
+		//}
 	}
 	else if (gameMode == 5)	//Manual Mode
 	{
@@ -488,17 +528,17 @@ void gamePlayCanbus()
 			complete = false;
 		}
 
-		if (!complete)
-		{
-			if (towerSelected)
-			{
-				solidColor(yellow, 0, 0, stripLength);
-			}
-			else
-			{
-				solidColor(off, 0, 0, stripLength);
-			}
-		}
+		//if (!complete)
+		//{
+		//	if (towerSelected)
+		//	{
+		//		solidColor(yellow, 0, 0, stripLength);
+		//	}
+		//	else
+		//	{
+		//		solidColor(off, 0, 0, stripLength);
+		//	}
+		//}
 	}
 	else if (gameMode == 6)	//End
 	{
@@ -533,6 +573,8 @@ void gamePlayCanbus()
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(yellow, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
+			wipeColor(blue, 0, 1, 0, stripLength);
+
 			gameModeChanged = false;
 
 			if ((nodeID == 3) || (nodeID == 8))
@@ -541,15 +583,17 @@ void gamePlayCanbus()
 				digitalWrite(manPin, HIGH);
 			}
 
-			if (towerSelected)
-			{
-				solidColor(yellow, 0, 0, stripLength);
-			}
-			else
-			{
-				solidColor(green, 0, 0, stripLength);
-			}
+
 		}
+
+		//if (towerSelected)
+		//{
+		//	solidColor(yellow, 0, 0, stripLength);
+		//}
+		//else
+		//{
+		//	solidColor(blue, 0, 0, stripLength);
+		//}
 	}
 	else  //Reset	
 	{
@@ -684,7 +728,7 @@ void gamePlayRandomTest()
 				digitalWrite(manPin, HIGH);
 			}
 		}
-		
+
 		//Debug Test code
 	}
 	else  //Reset	
@@ -752,7 +796,7 @@ void gamePlaySpeedTest()
 				digitalWrite(manPin, HIGH);
 			}
 		}
-		if (!complete) 
+		if (!complete)
 		{
 			//Auto Test Code
 		}
@@ -922,7 +966,7 @@ void NetworkSpeedTest()
 			complete = false;
 		}
 
-		if(messagesSent < 255)
+		if (messagesSent < 255)
 		{
 			messagesSent++;
 			nodeStatus[7] = messagesSent;

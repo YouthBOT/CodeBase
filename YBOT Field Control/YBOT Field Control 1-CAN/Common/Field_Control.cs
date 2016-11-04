@@ -60,43 +60,45 @@ namespace YBOT_Field_Control_2016
             cb = null;                                  //Despose of canbus object
             cb = new CANBUS();      //New Canbus object
 
-            //Fill node array with data from xml file
-            foreach (DataRow row in nodeTable.Rows)
+            if (nodeTable != null)
             {
-                if (row[0] != DBNull.Value)
+                //Fill node array with data from xml file
+                foreach (DataRow row in nodeTable.Rows)
                 {
-                    try
+                    if (row[0] != DBNull.Value)
                     {
-                        int nodeID = Convert.ToInt16(row["Node_ID"]);
-                        string nodeType = row["Node_Type"].ToString();
-                        this.node[nodeID].id = nodeID;
-
-                        switch (nodeType)
+                        try
                         {
-                            case "CANBUS":
-                                this.node[nodeID].type = ComModes.canBus;
-                                canbusPresent = true;
-                                break;
+                            int nodeID = Convert.ToInt16(row["Node_ID"]);
+                            string nodeType = row["Node_Type"].ToString();
+                            this.node[nodeID].id = nodeID;
 
-                            case "XBee":
-                                this.node[nodeID].type = ComModes.xBee;
-                                break;
+                            switch (nodeType)
+                            {
+                                case "CANBUS":
+                                    this.node[nodeID].type = ComModes.canBus;
+                                    canbusPresent = true;
+                                    break;
 
-                            case "WiFi":
-                                this.node[nodeID].type = ComModes.wiFi;
-                                break;
+                                case "XBee":
+                                    this.node[nodeID].type = ComModes.xBee;
+                                    break;
 
-                            default:
-                                MessageBox.Show("Not a valid type");
-                                this.node[nodeID].type = ComModes.none;
-                                break;
+                                case "WiFi":
+                                    this.node[nodeID].type = ComModes.wiFi;
+                                    break;
+
+                                default:
+                                    MessageBox.Show("Not a valid type");
+                                    this.node[nodeID].type = ComModes.none;
+                                    break;
+                            }
+
+                            this.node[nodeID].address = GetNodeAddress(nodeID);
                         }
-
-                        this.node[nodeID].address = GetNodeAddress(nodeID);
+                        catch (Exception ex) { MessageBox.Show(ex.Message); }
                     }
-                    catch (Exception ex) { MessageBox.Show(ex.Message); }
                 }
-
             }
 
             //Start canbus if we have canbus nodes
@@ -541,7 +543,7 @@ namespace YBOT_Field_Control_2016
 
                 int nodeID = Convert.ToInt32(parsedString[0]);
                 if (nodeID == cv.canControlID) nodeID = 0;
-           
+
                 this.node[nodeID].reportRec = Convert.ToByte(parsedString[1]);
 
                 if (this.node[nodeID].reportRec == 9)
@@ -554,7 +556,7 @@ namespace YBOT_Field_Control_2016
                     this.node[nodeID].nodeMessagesSent = Convert.ToInt32(parsedString[7]);
 
                     this.node[cv.controlBoard].nodeMessagesSent = Convert.ToInt32(parsedString[4]);
-                    this.node[cv.controlBoard].nodeMessagesReceived  = Convert.ToInt32(parsedString[5]);
+                    this.node[cv.controlBoard].nodeMessagesReceived = Convert.ToInt32(parsedString[5]);
 
                 }
                 else
@@ -566,7 +568,7 @@ namespace YBOT_Field_Control_2016
                     this.node[nodeID].outputStatus = Convert.ToByte(parsedString[6]);
                     this.node[nodeID].fosValue = Convert.ToByte(parsedString[7]);
                     this.node[nodeID].fosColor = this.cb.colorCode(parsedString[8]);
-                 }
+                }
             }
             catch (Exception ex) { logWrite("Update Node Failed - " + ex); }
 
@@ -780,7 +782,7 @@ namespace YBOT_Field_Control_2016
             {
                 string s = string.Format("0,6,{0},{1},{2}", function, functionMode, option);
                 this.cb.Send(s);
-            }        
+            }
         }
 
         public void ChangeGameFunction(int _nodeID, int function, int functionMode, string option)
@@ -788,10 +790,10 @@ namespace YBOT_Field_Control_2016
             if (node[_nodeID].type == ComModes.canBus)
             {
                 int nodeAddress = Convert.ToInt32(this.node[_nodeID].address);   //Get Address
-                string s = string.Format("{0},6,{1},{2},{2}",nodeAddress, function, functionMode, option);
+                string s = string.Format("{0},6,{1},{2},{2}", nodeAddress, function, functionMode, option);
                 this.cb.Send(nodeAddress + ",6," + function + "," + functionMode + "," + option);
             }
-            
+
         }
 
         /// <summary>

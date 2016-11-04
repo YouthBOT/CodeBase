@@ -75,7 +75,7 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
-uint8_t inputPins[6] = { 11, 10, 99, 99, 99, 99 };	//Green 10, Red 11
+uint8_t inputPins[6] = { 5, 99, 99, 99, 99, 99 };	//Green 10, Red 11
 //Output Pin number - Pin# of Output - 99 if not used
 uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
 //LED Pin number (Uno 13, Leonardo 23)
@@ -129,6 +129,7 @@ uint8_t gameMode = 8;				//Game Mode Value - starts in Debug mode
 uint8_t delayMultiplier = 0;		//Report Delay Multiplier
 int messagesSent = 0;
 int messagesRecieved = 0;
+int currentPullValue = 0;
 
 
 boolean sunState = false;			//Sun's state True = on, False = off
@@ -304,6 +305,8 @@ START_INIT:
 	Serial.println("Finished Calibration");
 
 	analogMaxPulled = 0;                    //Reset max pull
+
+	wipeColor(green, 0, 0, firstPixel(4), lastPixel(4));	//If okay light ring green
 
 }
 
@@ -482,19 +485,24 @@ void execute()
 			}
 			else
 			{
-				if (sunState)
-				{
-					sunState = false;
-					solidColor(blue, 0, firstPixel(3), lastPixel(4));
-				}
-				if (alarmState)
-				{
-					alarmState = false;
-					solidColor(blue, 0, firstPixel(2), lastPixel(2));
-				}
+
 			}
 		}
-		else towerSelected = false;
+		else
+		{
+			towerSelected = false;
+
+			if (sunState)
+			{
+				sunState = false;
+				solidColor(blue, 0, firstPixel(3), lastPixel(4));
+			}
+			if (alarmState)
+			{
+				alarmState = false;
+				solidColor(blue, 0, firstPixel(2), lastPixel(2));
+			}
+		}
 	}
 }
 
@@ -716,26 +724,31 @@ void gamePlayCanbus()
 				digitalWrite(manPin, HIGH);
 			}
 		}
-		int pullValue = getScaledAnalog();
-		if (pullValue >= (maxRange-1)) fullPull = true;
 
-		if (fullPull)
-		{
-			nodeStatus[7] = 0;
-			alarmState = false;
-			report(0, commandNode);
-			wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
-			fullPull = false;
-			delay(10);
-		}
-		else
-		{
-			nodeStatus[7] = 1;
-			alarmState = true;
-			report(0, commandNode);
-			wipeColor(red, 0, 0, firstPixel(2), lastPixel(2));
-		}
+		int oldPullValue = currentPullValue;
+		currentPullValue = getScaledAnalog();
+		if (currentPullValue >= (maxRange-1)) fullPull = true;
 
+
+		if (oldPullValue != currentPullValue)
+		{
+			if (fullPull)
+			{
+				nodeStatus[7] = 0;
+				alarmState = false;
+				report(0, commandNode);
+				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
+				fullPull = false;
+				delay(10);
+			}
+			else
+			{
+				nodeStatus[7] = 1;
+				alarmState = true;
+				report(0, commandNode);
+				wipeColor(red, 0, 0, firstPixel(2), lastPixel(2));
+			}
+		}
 
 		//If beam is broken
 		byte oldState = inputStates[0];

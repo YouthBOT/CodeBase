@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using System.IO.Ports;
 
@@ -726,6 +727,26 @@ namespace YBOT_Field_Control_2016
         {
             string str = ("7,1,4," + this.selectedTower);
             this.fc.SendMessage(11, str);
+            Thread.Sleep(20);
+            str = ("7,1,1,");
+            this.fc.SendMessage(this.selectedTower, str);
+        }
+
+        private void sqlConnectButton_Click(object sender, EventArgs e)
+        {
+            SqlConnectWindow sqlConnect = new SqlConnectWindow();
+            sqlConnect.Show();
+        }
+
+        private void testSqlButton_Click(object sender, EventArgs e)
+        {
+            YBotSqlWrapper.YbotSql.Instance.AddLog("This is a test", "test");
+        }
+
+        private void btnDeselect_Click(object sender, EventArgs e)
+        {
+            string str = ("7,0,");
+            this.fc.SendMessage(this.selectedTower, str);
         }
     }
 }
