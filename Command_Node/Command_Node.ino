@@ -244,6 +244,7 @@ void loop()
 		}
 		else if (destNode > 20)			//It's an xbee node
 		{
+			messagesSent++;
 			String stringOut = "$,";
 			String dest = String(destNode);
 			stringOut += dest;
@@ -308,9 +309,20 @@ void loop()
 			{
 				if (aChar == '\n')				//If there is a new line
 				{
-					fromPC++;
+					messagesRecieved++;
 					parseData();				//Parse the data that was received
-					newserial = true;
+					//newserial = true;
+
+					//If this came in on xbSerial it is the solar panel reporting so send it to the PC
+					toPC++;
+					Serial.print(destNode);
+					Serial.print(",");
+					for (int i = 0; i < sizeof(canIn); i++)
+					{
+						Serial.print(canOut[i]);
+						Serial.print(",");
+					}
+					Serial.println();
 				}
 				else
 				{
