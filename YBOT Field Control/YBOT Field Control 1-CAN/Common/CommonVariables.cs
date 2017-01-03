@@ -57,8 +57,8 @@ namespace YBOT_Field_Control_2016
         public string lightStatus;  //Node's light color
         public string gameMode;     //Node's game mode status
         public string lightMode;    //Node's light mode 
-        public byte fosValue;       //Other data sent from the node
-        public string fosColor;
+        public byte sunState;       //Other data sent from the node
+        public string alarmState;
         public bool scored;         //Flag true if scored, false if not
         //Network Testing Variables
         public int fromPC;          //Number of messages received from pc to command node

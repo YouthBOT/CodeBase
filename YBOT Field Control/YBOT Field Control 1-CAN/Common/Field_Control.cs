@@ -566,8 +566,10 @@ namespace YBOT_Field_Control_2016
                     this.node[nodeID].gameMode = this.cb.gameModeCode(parsedString[4]);
                     this.node[nodeID].inputStatus = Convert.ToByte(parsedString[5]);
                     this.node[nodeID].outputStatus = Convert.ToByte(parsedString[6]);
-                    this.node[nodeID].fosValue = Convert.ToByte(parsedString[7]);
-                    this.node[nodeID].fosColor = this.cb.colorCode(parsedString[8]);
+                    this.node[nodeID].sunState = Convert.ToByte(parsedString[7]);
+                    this.node[nodeID].alarmState = this.cb.colorCode(parsedString[8]);
+
+
                 }
             }
             catch (Exception ex) { logWrite("Update Node Failed - " + ex); }
