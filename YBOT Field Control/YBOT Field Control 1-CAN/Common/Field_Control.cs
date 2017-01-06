@@ -566,10 +566,8 @@ namespace YBOT_Field_Control_2016
                     this.node[nodeID].gameMode = this.cb.gameModeCode(parsedString[4]);
                     this.node[nodeID].inputStatus = Convert.ToByte(parsedString[5]);
                     this.node[nodeID].outputStatus = Convert.ToByte(parsedString[6]);
-                    this.node[nodeID].sunState = Convert.ToByte(parsedString[7]);
-                    this.node[nodeID].alarmState = this.cb.colorCode(parsedString[8]);
-
-
+                    this.node[nodeID].byte6 = Convert.ToByte(parsedString[7]);
+                    this.node[nodeID].byte7 = Convert.ToByte(parsedString[8]);
                 }
             }
             catch (Exception ex) { logWrite("Update Node Failed - " + ex); }
@@ -641,8 +639,8 @@ namespace YBOT_Field_Control_2016
                 this.node[nd.id].gameMode = "off";
                 this.node[nd.id].inputStatus = 0;
                 this.node[nd.id].outputStatus = 0;
-                this.node[nd.id].fosValue = 0;
-                this.node[nd.id].fosColor = "off";
+                this.node[nd.id].byte6 = 0;
+                this.node[nd.id].byte7 = 0;
                 this.node[nd.id].scored = false;
             }
         }

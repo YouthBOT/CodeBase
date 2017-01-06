@@ -69,3 +69,9 @@ C:\Users\YBOT CONTROL\Desktop\YBOT-11-1-16\YBOT Field Control\YBOT Field Control
 C:\Users\YBOT CONTROL\Desktop\YBOT-11-1-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.YBOT_Main.resources
 C:\Users\YBOT CONTROL\Desktop\YBOT-11-1-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.Properties.Resources.resources
 C:\Users\YBOT CONTROL\Desktop\YBOT-11-1-16\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT Field Control.csproj.GenerateResource.Cache
+D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBotSqlWrapper.dll
+D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\MySql.Data.dll
+D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\Renci.SshNet.dll
+D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\YBotSqlWrapper.pdb
+D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\bin\Debug\Renci.SshNet.xml
+D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBOT Field Control 1-CAN\obj\Debug\YBOT_Field_Control_2016.SqlConnectWindow.resources

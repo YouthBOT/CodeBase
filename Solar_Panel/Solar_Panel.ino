@@ -1755,7 +1755,8 @@ void homePanel()
 		currentLocation--;
 	}
 
-	
+	nodeStatus[6] = 9;
+	xbReport();
 	Serial.println("-----Panel Homed-----");
 	
 }

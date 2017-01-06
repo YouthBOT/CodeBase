@@ -24,6 +24,8 @@ namespace YBOT_Field_Control_2016
             gameMode = this.fc.ChangeGameMode(GameModes.reset);
 
             this.fc.ClearNodeState();
+
+            sunTower = 0;
         }
 
         /// <summary>
@@ -35,6 +37,20 @@ namespace YBOT_Field_Control_2016
 
             practiceMode = false;
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
+
+            //Wait for the solar panel to home.
+            while(this.fc.node[11].byte6 != 9)
+            {
+                Application.DoEvents();
+            }
+
+            sunTower = rndNum.Next(1, 11);
+            string str = ("7,1,4," + sunTower.ToString());
+            this.fc.SendMessage(11, str);
+            Thread.Sleep(20);
+            str = ("7,1,1,");
+            this.fc.SendMessage(sunTower, str);
+            Thread.Sleep(20);
 
             //Ring Bell
             this.fc.RingBell();
@@ -58,6 +74,20 @@ namespace YBOT_Field_Control_2016
 
             practiceMode = false;
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
+
+            //Wait for the solar panel to home.
+            while (this.fc.node[11].byte6 != 9)
+            {
+                Application.DoEvents();
+            }
+
+            sunTower = rndNum.Next(1, 11);
+            string str = ("7,1,4," + sunTower.ToString());
+            this.fc.SendMessage(11, str);
+            Thread.Sleep(20);
+            str = ("7,1,1,");
+            this.fc.SendMessage(sunTower, str);
+            Thread.Sleep(20);
 
             //Ring Bell
             this.fc.RingBell();
@@ -118,6 +148,17 @@ namespace YBOT_Field_Control_2016
                 if (this.fc.switchMode)
                 {
                     this.fc.switchMode = false;
+                    string str = ("7,0,0,");
+                    this.fc.SendMessage(sunTower, str);
+                    Thread.Sleep(20);
+                    sunTower = rndNum.Next(1, 11);
+                    str = ("7,1,4," + sunTower.ToString());
+                    this.fc.SendMessage(11, str);
+                    Thread.Sleep(20);
+                    str = ("7,1,1,");
+                    this.fc.SendMessage(sunTower, str);
+                    Thread.Sleep(20);
+
                     //this.fc.RobotTransmitters("both", State.off, State.on); //Turn on transmitter to Manual Mode
                     this.fc.RingBell();                        //Ring bell
                     Thread.Sleep(200);
@@ -133,7 +174,7 @@ namespace YBOT_Field_Control_2016
 
         public void AutoMode()
         {
-            //Autmode Code
+            //Automode Code here
         }
 
         public void ManualMode()

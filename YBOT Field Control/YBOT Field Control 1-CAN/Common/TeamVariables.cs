@@ -165,7 +165,73 @@ namespace YBOT_Field_Control_2016
         //Current year's game variables
         //------------------------------------------------------------------------------------------------\\
 
+        private int _autoTowerTested;           //Number of towers tested in automode
+        public int autoTowerTested
+        {
+            get { return _autoTowerTested; }
+            set { _autoTowerTested = value; }
+        }
 
+        private int _autoEmergencyTowerCycled;  //Number of towers cycled in automode
+        public int autoEmergencyTowerCycled
+        {
+            get { return _autoEmergencyTowerCycled; }
+            set { _autoEmergencyTowerCycled = value; }
+        }
+
+        private int _autoSolarPanelScore;       //Solar panel score for autonomous mode
+        public int autoSolarPanelScore
+        {
+            get { return _autoSolarPanelScore; }
+            set { _autoSolarPanelScore = value; }
+        }
+
+        private int _emergencyCleared;          //Number of towers cleared of emergency during manual mode
+        public int emergencyCleared
+        {
+            get { return _emergencyCleared; }
+            set { _emergencyCleared = value; }
+        }
+
+        private bool _emergencyBonus;           //If the teams earn the emergency bonus
+        public bool emergencyBonus
+        {
+            get { return _emergencyBonus; }
+            set { _emergencyBonus = value; }
+        }
+
+        private int _rocketPosition;            //Rocket position at the end of the game
+        public int rocketPosition
+        {
+            get { return _rocketPosition; }
+            set { _rocketPosition = value; }
+        }
+
+        private int _rockWeight;                //Rock weight in ounces
+        public int rockWeight
+        {
+            get { return _rockWeight; }
+            set { _rockWeight = value; }
+        }
+
+        private int _rockValue;                 //Final rock value
+        public int rockValue
+        {
+            get { return _rockValue; }
+            set { _rockValue = value; }
+        }
+
+        private int _rockScore;                 //Final rock score
+        public int rockScore
+        {
+            get { return _rockScore; }
+            set { _rockScore = value; }
+        }
+
+
+
+
+        //Team color 
         public Team(string teamColor)
         {
             _teamColor = teamColor;
@@ -187,6 +253,16 @@ namespace YBOT_Field_Control_2016
             manScore = 0;
             endGameScore = 0;
             autoMan = false;
+
+            autoEmergencyTowerCycled = 0;
+            autoSolarPanelScore = 0;
+            autoTowerTested = 0;
+            emergencyBonus = false;
+            emergencyCleared = 0;
+            rocketPosition = 0;
+            rockScore = 0;
+            rockValue = 0;
+            rockWeight = 0;
         }
     }
 }
