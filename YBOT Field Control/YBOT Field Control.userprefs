@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="YBOT Field Control 1-CAN/YBOT Field Control.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="YBOT Field Control 1-CAN/GUI/GameControl.cs">
+    <Files>
+      <File FileName="YBOT Field Control 1-CAN/GUI/GameControl.cs" Line="816" Column="29" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

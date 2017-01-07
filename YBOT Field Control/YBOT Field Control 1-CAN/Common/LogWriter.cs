@@ -139,8 +139,6 @@ namespace YBOT_Field_Control_2016
                 StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
                 sw.WriteLine(text);
                 sw.Close();
-
-                YbotSql.Instance.AddLog(text, fileName);
             }
             catch
             {
