@@ -493,6 +493,8 @@ void execute()
 			else if (selectedState == 4)
 			{
 				towerLocation(canIn[3]);
+				reportSent = false;
+				complete = false;
 			}
 			else if (selectedState == 9)
 			{
@@ -1093,6 +1095,490 @@ void gamePlayCanbus()
 		}
 	}
 
+}
+
+//Game Play Test Mode - All towers randomly respond 
+void gamePlayRandomTest()
+{
+	if (gameMode == 1)	//Ready
+	{
+		if (gameModeChanged)
+		{
+			wipeColor(yellow, 0, 1, 0, stripLength);
+			wipeColor(off, 0, 1, 0, stripLength);
+			gameModeChanged = false;
+			complete = false;
+		}
+	}
+	else if (gameMode == 2)	//Start
+	{
+		//not used at this time
+	}
+	else if (gameMode == 3)	//Autonomous
+	{
+		if (gameModeChanged)
+		{
+			solidColor(blue, 0, 0, stripLength);
+			gameModeChanged = false;
+
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, LOW);
+			}
+		}
+
+
+		if (!complete)
+		{
+			//Auto Test Code
+		}
+	}
+	else if (gameMode == 4)	//Man-Tonomous
+	{
+		if (gameModeChanged)
+		{
+			gameModeChanged = false;
+			complete = false;
+
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, HIGH);
+			}
+		}
+
+		if (!complete)
+		{
+			//ManTon Test Code
+		}
+	}
+	else if (gameMode == 5)	//Manual Mode
+	{
+		if (gameModeChanged)
+		{
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, HIGH);
+			}
+			wipeColor(blue, 0, 1, 0, stripLength);
+			wipeColor(off, 0, 1, 0, stripLength);
+			gameModeChanged = false;
+			complete = false;
+		}
+
+		if (!complete)
+		{
+			//Manual Test Coe
+		}
+	}
+	else if (gameMode == 6)	//End
+	{
+		if (gameModeChanged)
+		{
+			gameModeChanged = false;
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, LOW);
+				digitalWrite(manPin, LOW);
+			}
+		}
+	}
+	else if (gameMode == 7)	//Field Off
+	{
+		if (gameModeChanged)
+		{
+			solidColor(off, 0, 0, stripLength);
+			gameModeChanged = false;
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, LOW);
+				digitalWrite(manPin, LOW);
+			}
+		}
+
+	}
+	else if (gameMode == 8)	//Debug Mode
+	{
+		if (gameModeChanged)
+		{
+			wipeColor(blue, 0, 1, 0, stripLength);
+			wipeColor(yellow, 0, 1, 0, stripLength);
+			wipeColor(off, 0, 1, 0, stripLength);
+			gameModeChanged = false;
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, HIGH);
+			}
+		}
+
+		//Debug Test code
+	}
+	else  //Reset	
+	{
+		fieldReset();
+	}
+}
+
+//Game Play Test Mode - All Towers Respond at the same time with default color
+void gamePlaySpeedTest()
+{
+	if (gameMode == 1)	//Ready
+	{
+		if (gameModeChanged)
+		{
+			homePanel();
+			gameModeChanged = false;
+			fullPull = false;
+			nodeStatus[6] = 0;
+			nodeStatus[7] = 0;
+			complete = false;
+		}
+	}
+	else if (gameMode == 2)	//Start
+	{
+		//not used at this time
+	}
+	else if (gameMode == 3)	//Autonomous
+	{
+		if (gameModeChanged)
+		{
+			solidColor(blue, 0, 0, stripLength);
+			gameModeChanged = false;
+
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, LOW);
+			}
+		}
+		if (!complete)
+		{
+			int potVal = 1000;
+
+			if (potVal > 550)
+			{
+				digitalWrite(dirPin, HIGH);
+				if (potVal > 800) potVal = 1000;
+
+				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation++;
+				if (currentLocation > maxSteps) currentLocation = 0;
+
+			}
+			else if (potVal < 450)
+			{
+				digitalWrite(dirPin, LOW);
+				if (potVal < 200)potVal = 0;
+				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation--;
+				if (currentLocation < 0) currentLocation = (maxSteps - 1);
+			}
+			//Else the handle is in neutral
+			else
+			{
+				if (!reportSent)	//If report not sent
+				{
+					xbReport();
+					reportSent = true;													//Reset flag
+					complete = true;
+				}
+			}
+
+			//Angle Range Variables
+			int maxAngle1 = 0;
+			int minAngle1 = 0;
+
+			//If sun location is 0 do special math
+			if (sunLocation = 0)
+			{
+				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
+				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
+			}
+			else
+			{
+				maxAngle1 = sunLocation + angle_1;	//Calculate Max angle
+				minAngle1 = sunLocation - angle_1;	//Calculate Min angle
+			}
+
+			//If current panel location is within greatest angle
+			if ((currentLocation < maxAngle1) && (currentLocation > minAngle1))
+			{
+				//Angle Range Variables
+				int maxAngle2 = maxAngle1 - angle_2;
+				int minAngle2 = minAngle1 + angle_2;
+				int maxAngle3 = maxAngle1 - angle_3;
+				int minAngle3 = minAngle1 + angle_3;
+
+				//If current panel location is within 2nd angle
+				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
+				{
+					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+					nodeStatus[6] = 2;
+				}
+				//If current panel location is within 3rd angle
+				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+				{
+					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+					nodeStatus[6] = 3;
+					potVal = 500;
+				}
+				else
+				{
+					analogWrite(solarLED, 30);	//Turn on the LED 30/255
+					nodeStatus[6] = 1;
+				}
+			}
+			//Else turn off the LED
+			else
+			{
+				analogWrite(solarLED, LOW);
+				nodeStatus[6] = 0;
+			}
+		}
+	}
+	else if (gameMode == 4)	//Man-Tonomous
+	{
+		if (gameModeChanged)
+		{
+			gameModeChanged = false;
+			complete = false;
+
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, HIGH);
+			}
+		}
+		if (!complete)
+		{
+
+		}
+	}
+	else if (gameMode == 5)	//Manual Mode
+	{
+		if (gameModeChanged)
+		{
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, HIGH);
+			}
+			wipeColor(blue, 0, 1, 0, stripLength);
+			wipeColor(off, 0, 1, 0, stripLength);
+			gameModeChanged = false;
+			complete = false;
+		}
+
+		if (!complete)
+		{
+			int potVal = 1000;
+
+			if (potVal > 550)
+			{
+				digitalWrite(dirPin, HIGH);
+				if (potVal > 800) potVal = 1000;
+
+				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation++;
+				if (currentLocation > maxSteps) currentLocation = 0;
+
+			}
+			else if (potVal < 450)
+			{
+				digitalWrite(dirPin, LOW);
+				if (potVal < 200)potVal = 0;
+				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation--;
+				if (currentLocation < 0) currentLocation = (maxSteps - 1);
+			}
+			//Else the handle is in neutral
+			else
+			{
+				if (!reportSent)	//If report not sent
+				{
+					xbReport();
+					reportSent = true;													//Reset flag
+					complete = true;
+				}
+			}
+
+			//Angle Range Variables
+			int maxAngle1 = 0;
+			int minAngle1 = 0;
+
+			//If sun location is 0 do special math
+			if (sunLocation = 0)
+			{
+				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
+				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
+			}
+			else
+			{
+				maxAngle1 = sunLocation + angle_1;	//Calculate Max angle
+				minAngle1 = sunLocation - angle_1;	//Calculate Min angle
+			}
+
+			//If current panel location is within greatest angle
+			if ((currentLocation < maxAngle1) && (currentLocation > minAngle1))
+			{
+				//Angle Range Variables
+				int maxAngle2 = maxAngle1 - angle_2;
+				int minAngle2 = minAngle1 + angle_2;
+				int maxAngle3 = maxAngle1 - angle_3;
+				int minAngle3 = minAngle1 + angle_3;
+
+				//If current panel location is within 2nd angle
+				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
+				{
+					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+					nodeStatus[6] = 2;
+				}
+				//If current panel location is within 3rd angle
+				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+				{
+					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+					nodeStatus[6] = 3;
+					potVal = 500;
+				}
+				else
+				{
+					analogWrite(solarLED, 30);	//Turn on the LED 30/255
+					nodeStatus[6] = 1;
+				}
+			}
+			//Else turn off the LED
+			else
+			{
+				analogWrite(solarLED, LOW);
+				nodeStatus[6] = 0;
+			}
+		}
+
+	}
+	else if (gameMode == 6)	//End
+	{
+		if (gameModeChanged)
+		{
+			gameModeChanged = false;
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, LOW);
+				digitalWrite(manPin, LOW);
+			}
+		}
+	}
+	else if (gameMode == 7)	//Field Off
+	{
+		if (gameModeChanged)
+		{
+			solidColor(off, 0, 0, stripLength);
+			gameModeChanged = false;
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, LOW);
+				digitalWrite(manPin, LOW);
+			}
+		}
+
+	}
+	else if (gameMode == 8)	//Debug Mode
+	{
+		if (gameModeChanged)
+		{
+			wipeColor(blue, 0, 1, 0, stripLength);
+			wipeColor(yellow, 0, 1, 0, stripLength);
+			wipeColor(blue, 0, 1, 0, stripLength);
+			gameModeChanged = false;
+
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, HIGH);
+			}
+		}
+
+		int oldPullValue = currentPullValue;
+		currentPullValue = getScaledAnalog();
+		if (currentPullValue >= (maxRange - 1)) fullPull = true;
+
+
+		if (oldPullValue != currentPullValue)
+		{
+			if (fullPull)
+			{
+				nodeStatus[7] = 0;
+				alarmState = false;
+				report(0, commandNode);
+				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
+				fullPull = false;
+				delay(10);
+			}
+			else
+			{
+				nodeStatus[7] = 1;
+				alarmState = true;
+				report(0, commandNode);
+				wipeColor(red, 0, 0, firstPixel(2), lastPixel(2));
+			}
+		}
+
+		//If beam is broken
+		byte oldState = inputStates[0];
+		updateInputs();
+
+		if (oldState != inputStates[0])
+		{
+			if (checkInput(0))
+			{
+				nodeStatus[7] = 8;
+				report(0, commandNode);
+				testedState = true;
+				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+			}
+			else
+			{
+				nodeStatus[7] = 9;
+				report(0, commandNode);
+				testedState = false;
+				wipeColor(red, 0, 0, firstPixel(1), lastPixel(1));
+			}
+		}
+	}
+	else  //Reset	
+	{
+		fieldReset();
+	}
 }
 
 //Sends out one message when placed in Start

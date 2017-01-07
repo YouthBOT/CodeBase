@@ -186,6 +186,20 @@ namespace YBOT_Field_Control_2016
             set { _autoSolarPanelScore = value; }
         }
 
+        private int _manSolarPanelScore1;
+        public int manSolarPanelScore1
+        {
+            get { return _manSolarPanelScore1; }
+            set { _manSolarPanelScore1 = value; }
+        }
+
+        private int _manSolarPanelScore2;
+        public int manSolarPanelScore2
+        {
+            get { return _manSolarPanelScore2; }
+            set { _manSolarPanelScore2 = value; }
+        }
+
         private int _emergencyCleared;          //Number of towers cleared of emergency during manual mode
         public int emergencyCleared
         {
@@ -263,6 +277,8 @@ namespace YBOT_Field_Control_2016
             rockScore = 0;
             rockValue = 0;
             rockWeight = 0;
+            manSolarPanelScore1 = 0;
+            manSolarPanelScore2 = 0;
         }
     }
 }

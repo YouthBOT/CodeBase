@@ -49,7 +49,7 @@ uint32_t nodeID = (uint32_t)EEPROM.read(0);
 //Default Team's color is set automatically
 uint32_t defaultColor = red;
 //Red Side = 21 Green Side = 22 set automatically
-uint32_t defaultSide = 21;		
+uint32_t defaultSide = 21;
 //Command Node Number
 uint32_t commandNode = 31;
 
@@ -274,7 +274,7 @@ START_INIT:
 
 	solidColor(off, 0, 0, stripLength);	//Turn off light
 
-	
+
 	//Calibrate Tower
 	Serial.println("-----Calibrate Tower----");
 
@@ -296,7 +296,7 @@ START_INIT:
 		scaleFactor = (float)maxRange / (float)(maxRaw - minRaw);
 		wipeColor(green, 0, 0, 0, stripLength);   //Light tower green to show tower is calibrated         
 		delay(1000);                    //Visual Delay
-		wipeColor(green, 0, 0, 0, stripLength);                
+		wipeColor(green, 0, 0, 0, stripLength);
 	}
 	//Output for debugging
 	Serial.println(minRaw);
@@ -343,7 +343,7 @@ void loop()
 	//Watch for Player station button
 	if (gameMode == 3)
 	{
-		if  ((nodeID == 3) || (nodeID == 8))
+		if ((nodeID == 3) || (nodeID == 8))
 		{
 			int oldState = manTonState;
 			manTonState = digitalRead(manTonPin);
@@ -541,7 +541,7 @@ void gamePlayCanbus()
 			complete = false;
 			fullPull = false;
 			nodeStatus[6] = 0;
-			nodeStatus[7] = 0;
+			nodeStatus[7] = 9;
 			//nodeStatus[4] = 0;
 
 			if ((nodeID == 3) || (nodeID == 8))
@@ -654,14 +654,14 @@ void gamePlayCanbus()
 			wipeColor(blue, 0, 1, 0, stripLength);
 
 			//If tower has been tested set ring to green else set it to red
-			if(testedState) solidColor(green, 0, firstPixel(1), lastPixel(1));
+			if (testedState) solidColor(green, 0, firstPixel(1), lastPixel(1));
 			else solidColor(red, 0, firstPixel(1), lastPixel(1));
 
 			//Reset flags
 			gameModeChanged = false;
 			complete = false;
 			nodeStatus[6] = 0;
-			nodeStatus[7] = 0;
+			//nodeStatus[7] = 0;
 			//nodeStatus[4] = 0;
 
 			//Get current pull value so we can see if it has been moved
@@ -764,7 +764,7 @@ void gamePlayCanbus()
 
 		int oldPullValue = currentPullValue;
 		currentPullValue = getScaledAnalog();
-		if (currentPullValue >= (maxRange-1)) fullPull = true;
+		if (currentPullValue >= (maxRange - 1)) fullPull = true;
 
 
 		if (oldPullValue != currentPullValue)
@@ -931,7 +931,7 @@ void gamePlayRandomTest()
 				digitalWrite(manPin, HIGH);
 			}
 		}
-		
+
 		//Debug Test code
 	}
 	else  //Reset	
@@ -950,6 +950,10 @@ void gamePlaySpeedTest()
 			wipeColor(red, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
 			gameModeChanged = false;
+			fullPull = false;
+			defaultColor = getDefaultColor();
+			nodeStatus[6] = 0;
+			nodeStatus[7] = 0;
 			complete = false;
 		}
 	}
@@ -972,7 +976,22 @@ void gamePlaySpeedTest()
 		}
 		if (!complete)
 		{
-			//Auto Test Coe
+			//If the tower has been tested look to see if the valve has opened.
+			if (testedState)
+			{
+				nodeStatus[7] = 0;
+				alarmState = false;
+				report(0, commandNode);
+				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+				complete = true;
+			}
+			else
+			{
+				nodeStatus[7] = 8;
+				report(0, commandNode);
+				testedState = true;
+				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+			}
 		}
 	}
 	else if (gameMode == 4)	//Man-Tonomous
@@ -988,9 +1007,9 @@ void gamePlaySpeedTest()
 				digitalWrite(manPin, HIGH);
 			}
 		}
-		if (!complete) 
+		if (!complete)
 		{
-			//Auto Test Code
+
 		}
 	}
 	else if (gameMode == 5)	//Manual Mode
@@ -1010,7 +1029,15 @@ void gamePlaySpeedTest()
 
 		if (!complete)
 		{
-			//Manual Test Code
+			//If the tower has been tested look to see if the valve has opened.
+			if (testedState)
+			{
+				nodeStatus[7] = 0;
+				alarmState = false;
+				report(0, commandNode);
+				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+				complete = true;
+			}
 		}
 	}
 	else if (gameMode == 6)	//End
@@ -1045,15 +1072,62 @@ void gamePlaySpeedTest()
 		{
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
+			wipeColor(blue, 0, 1, 0, stripLength);
 			gameModeChanged = false;
+
 			if ((nodeID == 3) || (nodeID == 8))
 			{
 				digitalWrite(autoPin, HIGH);
 				digitalWrite(manPin, HIGH);
 			}
 		}
-		//Debug Code
+
+		int oldPullValue = currentPullValue;
+		currentPullValue = getScaledAnalog();
+		if (currentPullValue >= (maxRange - 1)) fullPull = true;
+
+
+		if (oldPullValue != currentPullValue)
+		{
+			if (fullPull)
+			{
+				nodeStatus[7] = 0;
+				alarmState = false;
+				report(0, commandNode);
+				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
+				fullPull = false;
+				delay(10);
+			}
+			else
+			{
+				nodeStatus[7] = 1;
+				alarmState = true;
+				report(0, commandNode);
+				wipeColor(red, 0, 0, firstPixel(2), lastPixel(2));
+			}
+		}
+
+		//If beam is broken
+		byte oldState = inputStates[0];
+		updateInputs();
+
+		if (oldState != inputStates[0])
+		{
+			if (checkInput(0))
+			{
+				nodeStatus[7] = 8;
+				report(0, commandNode);
+				testedState = true;
+				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+			}
+			else
+			{
+				nodeStatus[7] = 9;
+				report(0, commandNode);
+				testedState = false;
+				wipeColor(red, 0, 0, firstPixel(1), lastPixel(1));
+			}
+		}
 	}
 	else  //Reset	
 	{
@@ -1147,7 +1221,7 @@ void NetworkSpeedTest()
 			complete = false;
 		}
 
-		if(messagesSent < 255)
+		if (messagesSent < 255)
 		{
 			messagesSent++;
 			nodeStatus[7] = messagesSent;
@@ -1718,7 +1792,7 @@ int getRawanalog()
 	byte result;		// Average of readings
 	byte count = 20;	// Number of readings to take
 
-	for (int i = 0; i<count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		total += (float)analogRead(analog_PIN);
 	}
@@ -1739,7 +1813,7 @@ int getRawanalog()
 int getScaledAnalog()
 {
 	int result = (maxRaw - getRawanalog())*scaleFactor;
-	if (result<1) result = 0;	// No negative values
+	if (result < 1) result = 0;	// No negative values
 	return result;
 }
 

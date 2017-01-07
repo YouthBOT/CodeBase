@@ -487,6 +487,8 @@ namespace YBOT_Field_Control_2016
                 this.btnGreenMantonomous.BackColor = Color.Lime;
                 this.btnGreenMantonomous.ForeColor = Color.Black;
             }
+
+            if (green.autoMan && red.autoMan) joint.autoMan = true;
         }
 
         private void ScoreGame()
@@ -853,10 +855,10 @@ namespace YBOT_Field_Control_2016
                 this.green.autoMan = true;
                 this.GameLog("Green ManTonomous");
 
-                for (int i = 6; i <= 10; i++)
-                {
-                    this.fc.ChangeGameMode(i, GameModes.mantonomous);
-                }
+                //for (int i = 6; i <= 10; i++)
+                //{
+                //    this.fc.ChangeGameMode(i, GameModes.mantonomous);
+                //}
                 this.fc.RobotTransmitters("green", State.off, State.on);
             }
         }
@@ -871,10 +873,10 @@ namespace YBOT_Field_Control_2016
                 this.red.autoMan = true;
                 this.GameLog("Red ManTonomous");
 
-                for (int i = 1; i <= 5; i++)
-                {
-                    this.fc.ChangeGameMode(i, GameModes.mantonomous);
-                }
+                //for (int i = 1; i <= 5; i++)
+                //{
+                //    this.fc.ChangeGameMode(i, GameModes.mantonomous);
+                //}
                 this.fc.RobotTransmitters("red", State.off, State.on);
             }
         }
