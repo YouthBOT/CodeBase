@@ -606,7 +606,44 @@ void gamePlayCanbus()
 
 		if (!complete)
 		{
-			//ManTonomous Code Here
+			if (!complete)
+			{
+				//If the tower has been tested look to see if the valve has opened.
+				if (testedState)
+				{
+					//Get value of Pot
+					int pullValue = getScaledAnalog();
+					if (pullValue >= (maxRange - 1)) fullPull = true;
+
+					//If valve is fully opened
+					if (fullPull)
+					{
+						nodeStatus[7] = 0;
+						alarmState = false;
+						report(0, commandNode);
+						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+						complete = true;
+					}
+				}
+				else
+				{
+					//Recored old state and check current state
+					byte oldState = inputStates[0];
+					updateInputs();
+					//If state has changed
+					if (oldState != inputStates[0])
+					{
+						//If beam is broken
+						if (checkInput(0))
+						{
+							nodeStatus[7] = 8;
+							report(0, commandNode);
+							testedState = true;
+							wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+						}
+					}
+				}
+			}
 		}
 	}
 	else if (gameMode == 5)	//Manual Mode

@@ -140,6 +140,7 @@ int messagesRecieved = 0;
 boolean sunState = false;			//Sun's state True = on, False = off
 boolean alarmState = false;			//Alarm state True = on, False = offF
 boolean testedState = false;		//Tower's teseted state True = tested, False = not tested
+boolean reportSent = false;
 
 int currentLocation = 0;			//Current panel location in steps
 int sunTower = 0;					//Sun's tower number
@@ -594,8 +595,7 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
+			homePanel();
 			gameModeChanged = false;
 			fullPull = false;
 			nodeStatus[6] = 0;
@@ -605,32 +605,344 @@ void gamePlayCanbus()
 	}
 	else if (gameMode == 2)	//Start
 	{
-		homePanel();
+		
 	}
 	else if (gameMode == 3)	//Autonomous
 	{
 		if (gameModeChanged)
 		{
 			gameModeChanged = false;
+			reportSent = false;
 			complete = false;
 			fullPull = false;
 			nodeStatus[6] = 0;
 			nodeStatus[7] = 0;
-			//nodeStatus[4] = 0;
+			nodeStatus[4] = 0;
 		}
 
 		if (!complete)
 		{
 
+			potValL = analogRead(potInputL);
+			potValR = analogRead(potInputR);
+
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
+
+			if (potVal > 550)
+			{
+				digitalWrite(dirPin, HIGH);
+				if (potVal > 800) potVal = 1000;
+
+				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation++;
+				if (currentLocation > maxSteps) currentLocation = 0;
+
+			}
+			else if (potVal < 450)
+			{
+				digitalWrite(dirPin, LOW);
+				if (potVal < 200)potVal = 0;
+				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation--;
+				if (currentLocation < 0) currentLocation = (maxSteps - 1);
+			}
+			//Else the handle is in neutral
+			else
+			{
+				if (!reportSent)	//If report not sent
+				{
+					xbReport();
+					reportSent = true;													//Reset flag
+				}
+			}
+
+			//Angle Range Variables
+			int maxAngle1 = 0;
+			int minAngle1 = 0;
+
+			//If sun location is 0 do special math
+			if (sunLocation = 0)
+			{
+				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
+				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
+			}
+			else
+			{
+				maxAngle1 = sunLocation + angle_1;	//Calculate Max angle
+				minAngle1 = sunLocation - angle_1;	//Calculate Min angle
+			}
+
+			//If current panel location is within greatest angle
+			if ((currentLocation < maxAngle1) && (currentLocation > minAngle1))
+			{
+				//Angle Range Variables
+				int maxAngle2 = maxAngle1 - angle_2;
+				int minAngle2 = minAngle1 + angle_2;
+				int maxAngle3 = maxAngle1 - angle_3;
+				int minAngle3 = minAngle1 + angle_3;
+
+				//If current panel location is within 2nd angle
+				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
+				{
+					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+					nodeStatus[6] = 2;
+				}
+				//If current panel location is within 3rd angle
+				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+				{
+					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+					nodeStatus[6] = 3;
+				}
+				else
+				{
+					analogWrite(solarLED, 30);	//Turn on the LED 30/255
+					nodeStatus[6] = 1;
+				}
+			}
+			//Else turn off the LED
+			else
+			{
+				analogWrite(solarLED, LOW);
+				nodeStatus[6] = 0;
+			}
 		}
 	}
 	else if (gameMode == 4)	//Man-Tonomous
 	{
+		if (!complete)
+		{
 
+			potValL = analogRead(potInputL);
+			potValR = analogRead(potInputR);
+
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
+
+			if (potVal > 550)
+			{
+				digitalWrite(dirPin, HIGH);
+				if (potVal > 800) potVal = 1000;
+
+				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation++;
+				if (currentLocation > maxSteps) currentLocation = 0;
+
+			}
+			else if (potVal < 450)
+			{
+				digitalWrite(dirPin, LOW);
+				if (potVal < 200)potVal = 0;
+				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation--;
+				if (currentLocation < 0) currentLocation = (maxSteps - 1);
+			}
+			//Else the handle is in neutral
+			else
+			{
+				if (!reportSent)	//If report not sent
+				{
+					xbReport();
+					reportSent = true;													//Reset flag
+				}
+			}
+
+			//Angle Range Variables
+			int maxAngle1 = 0;
+			int minAngle1 = 0;
+
+			//If sun location is 0 do special math
+			if (sunLocation = 0)
+			{
+				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
+				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
+			}
+			else
+			{
+				maxAngle1 = sunLocation + angle_1;	//Calculate Max angle
+				minAngle1 = sunLocation - angle_1;	//Calculate Min angle
+			}
+
+			//If current panel location is within greatest angle
+			if ((currentLocation < maxAngle1) && (currentLocation > minAngle1))
+			{
+				//Angle Range Variables
+				int maxAngle2 = maxAngle1 - angle_2;
+				int minAngle2 = minAngle1 + angle_2;
+				int maxAngle3 = maxAngle1 - angle_3;
+				int minAngle3 = minAngle1 + angle_3;
+
+				//If current panel location is within 2nd angle
+				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
+				{
+					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+					nodeStatus[6] = 2;
+				}
+				//If current panel location is within 3rd angle
+				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+				{
+					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+					nodeStatus[6] = 3;
+				}
+				else
+				{
+					analogWrite(solarLED, 30);	//Turn on the LED 30/255
+					nodeStatus[6] = 1;
+				}
+			}
+			//Else turn off the LED
+			else
+			{
+				analogWrite(solarLED, LOW);
+				nodeStatus[6] = 0;
+			}
+		}
 	}
 	else if (gameMode == 5)	//Manual Mode
 	{
+		if (gameModeChanged)
+		{
+			gameModeChanged = false;
+			reportSent = false;
+			complete = false;
+			fullPull = false;
+			nodeStatus[6] = 0;
+			nodeStatus[7] = 0;
+			nodeStatus[4] = 0;
+		}
 
+		if (!complete)
+		{
+
+			potValL = analogRead(potInputL);
+			potValR = analogRead(potInputR);
+
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
+
+			if (potVal > 550)
+			{
+				digitalWrite(dirPin, HIGH);
+				if (potVal > 800) potVal = 1000;
+
+				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation++;
+				if (currentLocation > maxSteps) currentLocation = 0;
+
+			}
+			else if (potVal < 450)
+			{
+				digitalWrite(dirPin, LOW);
+				if (potVal < 200)potVal = 0;
+				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation--;
+				if (currentLocation < 0) currentLocation = (maxSteps - 1);
+			}
+			//Else the handle is in neutral
+			else
+			{
+				if (!reportSent)	//If report not sent
+				{
+					xbReport();
+					reportSent = true;													//Reset flag
+				}
+			}
+
+			//Angle Range Variables
+			int maxAngle1 = 0;
+			int minAngle1 = 0;
+
+			//If sun location is 0 do special math
+			if (sunLocation = 0)
+			{
+				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
+				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
+			}
+			else
+			{
+				maxAngle1 = sunLocation + angle_1;	//Calculate Max angle
+				minAngle1 = sunLocation - angle_1;	//Calculate Min angle
+			}
+
+			//If current panel location is within greatest angle
+			if ((currentLocation < maxAngle1) && (currentLocation > minAngle1))
+			{
+				//Angle Range Variables
+				int maxAngle2 = maxAngle1 - angle_2;
+				int minAngle2 = minAngle1 + angle_2;
+				int maxAngle3 = maxAngle1 - angle_3;
+				int minAngle3 = minAngle1 + angle_3;
+
+				//If current panel location is within 2nd angle
+				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
+				{
+					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+					nodeStatus[6] = 2;
+				}
+				//If current panel location is within 3rd angle
+				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+				{
+					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+					nodeStatus[6] = 3;
+				}
+				else
+				{
+					analogWrite(solarLED, 30);	//Turn on the LED 30/255
+					nodeStatus[6] = 1;
+				}
+			}
+			//Else turn off the LED
+			else
+			{
+				analogWrite(solarLED, LOW);
+				nodeStatus[6] = 0;
+			}
+		}
 	}
 	else if (gameMode == 6)	//End
 	{
@@ -1221,6 +1533,20 @@ void report(uint8_t check, uint32_t dAddress)
 	}
 }
 
+void xbReport()
+{
+	xbSerial.print("$,");
+	xbSerial.print(nodeID);
+	xbSerial.print(",");
+	for (int i = 0; i < sizeof(nodeStatus); i++)
+	{
+		xbSerial.print(nodeStatus[i]);
+		xbSerial.print(",");
+	}
+	xbSerial.println();
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <method>	updateInputs </method>
 ///
@@ -1429,7 +1755,8 @@ void homePanel()
 		currentLocation--;
 	}
 
-	
+	nodeStatus[6] = 9;
+	xbReport();
 	Serial.println("-----Panel Homed-----");
 	
 }

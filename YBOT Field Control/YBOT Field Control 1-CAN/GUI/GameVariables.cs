@@ -52,6 +52,8 @@ namespace YBOT_Field_Control_2016
         //Current year's game variables
         //------------------------------------------------------------------------------------------------\\
 
-
+        private Random rndNum = new Random();   //Random Number
+        private int sunTower = 0;               //Tower number to be the sun tower
+        public Team joint = new Team("joint");  //Joint team values
     }
 }
