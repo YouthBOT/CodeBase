@@ -119,7 +119,9 @@ namespace YBotSqlWrapper
                     sql);
                 command.ExecuteNonQuery ();
             } else {
+#if DEBUG
                 Console.WriteLine ("SQL server connection is null");
+#endif
             }
         }
     }

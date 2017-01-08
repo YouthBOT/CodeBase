@@ -40,3 +40,11 @@ D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBotSqlWrapper\
 D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBotSqlWrapper\obj\Debug\YBotSqlWrapper.csprojResolveAssemblyReference.cache
 D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBotSqlWrapper\obj\Debug\YBotSqlWrapper.dll
 D:\YBOT\2016-2017\Software\YBOT_Field_Control\YBOT Field Control\YBotSqlWrapper\obj\Debug\YBotSqlWrapper.pdb
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\bin\Debug\YBotSqlWrapper.dll.config
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\bin\Debug\YBotSqlWrapper.dll
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\bin\Debug\YBotSqlWrapper.pdb
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\bin\Debug\Renci.SshNet.dll
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\bin\Debug\Renci.SshNet.xml
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\obj\Debug\YBotSqlWrapper.csprojResolveAssemblyReference.cache
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\obj\Debug\YBotSqlWrapper.dll
+C:\Users\sbrandt\Dropbox\YBot\Code2017\YBOT Field Control\YBotSqlWrapper\obj\Debug\YBotSqlWrapper.pdb

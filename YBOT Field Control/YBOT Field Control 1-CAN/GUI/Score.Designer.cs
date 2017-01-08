@@ -31,18 +31,16 @@
             this.btnOverride = new System.Windows.Forms.Button();
             this.btnUpdateScore = new System.Windows.Forms.Button();
             this.grRedFinalScore = new System.Windows.Forms.GroupBox();
-            this.tbRedScore = new System.Windows.Forms.TextBox();
             this.tbRedPenalty = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lbRedPenaltyPointValue = new System.Windows.Forms.Label();
             this.lbRedPenaltyScore = new System.Windows.Forms.Label();
             this.btnRedDq = new System.Windows.Forms.Button();
             this.lblRedDQ = new System.Windows.Forms.Label();
             this.lblRedPenalty = new System.Windows.Forms.Label();
             this.lblRedFinalScore = new System.Windows.Forms.Label();
             this.gbGreenFinalScore = new System.Windows.Forms.GroupBox();
-            this.tbGreenScore = new System.Windows.Forms.TextBox();
             this.tbGreenPenalty = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lbGreenPenaltyPointValue = new System.Windows.Forms.Label();
             this.lbGreenPenaltyScore = new System.Windows.Forms.Label();
             this.btnGreenDq = new System.Windows.Forms.Button();
             this.lblGreenDq = new System.Windows.Forms.Label();
@@ -50,7 +48,7 @@
             this.lblGreenFinalScore = new System.Windows.Forms.Label();
             this.btnFinalScore = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.tbJointScore = new System.Windows.Forms.TextBox();
+            this.cbEmergencyCycledPenalty = new System.Windows.Forms.ComboBox();
             this.tbRockWeight = new System.Windows.Forms.TextBox();
             this.tbManualEmergencyCycled = new System.Windows.Forms.TextBox();
             this.tbManualSolar2Score = new System.Windows.Forms.TextBox();
@@ -58,8 +56,7 @@
             this.tbAutoSolarScore = new System.Windows.Forms.TextBox();
             this.tbAutoEmergencyCycled = new System.Windows.Forms.TextBox();
             this.tbAutoCornersTested = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.lbEmergencyPenaltyPointValue = new System.Windows.Forms.Label();
+            this.lbRocketLaunchedPointValue = new System.Windows.Forms.Label();
             this.lbManualEmergencyCycledPointValue = new System.Windows.Forms.Label();
             this.lbAutoEmergencyCycledPointValue = new System.Windows.Forms.Label();
             this.lbAutoCornersTestedPointValue = new System.Windows.Forms.Label();
@@ -71,7 +68,7 @@
             this.lbAutoCornerTestedScore = new System.Windows.Forms.Label();
             this.cbRocketLaunched = new System.Windows.Forms.CheckBox();
             this.cbRocketPosition = new System.Windows.Forms.ComboBox();
-            this.lbJointScore = new System.Windows.Forms.Label();
+            this.lbJointScoreLabel = new System.Windows.Forms.Label();
             this.lbRocketLaunched = new System.Windows.Forms.Label();
             this.lbRockWeight = new System.Windows.Forms.Label();
             this.lbRocketPosition = new System.Windows.Forms.Label();
@@ -82,7 +79,9 @@
             this.lbAutoSolar = new System.Windows.Forms.Label();
             this.lbAutoEmergencyCycled = new System.Windows.Forms.Label();
             this.lbAutoCornersTested = new System.Windows.Forms.Label();
-            this.cbEmergencyCycledPenalty = new System.Windows.Forms.ComboBox();
+            this.lbJointScore = new System.Windows.Forms.Label();
+            this.lbGreenScore = new System.Windows.Forms.Label();
+            this.lbRedScore = new System.Windows.Forms.Label();
             this.grRedFinalScore.SuspendLayout();
             this.gbGreenFinalScore.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -118,9 +117,9 @@
             // 
             // grRedFinalScore
             // 
-            this.grRedFinalScore.Controls.Add(this.tbRedScore);
+            this.grRedFinalScore.Controls.Add(this.lbRedScore);
             this.grRedFinalScore.Controls.Add(this.tbRedPenalty);
-            this.grRedFinalScore.Controls.Add(this.label3);
+            this.grRedFinalScore.Controls.Add(this.lbRedPenaltyPointValue);
             this.grRedFinalScore.Controls.Add(this.lbRedPenaltyScore);
             this.grRedFinalScore.Controls.Add(this.btnRedDq);
             this.grRedFinalScore.Controls.Add(this.lblRedDQ);
@@ -135,15 +134,6 @@
             this.grRedFinalScore.TabStop = false;
             this.grRedFinalScore.Text = "Red Final Score";
             // 
-            // tbRedScore
-            // 
-            this.tbRedScore.Enabled = false;
-            this.tbRedScore.Location = new System.Drawing.Point(210, 101);
-            this.tbRedScore.Name = "tbRedScore";
-            this.tbRedScore.Size = new System.Drawing.Size(100, 31);
-            this.tbRedScore.TabIndex = 193;
-            this.tbRedScore.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
             // tbRedPenalty
             // 
             this.tbRedPenalty.Enabled = false;
@@ -152,25 +142,26 @@
             this.tbRedPenalty.Size = new System.Drawing.Size(67, 31);
             this.tbRedPenalty.TabIndex = 185;
             this.tbRedPenalty.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tbRedPenalty.Validating += new System.ComponentModel.CancelEventHandler(this.PenaltyValidation);
             // 
-            // label3
+            // lbRedPenaltyPointValue
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.Red;
-            this.label3.Location = new System.Drawing.Point(206, 35);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(43, 24);
-            this.label3.TabIndex = 184;
-            this.label3.Text = "200";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lbRedPenaltyPointValue.AutoSize = true;
+            this.lbRedPenaltyPointValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbRedPenaltyPointValue.ForeColor = System.Drawing.Color.Red;
+            this.lbRedPenaltyPointValue.Location = new System.Drawing.Point(189, 35);
+            this.lbRedPenaltyPointValue.Name = "lbRedPenaltyPointValue";
+            this.lbRedPenaltyPointValue.Size = new System.Drawing.Size(43, 24);
+            this.lbRedPenaltyPointValue.TabIndex = 184;
+            this.lbRedPenaltyPointValue.Text = "200";
+            this.lbRedPenaltyPointValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lbRedPenaltyScore
             // 
             this.lbRedPenaltyScore.AutoSize = true;
             this.lbRedPenaltyScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbRedPenaltyScore.ForeColor = System.Drawing.Color.Red;
-            this.lbRedPenaltyScore.Location = new System.Drawing.Point(289, 35);
+            this.lbRedPenaltyScore.Location = new System.Drawing.Point(239, 35);
             this.lbRedPenaltyScore.Name = "lbRedPenaltyScore";
             this.lbRedPenaltyScore.Size = new System.Drawing.Size(21, 24);
             this.lbRedPenaltyScore.TabIndex = 177;
@@ -181,9 +172,9 @@
             // 
             this.btnRedDq.Enabled = false;
             this.btnRedDq.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.btnRedDq.Location = new System.Drawing.Point(210, 66);
+            this.btnRedDq.Location = new System.Drawing.Point(243, 66);
             this.btnRedDq.Name = "btnRedDq";
-            this.btnRedDq.Size = new System.Drawing.Size(100, 31);
+            this.btnRedDq.Size = new System.Drawing.Size(67, 31);
             this.btnRedDq.TabIndex = 136;
             this.btnRedDq.UseVisualStyleBackColor = true;
             this.btnRedDq.Click += new System.EventHandler(this.btnRedDq_Click);
@@ -226,9 +217,9 @@
             // 
             // gbGreenFinalScore
             // 
-            this.gbGreenFinalScore.Controls.Add(this.tbGreenScore);
+            this.gbGreenFinalScore.Controls.Add(this.lbGreenScore);
             this.gbGreenFinalScore.Controls.Add(this.tbGreenPenalty);
-            this.gbGreenFinalScore.Controls.Add(this.label2);
+            this.gbGreenFinalScore.Controls.Add(this.lbGreenPenaltyPointValue);
             this.gbGreenFinalScore.Controls.Add(this.lbGreenPenaltyScore);
             this.gbGreenFinalScore.Controls.Add(this.btnGreenDq);
             this.gbGreenFinalScore.Controls.Add(this.lblGreenDq);
@@ -243,15 +234,6 @@
             this.gbGreenFinalScore.TabStop = false;
             this.gbGreenFinalScore.Text = "Green Final Score";
             // 
-            // tbGreenScore
-            // 
-            this.tbGreenScore.Enabled = false;
-            this.tbGreenScore.Location = new System.Drawing.Point(210, 101);
-            this.tbGreenScore.Name = "tbGreenScore";
-            this.tbGreenScore.Size = new System.Drawing.Size(100, 31);
-            this.tbGreenScore.TabIndex = 192;
-            this.tbGreenScore.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
             // tbGreenPenalty
             // 
             this.tbGreenPenalty.Enabled = false;
@@ -260,25 +242,26 @@
             this.tbGreenPenalty.Size = new System.Drawing.Size(67, 31);
             this.tbGreenPenalty.TabIndex = 184;
             this.tbGreenPenalty.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tbGreenPenalty.Validating += new System.ComponentModel.CancelEventHandler(this.PenaltyValidation);
             // 
-            // label2
+            // lbGreenPenaltyPointValue
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.Red;
-            this.label2.Location = new System.Drawing.Point(206, 35);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(43, 24);
-            this.label2.TabIndex = 183;
-            this.label2.Text = "200";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lbGreenPenaltyPointValue.AutoSize = true;
+            this.lbGreenPenaltyPointValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbGreenPenaltyPointValue.ForeColor = System.Drawing.Color.Red;
+            this.lbGreenPenaltyPointValue.Location = new System.Drawing.Point(189, 35);
+            this.lbGreenPenaltyPointValue.Name = "lbGreenPenaltyPointValue";
+            this.lbGreenPenaltyPointValue.Size = new System.Drawing.Size(43, 24);
+            this.lbGreenPenaltyPointValue.TabIndex = 183;
+            this.lbGreenPenaltyPointValue.Text = "200";
+            this.lbGreenPenaltyPointValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lbGreenPenaltyScore
             // 
             this.lbGreenPenaltyScore.AutoSize = true;
             this.lbGreenPenaltyScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbGreenPenaltyScore.ForeColor = System.Drawing.Color.Red;
-            this.lbGreenPenaltyScore.Location = new System.Drawing.Point(289, 35);
+            this.lbGreenPenaltyScore.Location = new System.Drawing.Point(239, 35);
             this.lbGreenPenaltyScore.Name = "lbGreenPenaltyScore";
             this.lbGreenPenaltyScore.Size = new System.Drawing.Size(21, 24);
             this.lbGreenPenaltyScore.TabIndex = 176;
@@ -289,9 +272,9 @@
             // 
             this.btnGreenDq.Enabled = false;
             this.btnGreenDq.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.btnGreenDq.Location = new System.Drawing.Point(210, 66);
+            this.btnGreenDq.Location = new System.Drawing.Point(243, 66);
             this.btnGreenDq.Name = "btnGreenDq";
-            this.btnGreenDq.Size = new System.Drawing.Size(100, 31);
+            this.btnGreenDq.Size = new System.Drawing.Size(67, 31);
             this.btnGreenDq.TabIndex = 135;
             this.btnGreenDq.UseVisualStyleBackColor = true;
             this.btnGreenDq.Click += new System.EventHandler(this.btnGreenDq_Click);
@@ -348,8 +331,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.lbJointScore);
             this.groupBox1.Controls.Add(this.cbEmergencyCycledPenalty);
-            this.groupBox1.Controls.Add(this.tbJointScore);
             this.groupBox1.Controls.Add(this.tbRockWeight);
             this.groupBox1.Controls.Add(this.tbManualEmergencyCycled);
             this.groupBox1.Controls.Add(this.tbManualSolar2Score);
@@ -357,8 +340,7 @@
             this.groupBox1.Controls.Add(this.tbAutoSolarScore);
             this.groupBox1.Controls.Add(this.tbAutoEmergencyCycled);
             this.groupBox1.Controls.Add(this.tbAutoCornersTested);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.lbEmergencyPenaltyPointValue);
+            this.groupBox1.Controls.Add(this.lbRocketLaunchedPointValue);
             this.groupBox1.Controls.Add(this.lbManualEmergencyCycledPointValue);
             this.groupBox1.Controls.Add(this.lbAutoEmergencyCycledPointValue);
             this.groupBox1.Controls.Add(this.lbAutoCornersTestedPointValue);
@@ -370,7 +352,7 @@
             this.groupBox1.Controls.Add(this.lbAutoCornerTestedScore);
             this.groupBox1.Controls.Add(this.cbRocketLaunched);
             this.groupBox1.Controls.Add(this.cbRocketPosition);
-            this.groupBox1.Controls.Add(this.lbJointScore);
+            this.groupBox1.Controls.Add(this.lbJointScoreLabel);
             this.groupBox1.Controls.Add(this.lbRocketLaunched);
             this.groupBox1.Controls.Add(this.lbRockWeight);
             this.groupBox1.Controls.Add(this.lbRocketPosition);
@@ -390,13 +372,19 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Joint Scores";
             // 
-            // tbJointScore
+            // cbEmergencyCycledPenalty
             // 
-            this.tbJointScore.Enabled = false;
-            this.tbJointScore.Location = new System.Drawing.Point(535, 381);
-            this.tbJointScore.Name = "tbJointScore";
-            this.tbJointScore.Size = new System.Drawing.Size(100, 31);
-            this.tbJointScore.TabIndex = 191;
+            this.cbEmergencyCycledPenalty.Enabled = false;
+            this.cbEmergencyCycledPenalty.ForeColor = System.Drawing.Color.Red;
+            this.cbEmergencyCycledPenalty.FormattingEnabled = true;
+            this.cbEmergencyCycledPenalty.Items.AddRange(new object[] {
+            "0",
+            "250"});
+            this.cbEmergencyCycledPenalty.Location = new System.Drawing.Point(535, 241);
+            this.cbEmergencyCycledPenalty.Name = "cbEmergencyCycledPenalty";
+            this.cbEmergencyCycledPenalty.Size = new System.Drawing.Size(100, 33);
+            this.cbEmergencyCycledPenalty.TabIndex = 192;
+            this.cbEmergencyCycledPenalty.Text = "0";
             // 
             // tbRockWeight
             // 
@@ -404,6 +392,8 @@
             this.tbRockWeight.Name = "tbRockWeight";
             this.tbRockWeight.Size = new System.Drawing.Size(100, 31);
             this.tbRockWeight.TabIndex = 190;
+            this.tbRockWeight.Text = "0";
+            this.tbRockWeight.Validating += new System.ComponentModel.CancelEventHandler(this.RockWeightValidation);
             // 
             // tbManualEmergencyCycled
             // 
@@ -421,6 +411,7 @@
             this.tbManualSolar2Score.Name = "tbManualSolar2Score";
             this.tbManualSolar2Score.Size = new System.Drawing.Size(100, 31);
             this.tbManualSolar2Score.TabIndex = 187;
+            this.tbManualSolar2Score.Validating += new System.ComponentModel.CancelEventHandler(this.IntegerValidation);
             // 
             // tbManualSolar1Score
             // 
@@ -429,6 +420,7 @@
             this.tbManualSolar1Score.Name = "tbManualSolar1Score";
             this.tbManualSolar1Score.Size = new System.Drawing.Size(100, 31);
             this.tbManualSolar1Score.TabIndex = 186;
+            this.tbManualSolar1Score.Validating += new System.ComponentModel.CancelEventHandler(this.IntegerValidation);
             // 
             // tbAutoSolarScore
             // 
@@ -437,6 +429,7 @@
             this.tbAutoSolarScore.Name = "tbAutoSolarScore";
             this.tbAutoSolarScore.Size = new System.Drawing.Size(100, 31);
             this.tbAutoSolarScore.TabIndex = 185;
+            this.tbAutoSolarScore.Validating += new System.ComponentModel.CancelEventHandler(this.IntegerValidation);
             // 
             // tbAutoEmergencyCycled
             // 
@@ -456,29 +449,17 @@
             this.tbAutoCornersTested.TabIndex = 183;
             this.tbAutoCornersTested.Validating += new System.ComponentModel.CancelEventHandler(this.TowerIntegerValidation);
             // 
-            // label1
+            // lbRocketLaunchedPointValue
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label1.Location = new System.Drawing.Point(465, 350);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 24);
-            this.label1.TabIndex = 182;
-            this.label1.Text = "100";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // lbEmergencyPenaltyPointValue
-            // 
-            this.lbEmergencyPenaltyPointValue.AutoSize = true;
-            this.lbEmergencyPenaltyPointValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbEmergencyPenaltyPointValue.ForeColor = System.Drawing.Color.Red;
-            this.lbEmergencyPenaltyPointValue.Location = new System.Drawing.Point(461, 245);
-            this.lbEmergencyPenaltyPointValue.Name = "lbEmergencyPenaltyPointValue";
-            this.lbEmergencyPenaltyPointValue.Size = new System.Drawing.Size(43, 24);
-            this.lbEmergencyPenaltyPointValue.TabIndex = 181;
-            this.lbEmergencyPenaltyPointValue.Text = "250";
-            this.lbEmergencyPenaltyPointValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lbRocketLaunchedPointValue.AutoSize = true;
+            this.lbRocketLaunchedPointValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbRocketLaunchedPointValue.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.lbRocketLaunchedPointValue.Location = new System.Drawing.Point(465, 350);
+            this.lbRocketLaunchedPointValue.Name = "lbRocketLaunchedPointValue";
+            this.lbRocketLaunchedPointValue.Size = new System.Drawing.Size(43, 24);
+            this.lbRocketLaunchedPointValue.TabIndex = 182;
+            this.lbRocketLaunchedPointValue.Text = "100";
+            this.lbRocketLaunchedPointValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // lbManualEmergencyCycledPointValue
             // 
@@ -521,7 +502,7 @@
             this.lbRocketLaunchedScore.AutoSize = true;
             this.lbRocketLaunchedScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbRocketLaunchedScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbRocketLaunchedScore.Location = new System.Drawing.Point(614, 350);
+            this.lbRocketLaunchedScore.Location = new System.Drawing.Point(531, 350);
             this.lbRocketLaunchedScore.Name = "lbRocketLaunchedScore";
             this.lbRocketLaunchedScore.Size = new System.Drawing.Size(21, 24);
             this.lbRocketLaunchedScore.TabIndex = 176;
@@ -533,7 +514,7 @@
             this.lbManualEmergencyCycledScore.AutoSize = true;
             this.lbManualEmergencyCycledScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbManualEmergencyCycledScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbManualEmergencyCycledScore.Location = new System.Drawing.Point(614, 210);
+            this.lbManualEmergencyCycledScore.Location = new System.Drawing.Point(531, 210);
             this.lbManualEmergencyCycledScore.Name = "lbManualEmergencyCycledScore";
             this.lbManualEmergencyCycledScore.Size = new System.Drawing.Size(21, 24);
             this.lbManualEmergencyCycledScore.TabIndex = 168;
@@ -557,19 +538,19 @@
             this.lbRockScore.AutoSize = true;
             this.lbRockScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbRockScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbRockScore.Location = new System.Drawing.Point(614, 315);
+            this.lbRockScore.Location = new System.Drawing.Point(531, 315);
             this.lbRockScore.Name = "lbRockScore";
             this.lbRockScore.Size = new System.Drawing.Size(21, 24);
             this.lbRockScore.TabIndex = 166;
             this.lbRockScore.Text = "0";
-            this.lbRockScore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lbRockScore.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lbAutoEmergencyCycledScore
             // 
             this.lbAutoEmergencyCycledScore.AutoSize = true;
             this.lbAutoEmergencyCycledScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbAutoEmergencyCycledScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbAutoEmergencyCycledScore.Location = new System.Drawing.Point(614, 70);
+            this.lbAutoEmergencyCycledScore.Location = new System.Drawing.Point(531, 73);
             this.lbAutoEmergencyCycledScore.Name = "lbAutoEmergencyCycledScore";
             this.lbAutoEmergencyCycledScore.Size = new System.Drawing.Size(21, 24);
             this.lbAutoEmergencyCycledScore.TabIndex = 165;
@@ -581,7 +562,7 @@
             this.lbAutoCornerTestedScore.AutoSize = true;
             this.lbAutoCornerTestedScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbAutoCornerTestedScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbAutoCornerTestedScore.Location = new System.Drawing.Point(614, 35);
+            this.lbAutoCornerTestedScore.Location = new System.Drawing.Point(531, 31);
             this.lbAutoCornerTestedScore.Name = "lbAutoCornerTestedScore";
             this.lbAutoCornerTestedScore.Size = new System.Drawing.Size(21, 24);
             this.lbAutoCornerTestedScore.TabIndex = 164;
@@ -592,12 +573,14 @@
             // 
             this.cbRocketLaunched.AutoSize = true;
             this.cbRocketLaunched.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cbRocketLaunched.Enabled = false;
             this.cbRocketLaunched.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.cbRocketLaunched.Location = new System.Drawing.Point(405, 355);
             this.cbRocketLaunched.Name = "cbRocketLaunched";
             this.cbRocketLaunched.Size = new System.Drawing.Size(15, 14);
             this.cbRocketLaunched.TabIndex = 160;
             this.cbRocketLaunched.UseVisualStyleBackColor = true;
+            this.cbRocketLaunched.CheckedChanged += new System.EventHandler(this.cbRocketLaunched_CheckedChanged);
             // 
             // cbRocketPosition
             // 
@@ -614,17 +597,17 @@
             this.cbRocketPosition.Text = "Loaded";
             this.cbRocketPosition.TextChanged += new System.EventHandler(this.cbRocketPosition_TextChanged);
             // 
-            // lbJointScore
+            // lbJointScoreLabel
             // 
-            this.lbJointScore.AutoSize = true;
-            this.lbJointScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbJointScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbJointScore.Location = new System.Drawing.Point(7, 385);
-            this.lbJointScore.Name = "lbJointScore";
-            this.lbJointScore.Size = new System.Drawing.Size(115, 24);
-            this.lbJointScore.TabIndex = 158;
-            this.lbJointScore.Text = "Joint Score";
-            this.lbJointScore.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lbJointScoreLabel.AutoSize = true;
+            this.lbJointScoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbJointScoreLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.lbJointScoreLabel.Location = new System.Drawing.Point(7, 385);
+            this.lbJointScoreLabel.Name = "lbJointScoreLabel";
+            this.lbJointScoreLabel.Size = new System.Drawing.Size(115, 24);
+            this.lbJointScoreLabel.TabIndex = 158;
+            this.lbJointScoreLabel.Text = "Joint Score";
+            this.lbJointScoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lbRocketLaunched
             // 
@@ -746,18 +729,41 @@
             this.lbAutoCornersTested.Text = "Auto Corners Tested";
             this.lbAutoCornersTested.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // cbEmergencyCycledPenalty
+            // lbJointScore
             // 
-            this.cbEmergencyCycledPenalty.Enabled = false;
-            this.cbEmergencyCycledPenalty.FormattingEnabled = true;
-            this.cbEmergencyCycledPenalty.Items.AddRange(new object[] {
-            "0",
-            "250"});
-            this.cbEmergencyCycledPenalty.Location = new System.Drawing.Point(535, 241);
-            this.cbEmergencyCycledPenalty.Name = "cbEmergencyCycledPenalty";
-            this.cbEmergencyCycledPenalty.Size = new System.Drawing.Size(100, 33);
-            this.cbEmergencyCycledPenalty.TabIndex = 192;
-            this.cbEmergencyCycledPenalty.Text = "0";
+            this.lbJointScore.AutoSize = true;
+            this.lbJointScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbJointScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.lbJointScore.Location = new System.Drawing.Point(531, 385);
+            this.lbJointScore.Name = "lbJointScore";
+            this.lbJointScore.Size = new System.Drawing.Size(21, 24);
+            this.lbJointScore.TabIndex = 193;
+            this.lbJointScore.Text = "0";
+            this.lbJointScore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lbGreenScore
+            // 
+            this.lbGreenScore.AutoSize = true;
+            this.lbGreenScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbGreenScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.lbGreenScore.Location = new System.Drawing.Point(239, 105);
+            this.lbGreenScore.Name = "lbGreenScore";
+            this.lbGreenScore.Size = new System.Drawing.Size(21, 24);
+            this.lbGreenScore.TabIndex = 194;
+            this.lbGreenScore.Text = "0";
+            this.lbGreenScore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lbRedScore
+            // 
+            this.lbRedScore.AutoSize = true;
+            this.lbRedScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbRedScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.lbRedScore.Location = new System.Drawing.Point(239, 105);
+            this.lbRedScore.Name = "lbRedScore";
+            this.lbRedScore.Size = new System.Drawing.Size(21, 24);
+            this.lbRedScore.TabIndex = 195;
+            this.lbRedScore.Text = "0";
+            this.lbRedScore.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // Score
             // 
@@ -810,7 +816,7 @@
         private System.Windows.Forms.Label lbManualEmergencyCycled;
         private System.Windows.Forms.Label lbRockWeight;
         private System.Windows.Forms.Label lbRocketLaunched;
-        private System.Windows.Forms.Label lbJointScore;
+        private System.Windows.Forms.Label lbJointScoreLabel;
         private System.Windows.Forms.CheckBox cbRocketLaunched;
         private System.Windows.Forms.ComboBox cbRocketPosition;
         private System.Windows.Forms.Label lbAutoEmergencyCycledScore;
@@ -824,15 +830,8 @@
         private System.Windows.Forms.Label lbManualEmergencyCycledPointValue;
         private System.Windows.Forms.Label lbAutoEmergencyCycledPointValue;
         private System.Windows.Forms.Label lbAutoCornersTestedPointValue;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lbEmergencyPenaltyPointValue;
-        private System.Windows.Forms.TextBox tbRedScore;
         private System.Windows.Forms.TextBox tbRedPenalty;
-        private System.Windows.Forms.TextBox tbGreenScore;
         private System.Windows.Forms.TextBox tbGreenPenalty;
-        private System.Windows.Forms.TextBox tbJointScore;
         private System.Windows.Forms.TextBox tbRockWeight;
         private System.Windows.Forms.TextBox tbManualEmergencyCycled;
         private System.Windows.Forms.TextBox tbManualSolar2Score;
@@ -841,5 +840,11 @@
         private System.Windows.Forms.TextBox tbAutoEmergencyCycled;
         private System.Windows.Forms.TextBox tbAutoCornersTested;
         private System.Windows.Forms.ComboBox cbEmergencyCycledPenalty;
+        private System.Windows.Forms.Label lbRedPenaltyPointValue;
+        private System.Windows.Forms.Label lbGreenPenaltyPointValue;
+        private System.Windows.Forms.Label lbRocketLaunchedPointValue;
+        private System.Windows.Forms.Label lbJointScore;
+        private System.Windows.Forms.Label lbRedScore;
+        private System.Windows.Forms.Label lbGreenScore;
     }
 }
