@@ -106,9 +106,9 @@
             this.lblGreenPenalty1.Location = new System.Drawing.Point(19, 22);
             this.lblGreenPenalty1.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblGreenPenalty1.Name = "lblGreenPenalty1";
-            this.lblGreenPenalty1.Size = new System.Drawing.Size(77, 40);
+            this.lblGreenPenalty1.Size = new System.Drawing.Size(87, 40);
             this.lblGreenPenalty1.TabIndex = 136;
-            this.lblGreenPenalty1.Text = "- 10 pts ";
+            this.lblGreenPenalty1.Text = "- 200 pts ";
             this.lblGreenPenalty1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblGreenPenalty1.Click += new System.EventHandler(this.lblGreenPenalty1_Click);
             // 
@@ -122,9 +122,9 @@
             this.lblGreenPenalty2.Location = new System.Drawing.Point(19, 83);
             this.lblGreenPenalty2.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblGreenPenalty2.Name = "lblGreenPenalty2";
-            this.lblGreenPenalty2.Size = new System.Drawing.Size(77, 40);
+            this.lblGreenPenalty2.Size = new System.Drawing.Size(87, 40);
             this.lblGreenPenalty2.TabIndex = 137;
-            this.lblGreenPenalty2.Text = "- 10 pts ";
+            this.lblGreenPenalty2.Text = "- 200 pts ";
             this.lblGreenPenalty2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblGreenPenalty2.Click += new System.EventHandler(this.lblGreenPenalty2_Click);
             // 
@@ -138,9 +138,9 @@
             this.lblGreenPenalty3.Location = new System.Drawing.Point(19, 147);
             this.lblGreenPenalty3.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblGreenPenalty3.Name = "lblGreenPenalty3";
-            this.lblGreenPenalty3.Size = new System.Drawing.Size(77, 40);
+            this.lblGreenPenalty3.Size = new System.Drawing.Size(87, 40);
             this.lblGreenPenalty3.TabIndex = 138;
-            this.lblGreenPenalty3.Text = "- 10 pts ";
+            this.lblGreenPenalty3.Text = "- 200 pts ";
             this.lblGreenPenalty3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblGreenPenalty3.Click += new System.EventHandler(this.lblGreenPenalty3_Click);
             // 
@@ -186,9 +186,9 @@
             this.lblRedPenalty1.Location = new System.Drawing.Point(13, 22);
             this.lblRedPenalty1.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblRedPenalty1.Name = "lblRedPenalty1";
-            this.lblRedPenalty1.Size = new System.Drawing.Size(77, 40);
+            this.lblRedPenalty1.Size = new System.Drawing.Size(87, 40);
             this.lblRedPenalty1.TabIndex = 131;
-            this.lblRedPenalty1.Text = "- 10 pts ";
+            this.lblRedPenalty1.Text = "- 200 pts ";
             this.lblRedPenalty1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblRedPenalty1.Click += new System.EventHandler(this.lblRedPenalty1_Click);
             // 
@@ -202,9 +202,9 @@
             this.lblRedPenalty3.Location = new System.Drawing.Point(13, 147);
             this.lblRedPenalty3.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblRedPenalty3.Name = "lblRedPenalty3";
-            this.lblRedPenalty3.Size = new System.Drawing.Size(77, 40);
+            this.lblRedPenalty3.Size = new System.Drawing.Size(87, 40);
             this.lblRedPenalty3.TabIndex = 133;
-            this.lblRedPenalty3.Text = "- 10 pts ";
+            this.lblRedPenalty3.Text = "- 200 pts ";
             this.lblRedPenalty3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblRedPenalty3.Click += new System.EventHandler(this.lblRedPenalty3_Click);
             // 
@@ -218,9 +218,9 @@
             this.lblRedPenalty2.Location = new System.Drawing.Point(13, 83);
             this.lblRedPenalty2.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblRedPenalty2.Name = "lblRedPenalty2";
-            this.lblRedPenalty2.Size = new System.Drawing.Size(77, 40);
+            this.lblRedPenalty2.Size = new System.Drawing.Size(87, 40);
             this.lblRedPenalty2.TabIndex = 132;
-            this.lblRedPenalty2.Text = "- 10 pts ";
+            this.lblRedPenalty2.Text = "- 200 pts ";
             this.lblRedPenalty2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblRedPenalty2.Click += new System.EventHandler(this.lblRedPenalty2_Click);
             // 

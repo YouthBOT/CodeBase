@@ -57,64 +57,10 @@ namespace YBOT_Field_Control_2016
             return path;
         }
 
-        /*
-        public void WriteLog(string text)
-        {
-            string path = string.Format("{0}\\Logs", YBOTFilePath());
-            string file = "\\YBOT_Field_Control_Log.txt";        //Log file name
-            DateTime now = DateTime.Now;
-            //Try and write data to file, return if fail
-            try
-            {
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                string date = DateTime.Today.ToShortDateString();
-                string time = now.TimeOfDay.ToString();
-                text = string.Format("{0}_{1} : {2}", date, time, text);
-                FileStream fs = new FileStream((path + file), FileMode.Append, FileAccess.Write, FileShare.Write);
-                fs.Close();
-                StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
-                sw.WriteLine(text);
-                sw.Close();
-            }
-            catch
-            {
-                return;
-            }
-        }
-        */
-
         public void WriteLog(string text)
         {
             WriteLog(text, "YBOT_Field_Control_Log", "Logs");
         }
-
-        /*
-        public void WriteLog(string text, string fileName)
-        {
-            string path = string.Format("{0}\\Logs", YBOTFilePath());
-            string file = string.Format("\\{0}.txt", fileName);
-            DateTime now = DateTime.Now;
-
-            //Try and write data to file, return if fail
-            try
-            {
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                string date = DateTime.Today.ToShortDateString();
-                string time = now.TimeOfDay.ToString();
-                text = string.Format("{0}_{1} : {2}", date, time, text);
-                FileStream fs = new FileStream((path + file), FileMode.Append, FileAccess.Write, FileShare.Write);
-                fs.Close();
-                StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
-                sw.WriteLine(text);
-                sw.Close();
-            }
-            catch
-            {
-                return;
-            }
-
-        }
-        */
 
         public void WriteLog(string text, string fileName)
         {
@@ -139,68 +85,17 @@ namespace YBOT_Field_Control_2016
                 StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
                 sw.WriteLine(text);
                 sw.Close();
-
-                YbotSql.Instance.AddLog(text, fileName);
             }
             catch
             {
                 return;
             }
         }
-
-        /*
-        public void Log(string text)
-        {
-            string path = string.Format("{0}\\Logs", YBOTFilePath());
-            string file = "\\YBOT_Field_Control_Log.txt";        //Log file name
-            //Try and write data to file, return if fail
-            try
-            {
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                text = string.Format(text);
-                FileStream fs = new FileStream((path + file), FileMode.Append, FileAccess.Write, FileShare.Write);
-                fs.Close();
-                StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
-                sw.WriteLine(text);
-                sw.Close();
-            }
-            catch
-            {
-                return;
-            }
-        }
-        */
 
         public void Log(string text)
         {
             Log(text, "YBOT_Field_Control_Log", "Logs");
         }
-
-        /*
-        public void Log(string text, string fileName)
-        {
-            string path = string.Format("{0}\\Logs", YBOTFilePath());
-            string file = string.Format("\\{0}.txt", fileName);
-
-            //Try and write data to file, return if fail
-            try
-            {
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
-                text = string.Format(text);
-                //text = (date + "_" + time + " : " + text);
-                FileStream fs = new FileStream((path + file), FileMode.Append, FileAccess.Write, FileShare.Write);
-                fs.Close();
-                StreamWriter sw = new StreamWriter((path + file), true, Encoding.ASCII);
-                sw.WriteLine(text);
-                sw.Close();
-            }
-            catch
-            {
-                return;
-            }
-        }
-        */
 
         public void Log(string text, string fileName)
         {

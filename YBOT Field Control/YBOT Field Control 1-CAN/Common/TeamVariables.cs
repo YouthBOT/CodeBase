@@ -207,11 +207,11 @@ namespace YBOT_Field_Control_2016
             set { _emergencyCleared = value; }
         }
 
-        private bool _emergencyBonus;           //If the teams earn the emergency bonus
-        public bool emergencyBonus
+        private bool _rocketBonus;              //If the teams earn the rocket bonus
+        public bool rocketBonus
         {
-            get { return _emergencyBonus; }
-            set { _emergencyBonus = value; }
+            get { return _rocketBonus; }
+            set { _rocketBonus = value; }
         }
 
         private int _rocketPosition;            //Rocket position at the end of the game
@@ -243,8 +243,6 @@ namespace YBOT_Field_Control_2016
         }
 
 
-
-
         //Team color 
         public Team(string teamColor)
         {
@@ -271,7 +269,7 @@ namespace YBOT_Field_Control_2016
             autoEmergencyTowerCycled = 0;
             autoSolarPanelScore = 0;
             autoTowerTested = 0;
-            emergencyBonus = false;
+            rocketBonus = false;
             emergencyCleared = 0;
             rocketPosition = 0;
             rockScore = 0;
