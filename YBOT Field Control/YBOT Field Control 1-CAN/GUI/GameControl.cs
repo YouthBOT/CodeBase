@@ -446,12 +446,12 @@ namespace YBOT_Field_Control_2016
             btnStop.BackColor = Color.Red;
             btnStartGame.BackColor = GameControl.DefaultBackColor;
             btnPracticeMode.BackColor = GameControl.DefaultBackColor;
-            this.gameMode = this.fc.ChangeGameMode(GameModes.off);
+            gameMode = fc.ChangeGameMode(GameModes.off);
 
-            lblGreenScore.Text = this.green.finalScore.ToString();
-            lblRedScore.Text = this.red.finalScore.ToString();
-            GD.lblGreenScore.Text = this.green.finalScore.ToString();
-            GD.lblRedScore.Text = this.red.finalScore.ToString();
+            lblGreenScore.Text = green.finalScore.ToString();
+            lblRedScore.Text = red.finalScore.ToString();
+            GD.lblGreenScore.Text = green.finalScore.ToString();
+            GD.lblRedScore.Text = red.finalScore.ToString();
 
             btnStop.PerformClick();
         }
