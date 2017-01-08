@@ -438,14 +438,14 @@ namespace YBOT_Field_Control_2016
                 Application.DoEvents();
             }
 
-            ScoreGame();
-            RecordGame();
+            score.Close ();
 
-            score.Close();
+            //ScoreGame(); // everything is handled by Score Form this year
+            RecordGame ();
 
             btnStop.BackColor = Color.Red;
-            btnStartGame.BackColor = GameControl.DefaultBackColor;
-            btnPracticeMode.BackColor = GameControl.DefaultBackColor;
+            btnStartGame.BackColor = DefaultBackColor;
+            btnPracticeMode.BackColor = DefaultBackColor;
             gameMode = fc.ChangeGameMode(GameModes.off);
 
             lblGreenScore.Text = green.finalScore.ToString();
@@ -473,19 +473,19 @@ namespace YBOT_Field_Control_2016
 
         private void UpdateGame()
         { 
-            this.MainGame();
-            this.updateDisplays();
-            if (!red.autoMan && (this.fc.node[3].gameMode == GameModes.mantonomous.ToString()))
+            MainGame();
+            updateDisplays();
+            if (!red.autoMan && (fc.node[3].gameMode == GameModes.mantonomous.ToString()))
             {
                 red.autoMan = true;
-                this.btnRedMantonomous.BackColor = Color.Red;
-                this.btnRedMantonomous.ForeColor = Color.Black;
+                btnRedMantonomous.BackColor = Color.Red;
+                btnRedMantonomous.ForeColor = Color.Black;
             }
-            if (!green.autoMan && (this.fc.node[8].gameMode == GameModes.mantonomous.ToString()))
+            if (!green.autoMan && (fc.node[8].gameMode == GameModes.mantonomous.ToString()))
             {
                 green.autoMan = true;
-                this.btnGreenMantonomous.BackColor = Color.Lime;
-                this.btnGreenMantonomous.ForeColor = Color.Black;
+                btnGreenMantonomous.BackColor = Color.Lime;
+                btnGreenMantonomous.ForeColor = Color.Black;
             }
         }
 
@@ -493,56 +493,83 @@ namespace YBOT_Field_Control_2016
         {
             //Add convert additional points to intergers here
 
-            if (this.red.dq || this.red.penalty == 3)
+            if (red.dq || red.penalty == 3)
             {
-                this.red.finalScore = 0;
-                this.red.matchResult = "L";
+                red.finalScore = 0;
+                red.matchResult = "L";
             }
-            if (this.green.dq || this.green.penalty == 3)
+            if (green.dq || green.penalty == 3)
             {
-                this.green.finalScore = 0;
-                this.green.matchResult = "L";
+                green.finalScore = 0;
+                green.matchResult = "L";
             }
 
-            if (this.green.finalScore > this.red.finalScore)
+            if (green.finalScore > red.finalScore)
             {
-                this.green.matchResult = "W";
-                this.red.matchResult = "L";
+                green.matchResult = "W";
+                red.matchResult = "L";
             }
-            else if (this.red.finalScore > this.green.finalScore)
+            else if (red.finalScore > green.finalScore)
             {
-                this.red.matchResult = "W";
-                this.green.matchResult = "L";
+                red.matchResult = "W";
+                green.matchResult = "L";
             }
-            else if (this.green.finalScore == this.red.finalScore && !this.green.dq && !this.red.dq)
+            else if (green.finalScore == red.finalScore && !green.dq && !red.dq)
             {
-                this.red.matchResult = "T";
-                this.green.matchResult = "T";
+                red.matchResult = "T";
+                green.matchResult = "T";
             }
         }
 
         private void RecordGame()
         {
-            string file = "\\Match " + matchNumber.ToString() + " - Score";
-            string file2 = "\\Match Scores";
-            string folder = "Matches\\" + "Match " + matchNumber.ToString();
-            string folder2 = "Matches\\";
+            string file = @"\Match " + matchNumber.ToString() + " - Score";
+            string file2 = @"\Match Scores";
+            string folder = @"Matches\" + "Match " + matchNumber.ToString();
+            string folder2 = @"Matches\";
 
-            string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text.ToString() + "\t" + this.green.finalScore.ToString()
-                               + "\t" + this.green.penalty.ToString() + "\t" + this.green.dq.ToString() + "\t" + this.green.matchResult);
-            string greenTeam2 = ("THIS YEAR'S STUFF TO RECORD");
-            string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text.ToString() + "\t" + this.red.finalScore.ToString()
-                             + "\t" + this.red.penalty.ToString() + "\t" + this.red.dq.ToString() + "\t" + this.red.matchResult);
-            string redTeam2 = ("THIS YEAR'S STUFF TO RECORD");
+            string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text.ToString() + "\t" + green.finalScore.ToString()
+                               + "\t" + green.penalty.ToString() + "\t" + green.dq.ToString() + "\t" + green.matchResult);
+            string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
+                green.autoTowerTested,
+                green.autoEmergencyTowerCycled,
+                green.autoSolarPanelScore,
+                //green.manSolarPanelScore1,
+                //green.manSolarPanelScore2,
+                0,
+                0,
+                green.emergencyCleared,
+                green.rocketPosition,
+                green.rockWeight,
+                green.rockScore,
+                green.rocketBonus);
+
+            string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text.ToString() + "\t" + red.finalScore.ToString()
+                             + "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
+            string redTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
+                red.autoTowerTested,
+                red.autoEmergencyTowerCycled,
+                red.autoSolarPanelScore,
+                //red.manSolarPanelScore1,
+                //red.manSolarPanelScore2,
+                0,
+                0,
+                red.emergencyCleared,
+                red.rocketPosition,
+                red.rockWeight,
+                red.rockScore,
+                red.rocketBonus);
+
             string field = ("Match Number" + "\t" + "Team Name" + "\t" + "Final Score" + "\t" + "Penalties" + "\t" + "DQ" + "\t" + "Result");
-            string field2 = ("THIS YEAR'S STUFF TO RECORD");
+            string field2 = ("Auto Tested" + "\t" + "Auto Cycled" + "\t" + "Auto Solar" + "\t" + "Manual Solar 1" + "\t" + "Manual Solar 2" + "\t" + 
+                "Emergencies Clear" + "\t" + "Rocket Position" + "\t" + "Rock Weight" + "\t" + "Rock Score" + "\t" + "Rocket Bonus");
 
             string text = ("\r\n" + field + "\t" + field2 + "\r\n" + greenTeam + "\t" + greenTeam2 + "\r\n" + redTeam + "\t" + redTeam2);
 
             try
             {
-                this.lw.WriteLog(text, file, folder);
-                this.lw.WriteLog(text, file2, folder2);
+                lw.WriteLog(text, file, folder);
+                lw.WriteLog(text, file2, folder2);
             }
             catch
             {

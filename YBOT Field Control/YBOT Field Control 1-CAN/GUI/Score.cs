@@ -33,9 +33,6 @@ namespace YBOT_Field_Control_2016
         public Score (GameControl game) {
             InitializeComponent();
             this.game = game;
-
-            cbRocketPosition.TextChanged += OnValidation;
-            tbRockWeight.Validated += OnValidation;
         }
 
         private void Score_Shown (object sender, EventArgs e) {
@@ -132,6 +129,7 @@ namespace YBOT_Field_Control_2016
                 green.rockWeight = rockWeight;
                 green.rockScore = rockScore;
                 green.rocketPosition = rocketPositionMultiplier;
+                green.rocketBonus = cbRocketLaunched.Checked;
 
                 green.autoScore = autoScore;
                 green.manScore = manualScore;
@@ -143,7 +141,14 @@ namespace YBOT_Field_Control_2016
                 } else {
                     green.dq = true;
                 }
-                green.finalScore = greenScore;
+
+                if (!green.dq) {
+                    green.finalScore = greenScore;
+                    green.matchResult = "C";
+                } else {
+                    green.finalScore = 0;
+                    green.matchResult = "I";
+                }
 
                 red.autoTowerTested = autoCornersTested;
                 red.autoEmergencyTowerCycled = autoEmergencyCycled;
@@ -157,6 +162,7 @@ namespace YBOT_Field_Control_2016
                 red.rockWeight = rockWeight;
                 red.rockScore = rockScore;
                 red.rocketPosition = rocketPositionMultiplier;
+                red.rocketBonus = cbRocketLaunched.Checked;
 
                 red.autoScore = autoScore;
                 red.manScore = manualScore;
@@ -168,7 +174,14 @@ namespace YBOT_Field_Control_2016
                 } else {
                     red.dq = true;
                 }
-                red.finalScore = redScore;
+
+                if (!red.dq) {
+                    red.finalScore = redScore;
+                    red.matchResult = "C";
+                } else {
+                    red.finalScore = 0;
+                    red.matchResult = "I";
+                }
             }
         }
 
@@ -280,15 +293,27 @@ namespace YBOT_Field_Control_2016
             }
         }
 
-        private void TowerIntegerValidation (object sender, CancelEventArgs e) {
+        protected void TextBoxValidation (object sender, CancelEventArgs e) {
             var tb = sender as TextBox;
             if (tb != null) {
                 try {
                     var number = Convert.ToInt32 (tb.Text);
-                    if ((number < 0) || (number > 10)) {
-                        MessageBox.Show ("Invalid number of towers\n" +
-                            "Must be between 0 and 10");
-                        e.Cancel = true;
+
+                    var tag = tb.Tag as string;
+                    if (tag != null) {
+                        if (!string.IsNullOrWhiteSpace (tag)) {
+                            try {
+                                var indexComma = tag.IndexOf (',');
+                                var min = Convert.ToInt32 (tag.Substring (1, indexComma - 1));
+                                var max = Convert.ToInt32 (tag.Substring (indexComma + 1, tag.Length - indexComma - 2));
+                                if ((number < min) || (number > max)) {
+                                    MessageBox.Show (string.Format ("Invalid number of towers\nMust be between {0} and {1}", min, max));
+                                    e.Cancel = true;
+                                }
+                            } catch {
+                                //
+                            }
+                        }
                     }
                 } catch (FormatException) {
                     MessageBox.Show ("Invalid integer format");
@@ -297,67 +322,7 @@ namespace YBOT_Field_Control_2016
                     MessageBox.Show ("Number too large");
                     e.Cancel = true;
                 }
-            } else {
-                e.Cancel = true;
-            }
-        }
-
-        private void IntegerValidation (object sender, CancelEventArgs e) {
-            var tb = sender as TextBox;
-            if (tb != null) {
-                try {
-                    var number = Convert.ToInt32 (tb.Text);
-                } catch (FormatException) {
-                    MessageBox.Show ("Invalid integer format");
-                    e.Cancel = true;
-                } catch (OverflowException) {
-                    MessageBox.Show ("Number too large");
-                    e.Cancel = true;
-                }
-            } else {
-                e.Cancel = true;
-            }
-        }
-
-        private void RockWeightValidation (object sender, CancelEventArgs e) {
-            var tb = sender as TextBox;
-            if (tb != null) {
-                try {
-                    var number = Convert.ToInt32 (tb.Text);
-                    if ((number < 0) || (number > maxRockWeight)) {
-                        MessageBox.Show ("Invalid rock weight\n" +
-                            "Must be between 0 and " + maxRockWeight.ToString ());
-                        e.Cancel = true;
-                    }
-                } catch (FormatException) {
-                    MessageBox.Show ("Invalid integer format");
-                    e.Cancel = true;
-                } catch (OverflowException) {
-                    MessageBox.Show ("Number too large");
-                    e.Cancel = true;
-                }
-            } else {
-                e.Cancel = true;
-            }
-        }
-
-        private void PenaltyValidation (object sender, CancelEventArgs e) {
-            var tb = sender as TextBox;
-            if (tb != null) {
-                try {
-                    var number = Convert.ToInt32 (tb.Text);
-                    if ((number < 0) || (number > 3)) {
-                        MessageBox.Show ("Invalid number of penalties\n" +
-                            "Must be between 0 and 3");
-                        e.Cancel = true;
-                    }
-                } catch (FormatException) {
-                    MessageBox.Show ("Invalid integer format");
-                    e.Cancel = true;
-                } catch (OverflowException) {
-                    MessageBox.Show ("Number too large");
-                    e.Cancel = true;
-                }
+                
             } else {
                 e.Cancel = true;
             }
@@ -414,6 +379,7 @@ namespace YBOT_Field_Control_2016
                 var rocketPositionMultiplier = RocketPosition.Loaded;
 
                 cbRocketLaunched.Enabled = false;
+                cbRocketLaunched.Checked = false;
                 lbRocketLaunchedScore.Text = "0";
 
                 switch (cb.Text) {
@@ -426,9 +392,6 @@ namespace YBOT_Field_Control_2016
                 case "Launch Position":
                     rocketPositionMultiplier = RocketPosition.LaunchPosition;
                     cbRocketLaunched.Enabled = true;
-                    if (cbRocketLaunched.Checked) {
-                        lbRocketLaunchedScore.Text = rocketLaunchedPointValue.ToString ();
-                    }
                     break;
                 default:
                     rocketPositionMultiplier = RocketPosition.Loaded;

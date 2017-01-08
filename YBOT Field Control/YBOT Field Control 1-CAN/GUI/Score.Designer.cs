@@ -141,8 +141,9 @@
             this.tbRedPenalty.Name = "tbRedPenalty";
             this.tbRedPenalty.Size = new System.Drawing.Size(67, 31);
             this.tbRedPenalty.TabIndex = 185;
+            this.tbRedPenalty.Tag = "[0,3]";
             this.tbRedPenalty.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.tbRedPenalty.Validating += new System.ComponentModel.CancelEventHandler(this.PenaltyValidation);
+            this.tbRedPenalty.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // lbRedPenaltyPointValue
             // 
@@ -241,8 +242,9 @@
             this.tbGreenPenalty.Name = "tbGreenPenalty";
             this.tbGreenPenalty.Size = new System.Drawing.Size(67, 31);
             this.tbGreenPenalty.TabIndex = 184;
+            this.tbGreenPenalty.Tag = "[0,3]";
             this.tbGreenPenalty.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.tbGreenPenalty.Validating += new System.ComponentModel.CancelEventHandler(this.PenaltyValidation);
+            this.tbGreenPenalty.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // lbGreenPenaltyPointValue
             // 
@@ -392,8 +394,10 @@
             this.tbRockWeight.Name = "tbRockWeight";
             this.tbRockWeight.Size = new System.Drawing.Size(100, 31);
             this.tbRockWeight.TabIndex = 190;
+            this.tbRockWeight.Tag = "[0,128]";
             this.tbRockWeight.Text = "0";
-            this.tbRockWeight.Validating += new System.ComponentModel.CancelEventHandler(this.RockWeightValidation);
+            this.tbRockWeight.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
+            this.tbRockWeight.Validated += new System.EventHandler(this.OnValidation);
             // 
             // tbManualEmergencyCycled
             // 
@@ -402,7 +406,8 @@
             this.tbManualEmergencyCycled.Name = "tbManualEmergencyCycled";
             this.tbManualEmergencyCycled.Size = new System.Drawing.Size(100, 31);
             this.tbManualEmergencyCycled.TabIndex = 188;
-            this.tbManualEmergencyCycled.Validating += new System.ComponentModel.CancelEventHandler(this.TowerIntegerValidation);
+            this.tbManualEmergencyCycled.Tag = "[0,4]";
+            this.tbManualEmergencyCycled.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // tbManualSolar2Score
             // 
@@ -411,7 +416,8 @@
             this.tbManualSolar2Score.Name = "tbManualSolar2Score";
             this.tbManualSolar2Score.Size = new System.Drawing.Size(100, 31);
             this.tbManualSolar2Score.TabIndex = 187;
-            this.tbManualSolar2Score.Validating += new System.ComponentModel.CancelEventHandler(this.IntegerValidation);
+            this.tbManualSolar2Score.Tag = "[0,480]";
+            this.tbManualSolar2Score.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // tbManualSolar1Score
             // 
@@ -420,7 +426,8 @@
             this.tbManualSolar1Score.Name = "tbManualSolar1Score";
             this.tbManualSolar1Score.Size = new System.Drawing.Size(100, 31);
             this.tbManualSolar1Score.TabIndex = 186;
-            this.tbManualSolar1Score.Validating += new System.ComponentModel.CancelEventHandler(this.IntegerValidation);
+            this.tbManualSolar1Score.Tag = "[0,480]";
+            this.tbManualSolar1Score.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // tbAutoSolarScore
             // 
@@ -429,7 +436,8 @@
             this.tbAutoSolarScore.Name = "tbAutoSolarScore";
             this.tbAutoSolarScore.Size = new System.Drawing.Size(100, 31);
             this.tbAutoSolarScore.TabIndex = 185;
-            this.tbAutoSolarScore.Validating += new System.ComponentModel.CancelEventHandler(this.IntegerValidation);
+            this.tbAutoSolarScore.Tag = "[0,120]";
+            this.tbAutoSolarScore.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // tbAutoEmergencyCycled
             // 
@@ -438,7 +446,8 @@
             this.tbAutoEmergencyCycled.Name = "tbAutoEmergencyCycled";
             this.tbAutoEmergencyCycled.Size = new System.Drawing.Size(100, 31);
             this.tbAutoEmergencyCycled.TabIndex = 184;
-            this.tbAutoEmergencyCycled.Validating += new System.ComponentModel.CancelEventHandler(this.TowerIntegerValidation);
+            this.tbAutoEmergencyCycled.Tag = "[0,4]";
+            this.tbAutoEmergencyCycled.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // tbAutoCornersTested
             // 
@@ -447,14 +456,15 @@
             this.tbAutoCornersTested.Name = "tbAutoCornersTested";
             this.tbAutoCornersTested.Size = new System.Drawing.Size(100, 31);
             this.tbAutoCornersTested.TabIndex = 183;
-            this.tbAutoCornersTested.Validating += new System.ComponentModel.CancelEventHandler(this.TowerIntegerValidation);
+            this.tbAutoCornersTested.Tag = "[0,4]";
+            this.tbAutoCornersTested.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             // 
             // lbRocketLaunchedPointValue
             // 
             this.lbRocketLaunchedPointValue.AutoSize = true;
             this.lbRocketLaunchedPointValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbRocketLaunchedPointValue.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbRocketLaunchedPointValue.Location = new System.Drawing.Point(465, 350);
+            this.lbRocketLaunchedPointValue.Location = new System.Drawing.Point(461, 350);
             this.lbRocketLaunchedPointValue.Name = "lbRocketLaunchedPointValue";
             this.lbRocketLaunchedPointValue.Size = new System.Drawing.Size(43, 24);
             this.lbRocketLaunchedPointValue.TabIndex = 182;
@@ -478,7 +488,7 @@
             this.lbAutoEmergencyCycledPointValue.AutoSize = true;
             this.lbAutoEmergencyCycledPointValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbAutoEmergencyCycledPointValue.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbAutoEmergencyCycledPointValue.Location = new System.Drawing.Point(472, 70);
+            this.lbAutoEmergencyCycledPointValue.Location = new System.Drawing.Point(461, 70);
             this.lbAutoEmergencyCycledPointValue.Name = "lbAutoEmergencyCycledPointValue";
             this.lbAutoEmergencyCycledPointValue.Size = new System.Drawing.Size(32, 24);
             this.lbAutoEmergencyCycledPointValue.TabIndex = 179;
@@ -490,7 +500,7 @@
             this.lbAutoCornersTestedPointValue.AutoSize = true;
             this.lbAutoCornersTestedPointValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbAutoCornersTestedPointValue.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbAutoCornersTestedPointValue.Location = new System.Drawing.Point(472, 35);
+            this.lbAutoCornersTestedPointValue.Location = new System.Drawing.Point(461, 35);
             this.lbAutoCornersTestedPointValue.Name = "lbAutoCornersTestedPointValue";
             this.lbAutoCornersTestedPointValue.Size = new System.Drawing.Size(32, 24);
             this.lbAutoCornersTestedPointValue.TabIndex = 178;
@@ -526,7 +536,7 @@
             this.lbRocketPositionMulitplier.AutoSize = true;
             this.lbRocketPositionMulitplier.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbRocketPositionMulitplier.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbRocketPositionMulitplier.Location = new System.Drawing.Point(483, 315);
+            this.lbRocketPositionMulitplier.Location = new System.Drawing.Point(465, 315);
             this.lbRocketPositionMulitplier.Name = "lbRocketPositionMulitplier";
             this.lbRocketPositionMulitplier.Size = new System.Drawing.Size(21, 24);
             this.lbRocketPositionMulitplier.TabIndex = 167;
@@ -550,7 +560,7 @@
             this.lbAutoEmergencyCycledScore.AutoSize = true;
             this.lbAutoEmergencyCycledScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbAutoEmergencyCycledScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbAutoEmergencyCycledScore.Location = new System.Drawing.Point(531, 73);
+            this.lbAutoEmergencyCycledScore.Location = new System.Drawing.Point(531, 70);
             this.lbAutoEmergencyCycledScore.Name = "lbAutoEmergencyCycledScore";
             this.lbAutoEmergencyCycledScore.Size = new System.Drawing.Size(21, 24);
             this.lbAutoEmergencyCycledScore.TabIndex = 165;
@@ -562,7 +572,7 @@
             this.lbAutoCornerTestedScore.AutoSize = true;
             this.lbAutoCornerTestedScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbAutoCornerTestedScore.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.lbAutoCornerTestedScore.Location = new System.Drawing.Point(531, 31);
+            this.lbAutoCornerTestedScore.Location = new System.Drawing.Point(531, 35);
             this.lbAutoCornerTestedScore.Name = "lbAutoCornerTestedScore";
             this.lbAutoCornerTestedScore.Size = new System.Drawing.Size(21, 24);
             this.lbAutoCornerTestedScore.TabIndex = 164;
@@ -596,6 +606,7 @@
             this.cbRocketPosition.TabIndex = 159;
             this.cbRocketPosition.Text = "Loaded";
             this.cbRocketPosition.TextChanged += new System.EventHandler(this.cbRocketPosition_TextChanged);
+            this.cbRocketPosition.Validated += new System.EventHandler(this.OnValidation);
             // 
             // lbJointScoreLabel
             // 
