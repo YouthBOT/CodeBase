@@ -1,9 +1,5 @@
-# Created by https://www.gitignore.io
-
 bin/
 obj/
-.vs/
 *.pdb
-*.xml
 *.suo
 *.exe
