@@ -2,6 +2,7 @@
 
 bin/
 obj/
+.vs/
 *.pdb
 *.xml
 *.suo
