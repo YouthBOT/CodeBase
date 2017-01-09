@@ -242,7 +242,6 @@ namespace YBOT_Field_Control_2016
             set { _rockScore = value; }
         }
 
-
         //Team color 
         public Team(string teamColor)
         {

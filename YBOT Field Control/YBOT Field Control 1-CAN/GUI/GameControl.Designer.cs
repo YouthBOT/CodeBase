@@ -231,7 +231,7 @@
             this.btnRedPlus.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnRedPlus.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRedPlus.ForeColor = System.Drawing.Color.Black;
-            this.btnRedPlus.Location = new System.Drawing.Point(1006, 295);
+            this.btnRedPlus.Location = new System.Drawing.Point(1009, 295);
             this.btnRedPlus.Name = "btnRedPlus";
             this.btnRedPlus.Size = new System.Drawing.Size(100, 60);
             this.btnRedPlus.TabIndex = 160;
@@ -247,7 +247,7 @@
             this.btnRedMinus.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnRedMinus.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRedMinus.ForeColor = System.Drawing.Color.Black;
-            this.btnRedMinus.Location = new System.Drawing.Point(1006, 215);
+            this.btnRedMinus.Location = new System.Drawing.Point(1009, 215);
             this.btnRedMinus.Name = "btnRedMinus";
             this.btnRedMinus.Size = new System.Drawing.Size(100, 60);
             this.btnRedMinus.TabIndex = 159;
@@ -287,7 +287,7 @@
             this.btnGreenMinus.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnGreenMinus.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGreenMinus.ForeColor = System.Drawing.Color.Black;
-            this.btnGreenMinus.Location = new System.Drawing.Point(93, 295);
+            this.btnGreenMinus.Location = new System.Drawing.Point(96, 295);
             this.btnGreenMinus.Name = "btnGreenMinus";
             this.btnGreenMinus.Size = new System.Drawing.Size(100, 60);
             this.btnGreenMinus.TabIndex = 161;
@@ -329,7 +329,7 @@
             this.btnDisableRed.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnDisableRed.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDisableRed.ForeColor = System.Drawing.Color.Red;
-            this.btnDisableRed.Location = new System.Drawing.Point(1006, 130);
+            this.btnDisableRed.Location = new System.Drawing.Point(1009, 130);
             this.btnDisableRed.Name = "btnDisableRed";
             this.btnDisableRed.Size = new System.Drawing.Size(100, 60);
             this.btnDisableRed.TabIndex = 152;

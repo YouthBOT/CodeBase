@@ -33,6 +33,9 @@ namespace YBOT_Field_Control_2016
         public Score (GameControl game) {
             InitializeComponent();
             this.game = game;
+
+            tbGreenPenalty.Validated += PenaltyAutoDq;
+            tbRedPenalty.Validated += PenaltyAutoDq;
         }
 
         private void Score_Shown (object sender, EventArgs e) {
@@ -64,11 +67,11 @@ namespace YBOT_Field_Control_2016
             tbRedPenalty.Text = red.penalty.ToString ();
 
             if (green.dq || (green.penalty >= 3)) {
-                btnGreenDq.BackColor = Color.Lime;
+                cbGreenDq.Checked = true;
             }
 
             if (red.dq || (red.penalty >= 3)) {
-                btnRedDq.BackColor = Color.Red;
+                cbRedDq.Checked = true;
             }
 
             UpdateScore ();
@@ -97,8 +100,16 @@ namespace YBOT_Field_Control_2016
             var greenPenalty = Convert.ToInt32 (tbGreenPenalty.Text);
             var greenScore = jointScore - (greenPenalty * teamPenalty);
 
+            if (cbGreenDq.Checked || cbGreenDidntPlay.Checked) {
+                greenScore = 0;
+            }
+
             var redPenalty = Convert.ToInt32 (tbRedPenalty.Text);
             var redScore = jointScore - (redPenalty * teamPenalty);
+
+            if (cbRedDq.Checked || cbRedDidntPlay.Checked) {
+                redScore = 0;
+            }
 
             lbAutoCornerTestedScore.Text = autoCornersTested.ToString ();
             lbAutoEmergencyCycledScore.Text = autoEmergencyCycled.ToString ();
@@ -134,7 +145,7 @@ namespace YBOT_Field_Control_2016
                 green.score = jointScore;
 
                 green.penalty = greenPenalty;
-                if (btnGreenDq.BackColor == DefaultBackColor) {
+                if (cbGreenDq.Checked) {
                     green.dq = false;
                 } else {
                     green.dq = true;
@@ -142,10 +153,14 @@ namespace YBOT_Field_Control_2016
 
                 if (!green.dq) {
                     green.finalScore = greenScore;
-                    green.matchResult = "C";
                 } else {
                     green.finalScore = 0;
-                    green.matchResult = "I";
+                }
+
+                if (!cbGreenDidntPlay.Checked) {
+                    green.matchResult = "P";
+                } else {
+                    green.matchResult = "NP";
                 }
 
                 red.autoTowerTested = autoCornersTested;
@@ -167,7 +182,7 @@ namespace YBOT_Field_Control_2016
                 red.score = jointScore;
 
                 red.penalty = redPenalty;
-                if (btnRedDq.BackColor == DefaultBackColor) {
+                if (cbRedDq.Checked) {
                     red.dq = false;
                 } else {
                     red.dq = true;
@@ -175,27 +190,15 @@ namespace YBOT_Field_Control_2016
 
                 if (!red.dq) {
                     red.finalScore = redScore;
-                    red.matchResult = "C";
                 } else {
                     red.finalScore = 0;
-                    red.matchResult = "I";
                 }
-            }
-        }
 
-        private void btnGreenDq_Click (object sender, EventArgs e) {
-            if (btnGreenDq.BackColor == DefaultBackColor) {
-                btnGreenDq.BackColor = Color.Lime;
-            } else {
-                btnGreenDq.BackColor = DefaultBackColor;
-            }
-        }
-
-        private void btnRedDq_Click (object sender, EventArgs e) {
-            if (btnRedDq.BackColor == DefaultBackColor) {
-                btnRedDq.BackColor = Color.Red;
-            } else {
-                btnRedDq.BackColor = DefaultBackColor;
+                if (!cbRedDidntPlay.Checked) {
+                    red.matchResult = "P";
+                } else {
+                    red.matchResult = "NP";
+                }
             }
         }
 
@@ -219,12 +222,6 @@ namespace YBOT_Field_Control_2016
                 tbManualEmergencyCycled.Enabled = true;
                 cbEmergencyCycledPenalty.Enabled = true;
 
-                tbGreenPenalty.Enabled = true;
-                tbRedPenalty.Enabled = true;
-
-                btnGreenDq.Enabled = true;
-                btnRedDq.Enabled = true;
-
                 btnOverride.BackColor = Color.SteelBlue;
                 manualOverride = true;
 
@@ -236,10 +233,6 @@ namespace YBOT_Field_Control_2016
                 tbManualEmergencyCycled.Validated += ManualEmergencyCycledAutoPenalty;
                 tbManualEmergencyCycled.Validated += OnValidation;
                 cbEmergencyCycledPenalty.Validated += OnValidation;
-                tbGreenPenalty.Validated += PenaltyAutoDq;
-                tbGreenPenalty.Validated += OnValidation;
-                tbRedPenalty.Validated += PenaltyAutoDq;
-                tbRedPenalty.Validated += OnValidation;
             } else {
                 tbAutoCornersTested.Enabled = false;
                 tbAutoEmergencyCycled.Enabled = false;
@@ -253,12 +246,6 @@ namespace YBOT_Field_Control_2016
                 tbGreenPenalty.Enabled = false;
                 tbRedPenalty.Enabled = false;
 
-                tbGreenPenalty.Enabled = false;
-                tbRedPenalty.Enabled = false;
-
-                btnGreenDq.Enabled = false;
-                btnRedDq.Enabled = false;
-
                 btnOverride.BackColor = DefaultBackColor;
                 manualOverride = false;
                 InitScore ();
@@ -271,10 +258,6 @@ namespace YBOT_Field_Control_2016
                 tbManualEmergencyCycled.Validated -= ManualEmergencyCycledAutoPenalty;
                 tbManualEmergencyCycled.Validated -= OnValidation;
                 cbEmergencyCycledPenalty.Validated -= OnValidation;
-                tbGreenPenalty.Validated -= PenaltyAutoDq;
-                tbGreenPenalty.Validated -= OnValidation;
-                tbRedPenalty.Validated -= PenaltyAutoDq;
-                tbRedPenalty.Validated -= OnValidation;
             }
         }
 
@@ -333,15 +316,15 @@ namespace YBOT_Field_Control_2016
                     var penalties = Convert.ToInt32 (tb.Text);
                     if (penalties >= 3) {
                         if (tb.Name.Contains ("Green")) {
-                            btnGreenDq.BackColor = Color.Lime;
+                            cbGreenDq.Checked = true;
                         } else if (tb.Name.Contains ("Red")) {
-                            btnGreenDq.BackColor = Color.Red;
+                            cbRedDq.Checked = true;
                         }
                     } else {
                         if (tb.Name.Contains ("Green")) {
-                            btnGreenDq.BackColor = DefaultBackColor;
+                            cbGreenDq.Checked = false;
                         } else if (tb.Name.Contains ("Red")) {
-                            btnGreenDq.BackColor = DefaultBackColor;
+                            cbRedDq.Checked = false;
                         }
                     }
                 } catch {
@@ -369,6 +352,27 @@ namespace YBOT_Field_Control_2016
 
         private void OnValidation (object sender, EventArgs e) {
             UpdateScore ();
+        }
+
+        private void CheckedChanged (object sender, EventArgs e) {
+            var cb = sender as CheckBox;
+            if (cb != null) {
+                if ((cb.Name.Contains ("Green")) && cb.Checked) {
+                    if (cb.Name.Contains ("Dq")) {
+                        cbGreenDidntPlay.Checked = false;
+                    } else {
+                        cbGreenDq.Checked = false;
+                    }
+                } else if ((cb.Name.Contains ("Red")) && cb.Checked) {
+                    if (cb.Name.Contains ("Dq")) {
+                        cbRedDidntPlay.Checked = false;
+                    } else {
+                        cbRedDq.Checked = false;
+                    }
+                }
+
+                UpdateScore ();
+            }
         }
 
         private void cbRocketPosition_TextChanged (object sender, EventArgs e) {
