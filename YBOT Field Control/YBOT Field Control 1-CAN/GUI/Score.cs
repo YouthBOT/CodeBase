@@ -134,7 +134,6 @@ namespace YBOT_Field_Control_2016
                 green.manSolarPanelScore2 = manualSolar2;
                 green.emergencyCleared = manualEmergencyCycled;
 
-                green.rockValue = rocketPositionMultiplier;
                 green.rockWeight = rockWeight;
                 green.rockScore = rockScore;
                 green.rocketPosition = rocketPositionMultiplier;
@@ -171,7 +170,6 @@ namespace YBOT_Field_Control_2016
                 red.manSolarPanelScore2 = manualSolar2;
                 red.emergencyCleared = manualEmergencyCycled;
 
-                red.rockValue = rocketPositionMultiplier;
                 red.rockWeight = rockWeight;
                 red.rockScore = rockScore;
                 red.rocketPosition = rocketPositionMultiplier;

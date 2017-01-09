@@ -62,6 +62,8 @@ namespace YBOT_Field_Control_2016
             sql.SqlMessageEvent -= OnSqlMessageEvent;
             sql.SqlConnectedEvent -= OnSqlStatusEvent;
 
+            sql.GetGlobalData ();
+
             if (InvokeRequired) {
                 Invoke ((MethodInvoker)delegate () {
                     Close ();

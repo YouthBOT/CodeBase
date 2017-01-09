@@ -10,21 +10,25 @@ using System.Windows.Forms;
 using System.IO;
 using System.Xml;
 using System.Threading;
+using YBotSqlWrapper;
 
 namespace YBOT_Field_Control_2016
 {
     public partial class GameControl : Form
     {           
-        public GameControl()
-        {
-            InitializeComponent();
-            this.fc = new Field_Control();
-        }
+        public GameControl() : this (new Field_Control ()) { }
 
-        public GameControl(Field_Control _fc)
+        public GameControl(Field_Control fc)
         {
             InitializeComponent();
-            this.fc = _fc;
+            this.fc = fc;
+
+            if (YbotSql.Instance.IsConnected)
+            {
+                btnTournamentNext.Visible = true;
+                btnTournamentPrev.Visible = true;
+                lblTournamentName.Visible = true;
+            }
         }
 
         #region Game Controls

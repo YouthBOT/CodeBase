@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Threading;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Renci.SshNet;
 
@@ -24,12 +25,10 @@ namespace YBotSqlWrapper
         public bool IsConnected {
             get {
                 if (sql != null) {
-                    Console.WriteLine ("SQL state: {0}", sql.State);
                     return !((sql.State == ConnectionState.Broken) ||
                         (sql.State == ConnectionState.Closed) ||
                         (sql.State == ConnectionState.Connecting));
                 } else {
-                    Console.WriteLine ("SQL state: null");
                     return false;
                 }
             }
@@ -95,6 +94,11 @@ namespace YBotSqlWrapper
 
                 return;
             } catch (Exception ex) {
+                if (ssh != null) {
+                    ssh.Disconnect ();
+                    ssh.Dispose ();
+                }
+
                 string text = "failure\n" + ex.ToString ();
                 SqlMessageEvent?.Invoke (this, new SqlMessageArgs (text));
                 return;
@@ -114,14 +118,47 @@ namespace YBotSqlWrapper
         public void AddLog (string text, string type) {
             if ((sql != null) && (IsConnected)) {
                 var command = new MySqlCommand (
-                    "INSERT INTO event_log (event_id, event_type, event_message)" +
+                    "INSERT INTO event_log (event_id, event_type, event_message) " +
                     string.Format ("VALUES (NOW(), '{0}', '{1}');", type, text),
                     sql);
                 command.ExecuteNonQuery ();
-            } else {
-#if DEBUG
-                Console.WriteLine ("SQL server connection is null");
-#endif
+            }
+        }
+
+        public void AddMatch () {
+            if ((sql != null) && (IsConnected)) {
+                var command = new MySqlCommand (
+                    string.Empty,
+                    sql);
+                command.ExecuteNonQuery ();
+            }
+        }
+
+        public async void GetGlobalData () {
+            if ((sql != null) && (IsConnected)) {
+                var query = "SELECT * FROM tournaments " +
+                    string.Format ("WHERE YEAR(tournament_date)={0};", DateTime.Now.Year);
+                Console.WriteLine (query);
+                var command = new MySqlCommand (
+                    query,
+                    sql);
+                var reader = await command.ExecuteReaderAsync ();
+                while (await reader.ReadAsync ()) {
+                    try {
+                        var id = Convert.ToInt32 (reader[0]);
+                        var date = reader[1];
+                        var name = (string)reader[2];
+
+                        Console.WriteLine ("id: {0}", id);
+                        Console.WriteLine ("name: {0}", name);
+                        Console.WriteLine ("date: {0}", date);
+                        //var t = new Tournament ();
+
+                        //SqlData.Global.tournaments
+                    } catch (Exception ex) {
+                        Console.WriteLine (ex.ToString ());
+                    }
+                }
             }
         }
     }

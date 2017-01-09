@@ -228,13 +228,6 @@ namespace YBOT_Field_Control_2016
             set { _rockWeight = value; }
         }
 
-        private int _rockValue;                 //Final rock value
-        public int rockValue
-        {
-            get { return _rockValue; }
-            set { _rockValue = value; }
-        }
-
         private int _rockScore;                 //Final rock score
         public int rockScore
         {
@@ -272,7 +265,6 @@ namespace YBOT_Field_Control_2016
             emergencyCleared = 0;
             rocketPosition = 0;
             rockScore = 0;
-            rockValue = 0;
             rockWeight = 0;
             manSolarPanelScore1 = 0;
             manSolarPanelScore2 = 0;

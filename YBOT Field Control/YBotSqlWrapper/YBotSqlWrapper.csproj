@@ -55,6 +55,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataTypes\Schools.cs" />
+    <Compile Include="DataTypes\Tournaments.cs" />
+    <Compile Include="SqlData.cs" />
+    <Compile Include="Utilites.cs" />
     <Compile Include="YBotSql.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
