@@ -440,7 +440,7 @@ namespace YBOT_Field_Control_2016
 
             score.Close ();
 
-            //ScoreGame(); // everything is handled by Score Form this year
+            //ScoreGame(); 
             RecordGame ();
 
             btnStop.BackColor = Color.Red;
@@ -536,10 +536,8 @@ namespace YBOT_Field_Control_2016
                 green.autoTowerTested,
                 green.autoEmergencyTowerCycled,
                 green.autoSolarPanelScore,
-                //green.manSolarPanelScore1,
-                //green.manSolarPanelScore2,
-                0,
-                0,
+                green.manSolarPanelScore1,
+                green.manSolarPanelScore2,
                 green.emergencyCleared,
                 green.rocketPosition,
                 green.rockWeight,
@@ -552,10 +550,8 @@ namespace YBOT_Field_Control_2016
                 red.autoTowerTested,
                 red.autoEmergencyTowerCycled,
                 red.autoSolarPanelScore,
-                //red.manSolarPanelScore1,
-                //red.manSolarPanelScore2,
-                0,
-                0,
+                red.manSolarPanelScore1,
+                red.manSolarPanelScore2,
                 red.emergencyCleared,
                 red.rocketPosition,
                 red.rockWeight,

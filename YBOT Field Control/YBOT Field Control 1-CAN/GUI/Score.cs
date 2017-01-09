@@ -51,10 +51,8 @@ namespace YBOT_Field_Control_2016
             tbAutoCornersTested.Text = green.autoTowerTested.ToString ();
             tbAutoEmergencyCycled.Text = green.autoEmergencyTowerCycled.ToString ();
             tbAutoSolarScore.Text = green.autoSolarPanelScore.ToString ();
-            //tbManualSolar1Score.Text = green.manSolarPanelScore1.ToString ();
-            //tbManualSolar2Score.Text = green.manSolarPanelScore2.ToString ();
-            tbManualSolar1Score.Text = "0";
-            tbManualSolar2Score.Text = "0";
+            tbManualSolar1Score.Text = green.manSolarPanelScore1.ToString ();
+            tbManualSolar2Score.Text = green.manSolarPanelScore2.ToString ();
             tbManualEmergencyCycled.Text = green.emergencyCleared.ToString ();
             if (green.emergencyCleared < minimumEmergencyCycled) {
                 cbEmergencyCycledPenalty.Text = emergencyCycledPenaltyPointValue.ToString ();
@@ -121,8 +119,8 @@ namespace YBOT_Field_Control_2016
                 green.autoEmergencyTowerCycled = autoEmergencyCycled;
                 green.autoSolarPanelScore = autoSolar;
 
-                //green.manSolarPanelScore1 = manualSolar1;
-                //green.manSolarPanelScore2 = manualSolar2;
+                green.manSolarPanelScore1 = manualSolar1;
+                green.manSolarPanelScore2 = manualSolar2;
                 green.emergencyCleared = manualEmergencyCycled;
 
                 green.rockValue = rocketPositionMultiplier;
@@ -154,8 +152,8 @@ namespace YBOT_Field_Control_2016
                 red.autoEmergencyTowerCycled = autoEmergencyCycled;
                 red.autoSolarPanelScore = autoSolar;
 
-                //red.manSolarPanelScore1 = manualSolar1;
-                //red.manSolarPanelScore2 = manualSolar2;
+                red.manSolarPanelScore1 = manualSolar1;
+                red.manSolarPanelScore2 = manualSolar2;
                 red.emergencyCleared = manualEmergencyCycled;
 
                 red.rockValue = rocketPositionMultiplier;
