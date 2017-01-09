@@ -568,6 +568,15 @@ namespace YBOT_Field_Control_2016
                     this.node[nodeID].outputStatus = Convert.ToByte(parsedString[6]);
                     this.node[nodeID].byte6 = Convert.ToByte(parsedString[7]);
                     this.node[nodeID].byte7 = Convert.ToByte(parsedString[8]);
+
+                    if (this.node[nodeID].byte7 == 9) this.node[nodeID].tested = false;
+                    else this.node[nodeID].tested = true;
+
+                    if (this.node[nodeID].byte7 == 0) this.node[nodeID].deviceCycled = true;
+                    else this.node[nodeID].deviceCycled = false;
+
+                    if (this.node[nodeID].byte7 == 1) this.node[nodeID].alarmState = true;
+                    else this.node[nodeID].alarmState = false;
                 }
             }
             catch (Exception ex) { logWrite("Update Node Failed - " + ex); }
@@ -629,6 +638,9 @@ namespace YBOT_Field_Control_2016
             else return false;
         }
 
+        /// <summary>
+        /// Clear all node variables
+        /// </summary>
         public void ClearNodeState()
         {
             foreach (Nodes nd in node)
@@ -642,6 +654,39 @@ namespace YBOT_Field_Control_2016
                 this.node[nd.id].byte6 = 0;
                 this.node[nd.id].byte7 = 0;
                 this.node[nd.id].scored = false;
+
+                //This year's game variables
+                this.node[nd.id].tested = false;
+                this.node[nd.id].deviceCycled = false;
+                this.node[nd.id].alarmState = false;
+            }
+        }
+
+        /// <summary>
+        /// Clear some node variables
+        /// </summary>
+        /// <param name="selective">True = some; False = all</param>
+        public void ClearNodeState(bool selective)
+        {
+            foreach (Nodes nd in node)
+            {
+                this.node[nd.id].reportRec = 0;
+                this.node[nd.id].lightStatus = "off";
+                this.node[nd.id].lightMode = "0";            
+                this.node[nd.id].inputStatus = 0;
+                this.node[nd.id].outputStatus = 0;
+                this.node[nd.id].byte6 = 0;
+                this.node[nd.id].byte7 = 0;
+                this.node[nd.id].scored = false;
+
+                this.node[nd.id].deviceCycled = false;
+
+                if (!selective)
+                {
+                    this.node[nd.id].tested = false;
+                    this.node[nd.id].alarmState = false;
+                    this.node[nd.id].gameMode = "off";
+                }
             }
         }
 

@@ -55,5 +55,11 @@ namespace YBOT_Field_Control_2016
         private Random rndNum = new Random();   //Random Number
         private int sunTower = 0;               //Tower number to be the sun tower
         public Team joint = new Team("joint");  //Joint team values
+        private bool solarAligned = false;
+        private Time solarTime = new Time();
+        private Time solarChange = new Time();
+        private int[] emergencyTowers = { 2, 4, 7, 9 };
+        private int emerTower = 0;
+        private bool solarChanged = false;
     }
 }

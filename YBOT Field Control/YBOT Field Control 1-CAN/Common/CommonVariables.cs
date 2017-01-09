@@ -67,6 +67,11 @@ namespace YBOT_Field_Control_2016
         public int commandNodeMessagesReceived;
         public int nodeMessagesSent;
         public int nodeMessagesReceived;
+
+        //Current year's Variables
+        public bool tested;
+        public bool deviceCycled;
+        public bool alarmState;
     }
 
     public class CommonVariables

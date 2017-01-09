@@ -26,6 +26,9 @@ namespace YBOT_Field_Control_2016
             this.fc.ClearNodeState();
 
             sunTower = 0;
+            solarAligned = false;
+            emerTower = 0;
+            solarChanged = false;
         }
 
         /// <summary>
@@ -44,13 +47,7 @@ namespace YBOT_Field_Control_2016
                 Application.DoEvents();
             }
 
-            sunTower = rndNum.Next(1, 11);
-            string str = ("7,1,4," + sunTower.ToString());
-            this.fc.SendMessage(11, str);
-            Thread.Sleep(20);
-            str = ("7,1,1,");
-            this.fc.SendMessage(sunTower, str);
-            Thread.Sleep(20);
+            changeSunTower();
 
             //Ring Bell
             this.fc.RingBell();
@@ -81,13 +78,7 @@ namespace YBOT_Field_Control_2016
                 Application.DoEvents();
             }
 
-            sunTower = rndNum.Next(1, 11);
-            string str = ("7,1,4," + sunTower.ToString());
-            this.fc.SendMessage(11, str);
-            Thread.Sleep(20);
-            str = ("7,1,1,");
-            this.fc.SendMessage(sunTower, str);
-            Thread.Sleep(20);
+            changeSunTower();
 
             //Ring Bell
             this.fc.RingBell();
@@ -148,16 +139,9 @@ namespace YBOT_Field_Control_2016
                 if (this.fc.switchMode)
                 {
                     this.fc.switchMode = false;
-                    string str = ("7,0,0,");
-                    this.fc.SendMessage(sunTower, str);
-                    Thread.Sleep(20);
-                    sunTower = rndNum.Next(1, 11);
-                    str = ("7,1,4," + sunTower.ToString());
-                    this.fc.SendMessage(11, str);
-                    Thread.Sleep(20);
-                    str = ("7,1,1,");
-                    this.fc.SendMessage(sunTower, str);
-                    Thread.Sleep(20);
+
+                    changeSunTower();
+                    solarChanged = false;
 
                     //this.fc.RobotTransmitters("both", State.off, State.on); //Turn on transmitter to Manual Mode
                     this.fc.RingBell();                        //Ring bell
@@ -165,7 +149,9 @@ namespace YBOT_Field_Control_2016
                     GameLog("AutoMode Over");                   //Update Log
                     GameLog("Transmitters ON");                 //Update Log
 
-                    this.fc.ClearNodeState();
+                    this.fc.ClearNodeState(true);
+
+                    solarChange.elapsedTime.Start();
 
                 }
                 else ManualMode();
@@ -174,12 +160,92 @@ namespace YBOT_Field_Control_2016
 
         public void AutoMode()
         {
-            //Automode Code here
+            //if solar panel is aligned
+            if(this.fc.node[11].byte6 > 0)
+            {
+                //if aligned start timer
+                if(!solarAligned)
+                {
+                    solarTime.elapsedTime.Reset();
+                    solarAligned = true;
+                }
+
+                //Calculate score
+                int value = 0;
+                if (this.fc.node[11].byte6 == 1) value = 4;
+                else if (this.fc.node[11].byte6 == 2) value = 7;
+                else if (this.fc.node[11].byte6 == 3) value = 10;
+
+                int tempScore = solarTime.elapsedTime.Elapsed.Seconds * value;
+                this.joint.autoSolarPanelScore = tempScore;          
+             }
+
+            int testedTowers = 0;
+            int cycledTowers = 0;
+
+            //see if the towers have been tested or cycled
+            for (int i = 0; i < emergencyTowers.Length; i++)
+            {
+                if (this.fc.node[i].tested == true) testedTowers++;
+                if (this.fc.node[i].deviceCycled == true) cycledTowers++;
+            }
+
+            joint.autoEmergencyTowerCycled = cycledTowers;
+            joint.autoTowerTested = testedTowers;
+
+            //Calculate scores
+            if (!this.joint.autoMan)
+            {
+                int towerScore = (testedTowers * 50) + (cycledTowers * 100);
+                this.joint.score = towerScore + this.joint.autoSolarPanelScore;
+                this.joint.autoScore = this.joint.score;
+
+                this.red.score = this.joint.score;
+                this.red.autoScore = this.red.score;
+
+                this.green.score = this.joint.score;
+                this.green.autoScore = this.green.score;
+            }
+
         }
 
         public void ManualMode()
         {
-            //Manual Mode Code
+            //if solar panel is aligned
+            if (this.fc.node[11].byte6 > 0)
+            {
+                //if aligned start timer
+                if (!solarAligned)
+                {
+                    solarTime.elapsedTime.Reset();
+                    solarAligned = true;
+                }
+
+                //Calculate score
+                int value = 0;
+                if (this.fc.node[11].byte6 == 1) value = 4;
+                else if (this.fc.node[11].byte6 == 2) value = 7;
+                else if (this.fc.node[11].byte6 == 3) value = 10;
+
+                int tempScore = solarTime.elapsedTime.Elapsed.Seconds * value;
+
+                if (solarChange.elapsedTime.Elapsed.Seconds > 59)
+                {
+                    if(!solarChanged) changeSunTower();
+                    this.joint.manSolarPanelScore2 = tempScore;
+                }
+                else
+                {
+                    this.joint.manSolarPanelScore1 = tempScore;
+                }
+                
+            }
+
+            if ((this.fc.node[emerTower].tested) && (!this.fc.node[emerTower].alarmState))
+            {
+                joint.emergencyCleared++;
+                if(joint.emergencyCleared < 4) getEmerTower();
+            }
         }
 
 
@@ -208,6 +274,40 @@ namespace YBOT_Field_Control_2016
         //Current year's game methods
         //------------------------------------------------------------------------------------------------\\
 
+        private void getEmerTower()
+        {
+            int currentTower = emerTower;
+            do
+            {
+                int num = rndNum.Next(0, 4);
+                emerTower = emergencyTowers[num];
+            } while (emerTower != currentTower);
 
+            this.fc.node[emerTower].alarmState = true;
+
+            string str = null;
+            str = ("7,1,2,");
+            this.fc.SendMessage(sunTower, str);
+            Thread.Sleep(20);
+        }
+
+        private void changeSunTower()
+        {
+            string str = ("7,0,0,");
+            this.fc.SendMessage(sunTower, str);
+            Thread.Sleep(20);
+            sunTower = rndNum.Next(1, 11);
+            str = ("7,1,4," + sunTower.ToString());
+            this.fc.SendMessage(11, str);
+            Thread.Sleep(20);
+            str = ("7,1,1,");
+            this.fc.SendMessage(sunTower, str);
+            Thread.Sleep(20);
+
+            solarTime.elapsedTime.Reset();
+            solarAligned = false;
+            solarChange.elapsedTime.Stop();
+            solarChanged = true;
+        }
     }
 }
