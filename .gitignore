@@ -2,14 +2,9 @@
 
 bin/
 obj/
-Properties/
-gtk-gui/
+.vs/
 packages/
-*.config
-*.userprefs
-*.sln
-*.csproj
-*.dll
 *.pdb
 *.xml
 *.suo
+*.exe
