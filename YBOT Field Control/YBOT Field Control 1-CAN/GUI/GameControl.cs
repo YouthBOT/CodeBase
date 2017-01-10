@@ -597,7 +597,7 @@ namespace YBOT_Field_Control_2016
                 green.StoreJointVariablesToSqlMatch (ref match);
 
                 green.StoreTeamVariablesToSqlMatch (ref match);
-                match.redTeam = FindSchoolId (schools, lblGreenTeam.Text, "Green Team");
+                match.greenTeam = FindSchoolId (schools, lblGreenTeam.Text, "Green Team");
 
                 red.StoreTeamVariablesToSqlMatch (ref match);
                 match.redTeam = FindSchoolId (schools, lblRedTeam.Text, "Red Team");
