@@ -4,47 +4,23 @@ using System.Collections.Generic;
 
 namespace YBotSqlWrapper
 {
-    public class Schools : IEnumerable<School>
+    public class Schools : Generic<School>
     {
-        protected List<School> schools;
-
-        public School this[int id] {
+        public School this[int index] {
             get {
-                return schools[id];
+                return objectList[index];
             }
         }
 
         public School this[string name] {
             get {
-                foreach (var s in schools) {
+                foreach (var s in objectList) {
                     if (name == s.name) {
                         return s;
                     }
                 }
                 return null;
             }
-        }
-
-        public Schools () {
-            schools = new List<School> ();
-        }
-
-        public Schools (IEnumerable<School> schools) : this () {
-            foreach (var s in schools) {
-                this.schools.Add (s);
-            }
-        }
-
-        public void Add (School school) {
-            schools.Add (school);
-        }
-
-        public IEnumerator<School> GetEnumerator () {
-            return schools.GetEnumerator ();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator () {
-            return GetEnumerator ();
         }
     }
 

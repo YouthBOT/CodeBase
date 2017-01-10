@@ -833,9 +833,9 @@
             this.lbManualEmergencyCycled.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.lbManualEmergencyCycled.Location = new System.Drawing.Point(7, 210);
             this.lbManualEmergencyCycled.Name = "lbManualEmergencyCycled";
-            this.lbManualEmergencyCycled.Size = new System.Drawing.Size(261, 24);
+            this.lbManualEmergencyCycled.Size = new System.Drawing.Size(270, 24);
             this.lbManualEmergencyCycled.TabIndex = 143;
-            this.lbManualEmergencyCycled.Text = "Manual Emergency Cycled";
+            this.lbManualEmergencyCycled.Text = "Manual Emergency Cleared";
             this.lbManualEmergencyCycled.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lbManualSolar2

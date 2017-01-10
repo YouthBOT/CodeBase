@@ -2,10 +2,10 @@
 
 namespace YBotSqlWrapper
 {
-    public class SqlData
+    public class YBotSqlData
     {
-        protected static SqlData _global = new SqlData ();
-        public static SqlData Global {
+        protected static YBotSqlData _global = new YBotSqlData ();
+        public static YBotSqlData Global {
             get {
                 return _global;
             }
@@ -14,7 +14,7 @@ namespace YBotSqlWrapper
         public Tournaments tournaments;
         public Schools schools;
 
-        protected SqlData () {
+        protected YBotSqlData () {
             tournaments = new Tournaments ();
             schools = new Schools ();
         }

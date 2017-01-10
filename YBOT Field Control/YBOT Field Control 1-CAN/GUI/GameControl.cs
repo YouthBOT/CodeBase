@@ -11,6 +11,7 @@ using System.IO;
 using System.Xml;
 using System.Threading;
 using YBotSqlWrapper;
+using HelpfulUtilites;
 
 namespace YBOT_Field_Control_2016
 {
@@ -28,6 +29,12 @@ namespace YBOT_Field_Control_2016
                 btnTournamentNext.Visible = true;
                 btnTournamentPrev.Visible = true;
                 lblTournamentName.Visible = true;
+
+                foreach (var t in YBotSqlData.Global.tournaments) {
+                    if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
+                        lblTournamentName.Text = t.name;
+                    }
+                }
             }
         }
 
@@ -268,19 +275,19 @@ namespace YBOT_Field_Control_2016
 
         private void btnStartGame_Click(object sender, EventArgs e)
         {
-            this.autoModeTime = 30;
-            this.manAutoTime = 20;
-            this.midModeTime = 120;
+            autoModeTime = 30;
+            manAutoTime = 20;
+            midModeTime = 120;
 
             disableGameButtons();
             btnStop.BackColor = GameControl.DefaultBackColor;
             btnStartGame.BackColor = Color.LimeGreen;
             ClearDisplay();
-            this.GameStartUp();
-            this.gameTimer.Start();
-            this.time.countDownStart(2, 1);
-            this.time.timesUp = false;
-            this.MainGame();
+            GameStartUp();
+            gameTimer.Start();
+            time.countDownStart(2, 1);
+            time.timesUp = false;
+            MainGame();
         }
 
         private void btnPracticeMode_Click(object sender, EventArgs e)
@@ -289,12 +296,12 @@ namespace YBOT_Field_Control_2016
             btnStop.BackColor = GameControl.DefaultBackColor;
             btnPracticeMode.BackColor = Color.LimeGreen;
             ClearDisplay();
-            this.GameStartUp(GameModes.debug);
+            GameStartUp(GameModes.debug);
             Thread.Sleep(200);
-            this.time.elapsedTime.Restart();
-            this.time.timesUp = false;
-            this.practiceTimer.Start();
-            this.MainGame();
+            time.elapsedTime.Restart();
+            time.timesUp = false;
+            practiceTimer.Start();
+            MainGame();
         }
 
         private void btnAutoMode_Click(object sender, EventArgs e)
@@ -303,13 +310,13 @@ namespace YBOT_Field_Control_2016
             btnStop.BackColor = GameControl.DefaultBackColor;
             btnAutoMode.BackColor = Color.LimeGreen;
             ClearDisplay();
-            this.GameStartUp(GameModes.autonomous);
+            GameStartUp(GameModes.autonomous);
             Thread.Sleep(200);
-            this.GameLog("Auto Mode Started");
-            this.time.elapsedTime.Restart();
-            this.time.timesUp = false;
-            this.practiceTimer.Start();
-            this.MainGame();
+            GameLog("Auto Mode Started");
+            time.elapsedTime.Restart();
+            time.timesUp = false;
+            practiceTimer.Start();
+            MainGame();
         }
 
         private void btnManualMode_Click(object sender, EventArgs e)
@@ -318,13 +325,13 @@ namespace YBOT_Field_Control_2016
             btnStop.BackColor = GameControl.DefaultBackColor;
             btnManualMode.BackColor = Color.LimeGreen;
             ClearDisplay();
-            this.GameStartUp(GameModes.manual);
+            GameStartUp(GameModes.manual);
             Thread.Sleep(200);
-            this.GameLog("Middle Mode Started");
-            this.time.elapsedTime.Restart();
-            this.time.timesUp = false;
-            this.practiceTimer.Start();
-            this.MainGame();
+            GameLog("Middle Mode Started");
+            time.elapsedTime.Restart();
+            time.timesUp = false;
+            practiceTimer.Start();
+            MainGame();
         }
 
         private void btnTestMode_Click(object sender, EventArgs e)
@@ -334,7 +341,7 @@ namespace YBOT_Field_Control_2016
                 disableGameButtons();
                 btnStop.BackColor = GameControl.DefaultBackColor;
                 btnTestMode.BackColor = Color.LimeGreen;
-                this.testTimer.Start();
+                testTimer.Start();
                 TestMode();
             }
             else
@@ -345,37 +352,37 @@ namespace YBOT_Field_Control_2016
 
         private void TestMode()
         {
-            this.autoModeTime = 5;
-            this.manAutoTime =  2;
-            this.midModeTime = 30;
+            autoModeTime = 5;
+            manAutoTime =  2;
+            midModeTime = 30;
 
-            this.btnMatchNext.PerformClick();
+            btnMatchNext.PerformClick();
 
             ClearDisplay();
-            this.GameStartUp();
-            this.gameTimer.Start();
-            this.time.countDownStart(0, 30);
-            this.time.timesUp = false;
-            this.MainGame();
+            GameStartUp();
+            gameTimer.Start();
+            time.countDownStart(0, 30);
+            time.timesUp = false;
+            MainGame();
         }
 
         private void btnStop_Click(object sender, EventArgs e)
         {
             //Turn on all Hub Channel
-            this.fc.FieldAllOff();
-            this.gameTimer.Stop();
-            this.practiceTimer.Stop();
-            this.testTimer.Stop();
+            fc.FieldAllOff();
+            gameTimer.Stop();
+            practiceTimer.Stop();
+            testTimer.Stop();
             btnStop.BackColor = Color.Red;
             btnStartGame.BackColor = GameControl.DefaultBackColor;
             btnAutoMode.BackColor = GameControl.DefaultBackColor;
             btnManualMode.BackColor = GameControl.DefaultBackColor;
             btnPracticeMode.BackColor = GameControl.DefaultBackColor;
             btnTestMode.BackColor = GameControl.DefaultBackColor;
-            this.gameMode = GameModes.off;
+            gameMode = GameModes.off;
             enableGameButtons();
-            this.GameLog("Field Off");
-            this.LogGame();
+            GameLog("Field Off");
+            LogGame();
         }
 
         private void btnMatchNext_Click(object sender, EventArgs e)
@@ -534,7 +541,7 @@ namespace YBOT_Field_Control_2016
             string folder = @"Matches\" + "Match " + matchNumber.ToString();
             string folder2 = @"Matches\";
 
-            string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text.ToString() + "\t" + green.finalScore.ToString()
+            string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text + "\t" + green.finalScore.ToString()
                                + "\t" + green.penalty.ToString() + "\t" + green.dq.ToString() + "\t" + green.matchResult);
             string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
                 green.autoTowerTested,
@@ -548,7 +555,7 @@ namespace YBOT_Field_Control_2016
                 green.rockScore,
                 green.rocketBonus);
 
-            string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text.ToString() + "\t" + red.finalScore.ToString()
+            string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text + "\t" + red.finalScore.ToString()
                              + "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
             string redTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
                 red.autoTowerTested,
@@ -575,10 +582,78 @@ namespace YBOT_Field_Control_2016
             }
             catch
             {
-                MessageBox.Show("Game Score was not recorded");
+                MessageBox.Show("Game score was not recorded");
                 return;
             }
 
+            if (YbotSql.Instance.IsConnected) {
+                var schools = YBotSqlData.Global.schools;
+                var schoolNames = new List<string> ();
+                schools.ForEach (s => schoolNames.Add (s.name));
+
+                var match = new Match ();
+                match.tournamentId = YBotSqlData.Global.tournaments[lblTournamentName.Text].id;
+                match.matchNumber = matchNumber;
+                green.StoreJointVariablesToSqlMatch (ref match);
+
+                green.StoreTeamVariablesToSqlMatch (ref match);
+                match.redTeam = FindSchoolId (schools, lblGreenTeam.Text, "Green Team");
+
+                red.StoreTeamVariablesToSqlMatch (ref match);
+                match.redTeam = FindSchoolId (schools, lblRedTeam.Text, "Red Team");
+
+                YbotSql.Instance.AddMatch (match);
+            }
+        }
+
+        protected int FindSchoolId (Schools schools, string schoolName, string team) {
+            int id = schools["TOBy"].id;
+
+            if (schoolName != team) {
+                var school = schools[schoolName];
+                if (school != null) {
+                    id = school.id;
+                } else {
+                    var schoolNames = new List<string> ();
+                    schools.ForEach (s => schoolNames.Add (s.name));
+                    var teamNameFound = false;
+
+                    foreach (var s in schoolNames) {
+                        if (s.StartsWith (schoolName)) {
+                            var result = MessageBox.Show (
+                                string.Format ("Is {0} the same as {1}", schoolName, s), 
+                                "Matching " + team, 
+                                MessageBoxButtons.YesNoCancel);
+
+                            if (result == DialogResult.Yes) {
+                                teamNameFound = true;
+                                id = schools[s].id;
+                            } else if (result == DialogResult.Cancel) {
+                                teamNameFound = true;
+                            }
+                        }
+                    }
+                    
+                    while (!teamNameFound && (schoolNames.Count > 0)) {
+                        var closestString = lblRedTeam.Text.ClosestMatchingString (schoolNames);
+                        var result = MessageBox.Show (
+                            string.Format ("Is {0} the same as {1}", schoolName, closestString),
+                            "Matching " + team, 
+                            MessageBoxButtons.YesNoCancel);
+
+                        if (result == DialogResult.Yes) {
+                            teamNameFound = true;
+                            id = schools[closestString].id;
+                        } else if (result == DialogResult.Cancel) {
+                            teamNameFound = true;
+                        } else {
+                            schoolNames.Remove (closestString);
+                        }
+                    }
+                }
+            }
+
+            return id;
         }
 
         private void GetTeamNames()
@@ -656,6 +731,23 @@ namespace YBOT_Field_Control_2016
             btnManualMode.Enabled = true;
             btnPracticeMode.Enabled = true;
             btnTestMode.Enabled = true;
+        }
+
+        private void btnTournamentNext_Click (object sender, EventArgs e) {
+            var tournaments = YBotSqlData.Global.tournaments;
+            var index = tournaments.IndexOf (tournaments[lblTournamentName.Text]);
+            index = ++index % tournaments.Count;
+            lblTournamentName.Text = tournaments[index].name;
+        }
+
+        private void btnTournamentPrev_Click (object sender, EventArgs e) {
+            var tournaments = YBotSqlData.Global.tournaments;
+            var index = tournaments.IndexOf (tournaments[lblTournamentName.Text]);
+            index = --index;
+            if (index < 0) {
+                index = tournaments.Count - 1;
+            }
+            lblTournamentName.Text = tournaments[index].name;
         }
 
         #endregion
@@ -914,7 +1006,6 @@ namespace YBOT_Field_Control_2016
             this.fc.ChangeGameMode(GameModes.off);
             this.gameMode = GameModes.off;
         }
-
     }
 
     //Vertical Progress Bar 
@@ -929,6 +1020,7 @@ namespace YBOT_Field_Control_2016
                 return cp;
             }
         }
+
         protected override System.Drawing.Size DefaultSize { get { return new System.Drawing.Size(23, 100); } }  
     }
 }

@@ -1,50 +1,24 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace YBotSqlWrapper
 {
-    public class Tournaments : IEnumerable<Tournament>
+    public class Tournaments : Generic<Tournament>
     {
-        protected List<Tournament> tournaments;
-
-        public Tournament this[int id] {
+        public Tournament this[int index] {
             get {
-                return tournaments[id];
+                return objectList[index];
             }
         }
 
         public Tournament this[string name] {
             get {
-                foreach (var t in tournaments) {
+                foreach (var t in objectList) {
                     if (name == t.name) {
                         return t;
                     }
                 }
                 return null;
             }
-        }
-
-        public Tournaments () {
-            tournaments = new List<Tournament> ();
-        }
-
-        public Tournaments (IEnumerable<Tournament> tournaments) : this ()  {
-            foreach (var t in tournaments) {
-                this.tournaments.Add (t);
-            }
-        }
-
-        public void Add (Tournament tournament) {
-            tournaments.Add (tournament);
-        }
-
-        public IEnumerator<Tournament> GetEnumerator () {
-            return tournaments.GetEnumerator ();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator () {
-            return GetEnumerator ();
         }
     }
 

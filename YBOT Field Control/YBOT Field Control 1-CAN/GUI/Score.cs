@@ -168,9 +168,9 @@ namespace YBOT_Field_Control_2016
 
                 green.penalty = greenPenalty;
                 if (cbGreenDq.Checked) {
-                    green.dq = false;
-                } else {
                     green.dq = true;
+                } else {
+                    green.dq = false;
                 }
 
                 if (!green.dq) {
@@ -204,9 +204,9 @@ namespace YBOT_Field_Control_2016
 
                 red.penalty = redPenalty;
                 if (cbRedDq.Checked) {
-                    red.dq = false;
-                } else {
                     red.dq = true;
+                } else {
+                    red.dq = false;
                 }
 
                 if (!red.dq) {

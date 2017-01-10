@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SkylersUtilities
+namespace HelpfulUtilites
 {
     public class Description : Attribute
     {
@@ -15,31 +16,6 @@ namespace SkylersUtilities
 
     public static class Utils
     {
-        public static int LevenshteinDistance (string s, string t) {
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
-            if (n == 0) {
-                return m;
-            }
-            if (m == 0) {
-                return n;
-            }
-            for (int i = 0; i <= n; d[i, 0] = i++)
-                ;
-            for (int j = 0; j <= m; d[0, j] = j++)
-                ;
-            for (int i = 1; i <= n; i++) {
-                for (int j = 1; j <= m; j++) {
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
-                    d[i, j] = Math.Min (
-                        Math.Min (d[i - 1, j] + 1, d[i, j - 1] + 1),
-                        d[i - 1, j - 1] + cost);
-                }
-            }
-            return d[n, m];
-        }
-
         public static string GetDescription (Enum en) {
             Type type = en.GetType ();
             MemberInfo[] memInfo = type.GetMember (en.ToString ());
@@ -66,6 +42,46 @@ namespace SkylersUtilities
             return new string (value.ToCharArray ()
                 .Where (c => !Char.IsWhiteSpace (c))
                 .ToArray ());
+        }
+
+        public static int LevenshteinDistance (string s, string t) {
+            int n = s.Length;
+            int m = t.Length;
+            int[,] d = new int[n + 1, m + 1];
+            if (n == 0) {
+                return m;
+            }
+            if (m == 0) {
+                return n;
+            }
+            for (int i = 0; i <= n; d[i, 0] = i++)
+                ;
+            for (int j = 0; j <= m; d[0, j] = j++)
+                ;
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= m; j++) {
+                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
+                    d[i, j] = Math.Min (
+                        Math.Min (d[i - 1, j] + 1, d[i, j - 1] + 1),
+                        d[i - 1, j - 1] + cost);
+                }
+            }
+            return d[n, m];
+        }
+
+        public static string ClosestMatchingString (this string value, IEnumerable<string> items) {
+            var lowest = int.MaxValue;
+            var closestString = string.Empty;
+
+            foreach (var s in items) {
+                var distance = LevenshteinDistance (value, s);
+                if (distance < lowest) {
+                    lowest = distance;
+                    closestString = s;
+                }
+            }
+
+            return closestString;
         }
 
         public static int Map (this int value, int from1, int from2, int to1, int to2) {
