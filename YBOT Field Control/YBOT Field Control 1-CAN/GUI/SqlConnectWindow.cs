@@ -25,7 +25,7 @@ namespace YBOT_Field_Control_2016
 
         private void KeyPressEvent (object sender, KeyEventArgs args) {
             if (args.KeyData == Keys.Enter) {
-                connectionButton_Click (sender, new EventArgs ());
+                connectionButton.PerformClick ();
             }
         }
 
@@ -43,7 +43,7 @@ namespace YBOT_Field_Control_2016
             messageTextbox.Text = string.Empty;
 
             sql.SqlMessageEvent += OnSqlMessageEvent;
-            sql.SqlConnectedEvent += OnSqlStatusEvent;
+            sql.SqlConnectedEvent += OnSqlConnectedEvent;
 
             sql.Connect (serverIpTextBox.Text, passwordTextBox.Text, sshCheckBox.Checked);
         }
@@ -58,11 +58,9 @@ namespace YBOT_Field_Control_2016
             }
         }
 
-        protected void OnSqlStatusEvent (object sender) {
+        protected void OnSqlConnectedEvent (object sender) {
             sql.SqlMessageEvent -= OnSqlMessageEvent;
-            sql.SqlConnectedEvent -= OnSqlStatusEvent;
-
-            sql.GetGlobalData ();
+            sql.SqlConnectedEvent -= OnSqlConnectedEvent;
 
             if (InvokeRequired) {
                 Invoke ((MethodInvoker)delegate () {
@@ -71,6 +69,8 @@ namespace YBOT_Field_Control_2016
             } else {
                 Close ();
             }
+
+            sql.GetGlobalData ();
         }
     }
 }

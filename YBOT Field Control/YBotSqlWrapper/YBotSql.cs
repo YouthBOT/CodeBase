@@ -136,28 +136,42 @@ namespace YBotSqlWrapper
 
         public async void GetGlobalData () {
             if ((sql != null) && (IsConnected)) {
-                var query = "SELECT * FROM tournaments " +
-                    string.Format ("WHERE YEAR(tournament_date)={0};", DateTime.Now.Year);
-                Console.WriteLine (query);
-                var command = new MySqlCommand (
-                    query,
-                    sql);
-                var reader = await command.ExecuteReaderAsync ();
-                while (await reader.ReadAsync ()) {
-                    try {
-                        var id = Convert.ToInt32 (reader[0]);
-                        var date = reader[1];
-                        var name = (string)reader[2];
+                try {
+                    var query = "SELECT * FROM tournaments " +
+                        string.Format ("WHERE YEAR(tournament_date)={0};", DateTime.Now.Year);
+                    var command = new MySqlCommand (query,sql);
+                    var reader = await command.ExecuteReaderAsync ();
+                    while (await reader.ReadAsync ()) {
+                        try {
+                            var id = Convert.ToInt32 (reader[0]);
+                            var date = (DateTime)reader[1];
+                            var name = (string)reader[2];
 
-                        Console.WriteLine ("id: {0}", id);
-                        Console.WriteLine ("name: {0}", name);
-                        Console.WriteLine ("date: {0}", date);
-                        //var t = new Tournament ();
-
-                        //SqlData.Global.tournaments
-                    } catch (Exception ex) {
-                        Console.WriteLine (ex.ToString ());
+                            var t = new Tournament (id, date, name);
+                            SqlData.Global.tournaments.Add (t);
+                        } catch (Exception ex) {
+                            //
+                        }
                     }
+                    reader.Close ();
+
+                    query = "SELECT * FROM schools;";
+                    command = new MySqlCommand (query, sql);
+                    reader = await command.ExecuteReaderAsync ();
+                    while (await reader.ReadAsync ()) {
+                        try {
+                            var id = Convert.ToInt32 (reader[0]);
+                            var name = (string)reader[1];
+
+                            var s = new School (id, name);
+                            SqlData.Global.schools.Add (s);
+                        } catch (Exception ex) {
+                            //
+                        }
+                    }
+                    reader.Close ();
+                } catch (MySqlException ex) {
+                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (ex.ToString ()));
                 }
             }
         }
