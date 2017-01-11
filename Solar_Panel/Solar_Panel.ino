@@ -299,7 +299,7 @@ void loop()
 		newserial = false;
 
 		//If message is for the command node process the data
-		if (destNode == nodeID)
+		if ((destNode == nodeID) || (destNode == 0))
 		{
 			for (uint8_t i = 0; i < sizeof(canIn); i++)
 			{
@@ -603,6 +603,7 @@ void gamePlayCanbus()
 			nodeStatus[6] = 0;
 			nodeStatus[7] = 0;
 			complete = false;
+			reportSent = false;
 		}
 	}
 	else if (gameMode == 2)	//Start
@@ -632,8 +633,12 @@ void gamePlayCanbus()
 			if (potValR < 450 || potValR > 550) potVal = potValR;
 			else potVal = potValL;
 
+			//Serial.println(potVal);
+
 			if (potVal > 550)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, HIGH);
 				if (potVal > 800) potVal = 1000;
 
@@ -651,6 +656,8 @@ void gamePlayCanbus()
 			}
 			else if (potVal < 450)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, LOW);
 				if (potVal < 200)potVal = 0;
 				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
@@ -667,10 +674,13 @@ void gamePlayCanbus()
 			//Else the handle is in neutral
 			else
 			{
+				//Serial.println("Neutral");
+
 				if (!reportSent)	//If report not sent
 				{
 					xbReport();
 					reportSent = true;													//Reset flag
+					//Serial.println("Report Sent");
 				}
 			}
 
@@ -739,6 +749,8 @@ void gamePlayCanbus()
 
 			if (potVal > 550)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, HIGH);
 				if (potVal > 800) potVal = 1000;
 
@@ -756,6 +768,8 @@ void gamePlayCanbus()
 			}
 			else if (potVal < 450)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, LOW);
 				if (potVal < 200)potVal = 0;
 				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
@@ -855,6 +869,8 @@ void gamePlayCanbus()
 
 			if (potVal > 550)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, HIGH);
 				if (potVal > 800) potVal = 1000;
 
@@ -872,6 +888,8 @@ void gamePlayCanbus()
 			}
 			else if (potVal < 450)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, LOW);
 				if (potVal < 200)potVal = 0;
 				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
@@ -1235,6 +1253,7 @@ void gamePlaySpeedTest()
 			nodeStatus[6] = 0;
 			nodeStatus[7] = 0;
 			complete = false;
+			reportSent = false;
 		}
 	}
 	else if (gameMode == 2)	//Start
@@ -1253,6 +1272,7 @@ void gamePlaySpeedTest()
 				digitalWrite(autoPin, HIGH);
 				digitalWrite(manPin, LOW);
 			}
+			reportSent = false;
 		}
 		if (!complete)
 		{
@@ -1260,6 +1280,8 @@ void gamePlaySpeedTest()
 
 			if (potVal > 550)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, HIGH);
 				if (potVal > 800) potVal = 1000;
 
@@ -1277,6 +1299,8 @@ void gamePlaySpeedTest()
 			}
 			else if (potVal < 450)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, LOW);
 				if (potVal < 200)potVal = 0;
 				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
@@ -1295,6 +1319,7 @@ void gamePlaySpeedTest()
 			{
 				if (!reportSent)	//If report not sent
 				{
+					Serial.println("Neutral");
 					xbReport();
 					reportSent = true;													//Reset flag
 					complete = true;
@@ -1392,6 +1417,8 @@ void gamePlaySpeedTest()
 
 			if (potVal > 550)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, HIGH);
 				if (potVal > 800) potVal = 1000;
 
@@ -1409,6 +1436,8 @@ void gamePlaySpeedTest()
 			}
 			else if (potVal < 450)
 			{
+				reportSent = false;
+
 				digitalWrite(dirPin, LOW);
 				if (potVal < 200)potVal = 0;
 				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
@@ -1516,64 +1545,118 @@ void gamePlaySpeedTest()
 	{
 		if (gameModeChanged)
 		{
-			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(blue, 0, 1, 0, stripLength);
+			Serial.println("DEBUG MODE");
+			digitalWrite(solarLED, HIGH);
+			delay(500);
+			digitalWrite(solarLED, LOW);
+			delay(500);
+			digitalWrite(solarLED, HIGH);
+			delay(500);
+			digitalWrite(solarLED, LOW);
 			gameModeChanged = false;
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, HIGH);
-			}
+			complete = false;
 		}
 
-		int oldPullValue = currentPullValue;
-		currentPullValue = getScaledAnalog();
-		if (currentPullValue >= (maxRange - 1)) fullPull = true;
-
-
-		if (oldPullValue != currentPullValue)
+		if (!complete)
 		{
-			if (fullPull)
+
+			potValL = analogRead(potInputL);
+			//delay(10);
+			potValR = analogRead(potInputR);
+			//delay(10);
+
+
+			//Serial.print("Left = ");
+			//Serial.println(potValL);
+			//Serial.print("Right = ");
+			//Serial.println(potValR);
+
+
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
+
+			//Serial.print("Pot Value = ");
+			//Serial.println(potVal);
+			//delay(100);
+
+			if (potVal > 550)
 			{
-				nodeStatus[7] = 0;
-				alarmState = false;
-				report(0, commandNode);
-				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
-				fullPull = false;
-				delay(10);
+				digitalWrite(dirPin, HIGH);
+				if (potVal > 800) potVal = 1000;
+
+				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
+
+				//Serial.println("Direction = CCW");
+				//Serial.print("Delay = ");
+				//Serial.println(stepDelay);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation++;
+				if (currentLocation > maxSteps) currentLocation = 0;
+
+			}
+			else if (potVal < 450)
+			{
+				digitalWrite(dirPin, LOW);
+				if (potVal < 200)potVal = 0;
+				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
+
+				//Serial.println("Direction = CW");
+				//Serial.print("Delay = ");
+				//Serial.println(stepDelay);
+
+				digitalWrite(stepPin, HIGH);
+				delay(stepDelay);
+
+				digitalWrite(stepPin, LOW);
+				delay(stepDelay);
+
+				currentLocation--;
+				if (currentLocation < 0) currentLocation = (maxSteps - 1);
+			}
+
+			int max = sunLocation + angle_1;
+			int min = sunLocation - angle_1;
+
+			if (max > maxSteps)
+			{
+				int limitShift = max - maxSteps;
+
+				if (currentLocation < limitShift)
+				{
+					int delta = abs((currentLocation + maxSteps) - sunLocation);
+					int ledPower = map(delta, 0, angle_1, 255, 0);
+					analogWrite(solarLED, ledPower);
+				}
+				else if (currentLocation > min)
+				{
+					int delta = abs(sunLocation - currentLocation);
+					int ledPower = map(delta, 0, angle_1, 255, 0);
+					analogWrite(solarLED, ledPower);
+				}
+				else
+				{
+					analogWrite(solarLED, LOW);
+				}
+			}
+			else if ((currentLocation > min) && (currentLocation < max))
+			{
+				int delta = abs(sunLocation - currentLocation);
+				int ledPower = map(delta, 0, angle_1, 255, 0);
+				analogWrite(solarLED, ledPower);
 			}
 			else
 			{
-				nodeStatus[7] = 1;
-				alarmState = true;
-				report(0, commandNode);
-				wipeColor(red, 0, 0, firstPixel(2), lastPixel(2));
+				analogWrite(solarLED, LOW);
 			}
 		}
 
-		//If beam is broken
-		byte oldState = inputStates[0];
-		updateInputs();
-
-		if (oldState != inputStates[0])
-		{
-			if (checkInput(0))
-			{
-				nodeStatus[7] = 8;
-				report(0, commandNode);
-				testedState = true;
-				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
-			}
-			else
-			{
-				nodeStatus[7] = 9;
-				report(0, commandNode);
-				testedState = false;
-				wipeColor(red, 0, 0, firstPixel(1), lastPixel(1));
-			}
-		}
 	}
 	else  //Reset	
 	{
@@ -2021,15 +2104,20 @@ void report(uint8_t check, uint32_t dAddress)
 
 void xbReport()
 {
-	xbSerial.print("$,");
-	xbSerial.print(nodeID);
-	xbSerial.print(",");
+	//xbSerial.print("$,");
+	//xbSerial.print(nodeID);
+	//xbSerial.print(",");
+
+	String stringOut = "$,";
+	String dest = String(nodeID);
+	stringOut += dest;
+	stringOut += ",";
 	for (int i = 0; i < sizeof(nodeStatus); i++)
 	{
-		xbSerial.print(nodeStatus[i]);
-		xbSerial.print(",");
+		stringOut += String(nodeStatus[i]);	//send data
+		stringOut += ",";
 	}
-	xbSerial.println();
+	xbSerial.println(stringOut);
 
 }
 

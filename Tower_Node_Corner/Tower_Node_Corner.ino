@@ -75,7 +75,9 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
-uint8_t inputPins[6] = { 5, 99, 99, 99, 99, 99 };	//Green 10, Red 11
+//Oxy Towers = 11, Fire Towers = 5 (Fire Towrs need to have condition set to false)
+uint8_t inputPins[6] = { 11, 99, 99, 99, 99, 99 };
+boolean conditioned = true;
 //Output Pin number - Pin# of Output - 99 if not used
 uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
 //LED Pin number (Uno 13, Leonardo 23)
@@ -534,8 +536,17 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			wipeColor(blue, 0, 1, 0, stripLength);
-			solidColor(red, 0, firstPixel(1), lastPixel(1));
+			if (!sunState)
+			{
+				wipeColor(blue, 0, 1, 0, stripLength);
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+				solidColor(red, 0, firstPixel(1), lastPixel(1));
+			}
+			else
+			{
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+				solidColor(red, 0, firstPixel(1), lastPixel(1));
+			}
 
 			gameModeChanged = false;
 			complete = false;
@@ -566,7 +577,7 @@ void gamePlayCanbus()
 					nodeStatus[7] = 0;
 					alarmState = false;
 					report(0, commandNode);
-					wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+					wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
 					complete = true;
 				}
 			}
@@ -621,7 +632,7 @@ void gamePlayCanbus()
 						nodeStatus[7] = 0;
 						alarmState = false;
 						report(0, commandNode);
-						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+						wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
 						complete = true;
 					}
 				}
@@ -652,6 +663,15 @@ void gamePlayCanbus()
 		if (gameModeChanged)
 		{
 			wipeColor(blue, 0, 1, 0, stripLength);
+			if (!sunState)
+			{
+				wipeColor(blue, 0, 1, 0, stripLength);
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+			}
+			else
+			{
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+			}
 
 			//If tower has been tested set ring to green else set it to red
 			if (testedState) solidColor(green, 0, firstPixel(1), lastPixel(1));
@@ -680,7 +700,7 @@ void gamePlayCanbus()
 
 		if (!complete)
 		{
-			if (testedState)
+			if (testedState && alarmState)
 			{
 				int pullValue = getScaledAnalog();
 
@@ -696,12 +716,12 @@ void gamePlayCanbus()
 						nodeStatus[7] = 0;
 						alarmState = false;
 						report(0, commandNode);
-						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+						wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
 						complete = true;
 					}
 				}
 			}
-			else
+			else if (!testedState)
 			{
 				//If beam is broken
 				byte oldState = inputStates[0];
@@ -965,7 +985,17 @@ void gamePlaySpeedTest()
 	{
 		if (gameModeChanged)
 		{
-			solidColor(blue, 0, 0, stripLength);
+			if (!sunState)
+			{
+				wipeColor(blue, 0, 1, 0, stripLength);
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+				solidColor(red, 0, firstPixel(1), lastPixel(1));
+			}
+			else
+			{
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+				solidColor(red, 0, firstPixel(1), lastPixel(1));
+			}
 			gameModeChanged = false;
 
 			if ((nodeID == 3) || (nodeID == 8))
@@ -982,7 +1012,7 @@ void gamePlaySpeedTest()
 				nodeStatus[7] = 0;
 				alarmState = false;
 				report(0, commandNode);
-				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
 				complete = true;
 			}
 			else
@@ -1022,7 +1052,20 @@ void gamePlaySpeedTest()
 				digitalWrite(manPin, HIGH);
 			}
 			wipeColor(blue, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
+			if (!sunState)
+			{
+				wipeColor(blue, 0, 1, 0, stripLength);
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+			}
+			else
+			{
+				solidColor(white, 0, firstPixel(2), lastPixel(2));
+			}
+
+			//If tower has been tested set ring to green else set it to red
+			if (testedState) solidColor(green, 0, firstPixel(1), lastPixel(1));
+			else solidColor(red, 0, firstPixel(1), lastPixel(1));
+
 			gameModeChanged = false;
 			complete = false;
 		}
@@ -1035,7 +1078,7 @@ void gamePlaySpeedTest()
 				nodeStatus[7] = 0;
 				alarmState = false;
 				report(0, commandNode);
-				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
+				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
 				complete = true;
 			}
 		}
@@ -1604,8 +1647,11 @@ boolean checkInput(uint8_t input)
 	//Read pin state
 	uint8_t newState = digitalRead(inputPins[input]);
 	//Reverse Logic
-	//if (newState == 0) newState = 1;
-	//else newState = 0;
+	if (!conditioned)
+	{
+		if (newState == 0) newState = 1;
+		else newState = 0;
+	}
 
 	//Get old state
 	uint8_t oldState = inputStates[input];

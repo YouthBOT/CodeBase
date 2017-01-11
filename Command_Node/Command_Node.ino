@@ -90,8 +90,8 @@ uint8_t buzzerPin = 5;
 byte index = 0;		//Counter for serial data
 char inData[32];	//Incoming serial data
 boolean newserial = false;
-int xbRX = 2;		//xb RX pin
-int xbTX = 3;		//xb TX pin
+int xbRX = 3;		//xb RX pin
+int xbTX = 2;		//xb TX pin
 SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,9 +242,29 @@ void loop()
 			}
 			execute();					//Execute Command
 		}
-		else if (destNode > 20)			//It's an xbee node
+		else if (destNode == 0) //This message is for everyone so send it to all towers
 		{
 			messagesSent++;
+			//Send it to CANBUS nodes
+			uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
+			CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
+
+			//Build string and send it to xbee nodes
+			String stringOut = "$,";
+			String dest = String(destNode);
+			stringOut += dest;
+			stringOut += ",";
+			for (uint8_t i = 0; i < sizeof(canOut); i++)
+			{
+				stringOut += String(canOut[i]);	
+				stringOut += ",";
+			}
+			xbSerial.println(stringOut);
+		}
+		else if (destNode > 20)		//It's an xbee node
+		{
+			messagesSent++;
+			//Build Message String
 			String stringOut = "$,";
 			String dest = String(destNode);
 			stringOut += dest;
@@ -252,12 +272,12 @@ void loop()
 
 			for (uint8_t i = 0; i < sizeof(canOut); i++)
 			{
-					stringOut += String(canOut[i]);	//send data
-					stringOut += ",";
+				stringOut += String(canOut[i]);	
+				stringOut += ",";
 			}
-			xbSerial.println(stringOut);
+			xbSerial.println(stringOut);	//Send it to XBee nodes
 		}
-		else							//Else send it out
+		else //Else send it out to CANBUS
 		{
 			messagesSent++;
 			uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
@@ -498,7 +518,6 @@ void parseData()
 
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <method>Change Game Modes </method>

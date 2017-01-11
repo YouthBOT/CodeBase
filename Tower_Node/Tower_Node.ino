@@ -465,8 +465,16 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			solidColor(blue, 0, 0, stripLength);
+			if(!sunState) solidColor(blue, 0, 0, stripLength);
+			else
+			{
+				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
+				solidColor(blue, 0, firstPixel(1), lastPixel(2));
+			}
+
 			gameModeChanged = false;
+
+			complete = false;
 
 			if ((nodeID == 3) || (nodeID == 8))
 			{
@@ -491,6 +499,7 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
+
 			gameModeChanged = false;
 			complete = false;
 
@@ -524,6 +533,12 @@ void gamePlayCanbus()
 			}
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
+			if (!sunState) solidColor(blue, 0, 0, stripLength);
+			else
+			{
+				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
+				solidColor(blue, 0, firstPixel(1), lastPixel(2));
+			}
 			gameModeChanged = false;
 			complete = false;
 		}
@@ -769,7 +784,12 @@ void gamePlaySpeedTest()
 	{
 		if (gameModeChanged)
 		{
-			solidColor(blue, 0, 0, stripLength);
+			if (!sunState) solidColor(blue, 0, 0, stripLength);
+			else
+			{
+				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
+				solidColor(blue, 0, firstPixel(1), lastPixel(2));
+			}
 			gameModeChanged = false;
 
 			if ((nodeID == 3) || (nodeID == 8))
@@ -812,6 +832,12 @@ void gamePlaySpeedTest()
 			}
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
+			if (!sunState) solidColor(blue, 0, 0, stripLength);
+			else
+			{
+				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
+				solidColor(blue, 0, firstPixel(1), lastPixel(2));
+			}
 			gameModeChanged = false;
 			complete = false;
 		}

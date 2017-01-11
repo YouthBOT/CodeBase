@@ -41,13 +41,16 @@ namespace YBOT_Field_Control_2016
             practiceMode = false;
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
 
-            //Wait for the solar panel to home.
-            while(this.fc.node[11].byte6 != 9)
-            {
-                Application.DoEvents();
-            }
+            //Home The Solar Panel
+            string str = ("7,1,3,");
+            this.fc.SendMessage(sunTower, str);
+            Thread.Sleep(20);
 
             changeSunTower();
+
+            //Wait for the solar panel to home.
+            Thread.Sleep(10000);
+
 
             //Ring Bell
             this.fc.RingBell();
@@ -72,13 +75,15 @@ namespace YBOT_Field_Control_2016
             practiceMode = false;
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
 
-            //Wait for the solar panel to home.
-            while (this.fc.node[11].byte6 != 9)
-            {
-                Application.DoEvents();
-            }
+            //Home The Solar Panel
+            string str = ("7,1,3,");
+            this.fc.SendMessage(sunTower, str);
+            Thread.Sleep(20);
 
             changeSunTower();
+
+            //Wait for the solar panel to home.
+            Thread.Sleep(10000);
 
             //Ring Bell
             this.fc.RingBell();
@@ -186,8 +191,9 @@ namespace YBOT_Field_Control_2016
             //see if the towers have been tested or cycled
             for (int i = 0; i < emergencyTowers.Length; i++)
             {
-                if (this.fc.node[i].tested == true) testedTowers++;
-                if (this.fc.node[i].deviceCycled == true) cycledTowers++;
+                int tower = emergencyTowers[i];
+                if (this.fc.node[tower].tested == true) testedTowers++;
+                if (this.fc.node[tower].deviceCycled == true) cycledTowers++;
             }
 
             joint.autoEmergencyTowerCycled = cycledTowers;
