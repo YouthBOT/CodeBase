@@ -115,13 +115,13 @@ namespace YBotSqlWrapper
             }
         }
 
-        public void AddLog (string text, string type) {
+        public async void AddLog (string text, string type) {
             if ((sql != null) && (IsConnected)) {
                 var command = new MySqlCommand (
                     "INSERT INTO event_log (event_id, event_type, event_message) " +
                     string.Format ("VALUES (NOW(), '{0}', '{1}');", type, text),
                     sql);
-                command.ExecuteNonQuery ();
+                await command.ExecuteNonQueryAsync ();
             }
         }
 
