@@ -7,19 +7,17 @@ namespace YBOT_Field_Control_2016
 {
     public partial class Score : Form
     {
-        const int autoCornersTestedPointValue = 15;
-        const int autoEmergencyCycledPointValue = 35;
+        const int autoCornersTestedPointValue = 50;
+        const int autoEmergencyCycledPointValue = 100;
         const int manualEmergencyCycledPointValue = 100;
         const int emergencyCycledPenaltyPointValue = 250;
         const int minimumEmergencyCycled = 4;
-        const int maxRockWeight = 128;
-        const int rocketLaunchedPointValue = 100;
+        const int rocketLaunchedPointValue = 200;
         const int teamPenalty = 200;
 
         enum RocketPosition : int {
             Loaded = 1,
-            DoorClosed = 2,
-            CrawlerMoved = 3,
+            DoorClosed = 3,
             LaunchPosition = 5
         }
 
@@ -33,6 +31,10 @@ namespace YBOT_Field_Control_2016
         public Score (GameControl game) {
             InitializeComponent();
             this.game = game;
+
+            tbGreenPenalty.Validated += PenaltyAutoDq;
+            tbRedPenalty.Validated += PenaltyAutoDq;
+            tbManualEmergencyCycled.Validated += ManualEmergencyCycledAutoPenalty;
         }
 
         private void Score_Shown (object sender, EventArgs e) {
@@ -51,10 +53,8 @@ namespace YBOT_Field_Control_2016
             tbAutoCornersTested.Text = green.autoTowerTested.ToString ();
             tbAutoEmergencyCycled.Text = green.autoEmergencyTowerCycled.ToString ();
             tbAutoSolarScore.Text = green.autoSolarPanelScore.ToString ();
-            //tbManualSolar1Score.Text = green.manSolarPanelScore1.ToString ();
-            //tbManualSolar2Score.Text = green.manSolarPanelScore2.ToString ();
-            tbManualSolar1Score.Text = "0";
-            tbManualSolar2Score.Text = "0";
+            tbManualSolar1Score.Text = green.manSolarPanelScore1.ToString ();
+            tbManualSolar2Score.Text = green.manSolarPanelScore2.ToString ();
             tbManualEmergencyCycled.Text = green.emergencyCleared.ToString ();
             if (green.emergencyCleared < minimumEmergencyCycled) {
                 cbEmergencyCycledPenalty.Text = emergencyCycledPenaltyPointValue.ToString ();
@@ -66,11 +66,11 @@ namespace YBOT_Field_Control_2016
             tbRedPenalty.Text = red.penalty.ToString ();
 
             if (green.dq || (green.penalty >= 3)) {
-                btnGreenDq.BackColor = Color.Lime;
+                cbGreenDq.Checked = true;
             }
 
             if (red.dq || (red.penalty >= 3)) {
-                btnRedDq.BackColor = Color.Red;
+                cbRedDq.Checked = true;
             }
 
             UpdateScore ();
@@ -94,13 +94,41 @@ namespace YBOT_Field_Control_2016
             var rocketLaunched = Convert.ToInt32 (lbRocketLaunchedScore.Text);
             var autoScore = autoCornersTested + autoEmergencyCycled + autoSolar;
             var manualScore = manualSolar1 + manualSolar2 + manualEmergencyCycled - emergencyCycledPenalty + rockScore + rocketLaunched;
-            var jointScore = autoScore + manualScore;
 
+            int jointScore;
+            if (!manualOverride) {
+                jointScore = autoScore + manualScore;
+            } else {
+                jointScore = Convert.ToInt32 (tbJointScore.Text);
+            }
+
+            var greenPush = Convert.ToInt32 (tbGreenPushes.Text);
             var greenPenalty = Convert.ToInt32 (tbGreenPenalty.Text);
-            var greenScore = jointScore - (greenPenalty * teamPenalty);
 
+            int greenScore;
+            if (!manualOverride) {
+                greenScore = jointScore - (greenPenalty * teamPenalty + greenPush * teamPenalty);
+            } else {
+                greenScore = Convert.ToInt32 (tbGreenScore.Text);
+            }
+
+            if (cbGreenDq.Checked || cbGreenDidntPlay.Checked) {
+                greenScore = 0;
+            }
+
+            var redPush = Convert.ToInt32 (tbRedPushes.Text);
             var redPenalty = Convert.ToInt32 (tbRedPenalty.Text);
-            var redScore = jointScore - (redPenalty * teamPenalty);
+
+            int redScore;
+            if (!manualOverride) {
+                redScore = jointScore - (redPenalty * teamPenalty + redPush * teamPenalty);
+            } else {
+                redScore = Convert.ToInt32 (tbRedScore.Text);
+            }
+
+            if (cbRedDq.Checked || cbRedDidntPlay.Checked) {
+                redScore = 0;
+            }
 
             lbAutoCornerTestedScore.Text = autoCornersTested.ToString ();
             lbAutoEmergencyCycledScore.Text = autoEmergencyCycled.ToString ();
@@ -109,7 +137,11 @@ namespace YBOT_Field_Control_2016
             lbJointScore.Text = jointScore.ToString ();
 
             lbGreenPenaltyScore.Text = (greenPenalty * teamPenalty).ToString ();
+            lbGreenPushScore.Text = (greenPush * teamPenalty).ToString ();
+
             lbRedPenaltyScore.Text = (redPenalty * teamPenalty).ToString ();
+            lbRedPushScore.Text = (redPush * teamPenalty).ToString ();
+
             lbGreenScore.Text = greenScore.ToString ();
             lbRedScore.Text = redScore.ToString ();
 
@@ -121,11 +153,10 @@ namespace YBOT_Field_Control_2016
                 green.autoEmergencyTowerCycled = autoEmergencyCycled;
                 green.autoSolarPanelScore = autoSolar;
 
-                //green.manSolarPanelScore1 = manualSolar1;
-                //green.manSolarPanelScore2 = manualSolar2;
+                green.manSolarPanelScore1 = manualSolar1;
+                green.manSolarPanelScore2 = manualSolar2;
                 green.emergencyCleared = manualEmergencyCycled;
 
-                green.rockValue = rocketPositionMultiplier;
                 green.rockWeight = rockWeight;
                 green.rockScore = rockScore;
                 green.rocketPosition = rocketPositionMultiplier;
@@ -136,29 +167,32 @@ namespace YBOT_Field_Control_2016
                 green.score = jointScore;
 
                 green.penalty = greenPenalty;
-                if (btnGreenDq.BackColor == DefaultBackColor) {
-                    green.dq = false;
-                } else {
+                if (cbGreenDq.Checked) {
                     green.dq = true;
+                } else {
+                    green.dq = false;
                 }
 
                 if (!green.dq) {
                     green.finalScore = greenScore;
-                    green.matchResult = "C";
                 } else {
                     green.finalScore = 0;
-                    green.matchResult = "I";
+                }
+
+                if (!cbGreenDidntPlay.Checked) {
+                    green.matchResult = "P";
+                } else {
+                    green.matchResult = "NP";
                 }
 
                 red.autoTowerTested = autoCornersTested;
                 red.autoEmergencyTowerCycled = autoEmergencyCycled;
                 red.autoSolarPanelScore = autoSolar;
 
-                //red.manSolarPanelScore1 = manualSolar1;
-                //red.manSolarPanelScore2 = manualSolar2;
+                red.manSolarPanelScore1 = manualSolar1;
+                red.manSolarPanelScore2 = manualSolar2;
                 red.emergencyCleared = manualEmergencyCycled;
 
-                red.rockValue = rocketPositionMultiplier;
                 red.rockWeight = rockWeight;
                 red.rockScore = rockScore;
                 red.rocketPosition = rocketPositionMultiplier;
@@ -169,35 +203,23 @@ namespace YBOT_Field_Control_2016
                 red.score = jointScore;
 
                 red.penalty = redPenalty;
-                if (btnRedDq.BackColor == DefaultBackColor) {
-                    red.dq = false;
-                } else {
+                if (cbRedDq.Checked) {
                     red.dq = true;
+                } else {
+                    red.dq = false;
                 }
 
                 if (!red.dq) {
                     red.finalScore = redScore;
-                    red.matchResult = "C";
                 } else {
                     red.finalScore = 0;
-                    red.matchResult = "I";
                 }
-            }
-        }
 
-        private void btnGreenDq_Click (object sender, EventArgs e) {
-            if (btnGreenDq.BackColor == DefaultBackColor) {
-                btnGreenDq.BackColor = Color.Lime;
-            } else {
-                btnGreenDq.BackColor = DefaultBackColor;
-            }
-        }
-
-        private void btnRedDq_Click (object sender, EventArgs e) {
-            if (btnRedDq.BackColor == DefaultBackColor) {
-                btnRedDq.BackColor = Color.Red;
-            } else {
-                btnRedDq.BackColor = DefaultBackColor;
+                if (!cbRedDidntPlay.Checked) {
+                    red.matchResult = "P";
+                } else {
+                    red.matchResult = "NP";
+                }
             }
         }
 
@@ -212,71 +234,29 @@ namespace YBOT_Field_Control_2016
 
         private void btnOverride_Click (object sender, EventArgs e) {
             if (!manualOverride) {
-                tbAutoCornersTested.Enabled = true;
-                tbAutoEmergencyCycled.Enabled = true;
-                tbAutoSolarScore.Enabled = true;
+                UpdateScore ();
 
-                tbManualSolar1Score.Enabled = true;
-                tbManualSolar2Score.Enabled = true;
-                tbManualEmergencyCycled.Enabled = true;
-                cbEmergencyCycledPenalty.Enabled = true;
+                tbJointScore.Visible = true;
+                tbJointScore.Text = lbJointScore.Text;
 
-                tbGreenPenalty.Enabled = true;
-                tbRedPenalty.Enabled = true;
+                tbGreenScore.Visible = true;
+                tbGreenScore.Text = lbGreenScore.Text;
 
-                btnGreenDq.Enabled = true;
-                btnRedDq.Enabled = true;
+                tbRedScore.Visible = true;
+                tbRedScore.Text = lbRedScore.Text;
 
                 btnOverride.BackColor = Color.SteelBlue;
                 manualOverride = true;
-
-                tbAutoCornersTested.Validated += OnValidation;
-                tbAutoEmergencyCycled.Validated += OnValidation;
-                tbAutoSolarScore.Validated += OnValidation;
-                tbManualSolar1Score.Validated += OnValidation;
-                tbManualSolar2Score.Validated += OnValidation;
-                tbManualEmergencyCycled.Validated += ManualEmergencyCycledAutoPenalty;
-                tbManualEmergencyCycled.Validated += OnValidation;
-                cbEmergencyCycledPenalty.Validated += OnValidation;
-                tbGreenPenalty.Validated += PenaltyAutoDq;
-                tbGreenPenalty.Validated += OnValidation;
-                tbRedPenalty.Validated += PenaltyAutoDq;
-                tbRedPenalty.Validated += OnValidation;
             } else {
-                tbAutoCornersTested.Enabled = false;
-                tbAutoEmergencyCycled.Enabled = false;
-                tbAutoSolarScore.Enabled = false;
+                manualOverride = false;
 
-                tbManualSolar1Score.Enabled = false;
-                tbManualSolar2Score.Enabled = false;
-                tbManualEmergencyCycled.Enabled = false;
-                cbEmergencyCycledPenalty.Enabled = false;
+                tbJointScore.Visible = false;
+                tbGreenScore.Visible = false;
+                tbRedScore.Visible = false;
 
-                tbGreenPenalty.Enabled = false;
-                tbRedPenalty.Enabled = false;
-
-                tbGreenPenalty.Enabled = false;
-                tbRedPenalty.Enabled = false;
-
-                btnGreenDq.Enabled = false;
-                btnRedDq.Enabled = false;
+                UpdateScore ();
 
                 btnOverride.BackColor = DefaultBackColor;
-                manualOverride = false;
-                InitScore ();
-
-                tbAutoCornersTested.Validated -= OnValidation;
-                tbAutoEmergencyCycled.Validated -= OnValidation;
-                tbAutoSolarScore.Validated -= OnValidation;
-                tbManualSolar1Score.Validated -= OnValidation;
-                tbManualSolar2Score.Validated -= OnValidation;
-                tbManualEmergencyCycled.Validated -= ManualEmergencyCycledAutoPenalty;
-                tbManualEmergencyCycled.Validated -= OnValidation;
-                cbEmergencyCycledPenalty.Validated -= OnValidation;
-                tbGreenPenalty.Validated -= PenaltyAutoDq;
-                tbGreenPenalty.Validated -= OnValidation;
-                tbRedPenalty.Validated -= PenaltyAutoDq;
-                tbRedPenalty.Validated -= OnValidation;
             }
         }
 
@@ -299,19 +279,21 @@ namespace YBOT_Field_Control_2016
                 try {
                     var number = Convert.ToInt32 (tb.Text);
 
-                    var tag = tb.Tag as string;
-                    if (tag != null) {
-                        if (!string.IsNullOrWhiteSpace (tag)) {
-                            try {
-                                var indexComma = tag.IndexOf (',');
-                                var min = Convert.ToInt32 (tag.Substring (1, indexComma - 1));
-                                var max = Convert.ToInt32 (tag.Substring (indexComma + 1, tag.Length - indexComma - 2));
-                                if ((number < min) || (number > max)) {
-                                    MessageBox.Show (string.Format ("Invalid number of towers\nMust be between {0} and {1}", min, max));
-                                    e.Cancel = true;
+                    if (!manualOverride) {
+                        var tag = tb.Tag as string;
+                        if (tag != null) {
+                            if (!string.IsNullOrWhiteSpace (tag)) {
+                                try {
+                                    var indexComma = tag.IndexOf (',');
+                                    var min = Convert.ToInt32 (tag.Substring (1, indexComma - 1));
+                                    var max = Convert.ToInt32 (tag.Substring (indexComma + 1, tag.Length - indexComma - 2));
+                                    if ((number < min) || (number > max)) {
+                                        MessageBox.Show (string.Format ("Invalid number of towers\nMust be between {0} and {1}", min, max));
+                                        e.Cancel = true;
+                                    }
+                                } catch {
+                                    //
                                 }
-                            } catch {
-                                //
                             }
                         }
                     }
@@ -335,15 +317,15 @@ namespace YBOT_Field_Control_2016
                     var penalties = Convert.ToInt32 (tb.Text);
                     if (penalties >= 3) {
                         if (tb.Name.Contains ("Green")) {
-                            btnGreenDq.BackColor = Color.Lime;
+                            cbGreenDq.Checked = true;
                         } else if (tb.Name.Contains ("Red")) {
-                            btnGreenDq.BackColor = Color.Red;
+                            cbRedDq.Checked = true;
                         }
                     } else {
                         if (tb.Name.Contains ("Green")) {
-                            btnGreenDq.BackColor = DefaultBackColor;
+                            cbGreenDq.Checked = false;
                         } else if (tb.Name.Contains ("Red")) {
-                            btnGreenDq.BackColor = DefaultBackColor;
+                            cbRedDq.Checked = false;
                         }
                     }
                 } catch {
@@ -373,6 +355,27 @@ namespace YBOT_Field_Control_2016
             UpdateScore ();
         }
 
+        private void CheckedChanged (object sender, EventArgs e) {
+            var cb = sender as CheckBox;
+            if (cb != null) {
+                if ((cb.Name.Contains ("Green")) && cb.Checked) {
+                    if (cb.Name.Contains ("Dq")) {
+                        cbGreenDidntPlay.Checked = false;
+                    } else {
+                        cbGreenDq.Checked = false;
+                    }
+                } else if ((cb.Name.Contains ("Red")) && cb.Checked) {
+                    if (cb.Name.Contains ("Dq")) {
+                        cbRedDidntPlay.Checked = false;
+                    } else {
+                        cbRedDq.Checked = false;
+                    }
+                }
+
+                UpdateScore ();
+            }
+        }
+
         private void cbRocketPosition_TextChanged (object sender, EventArgs e) {
             var cb = sender as ComboBox;
             if (cb != null) {
@@ -385,9 +388,6 @@ namespace YBOT_Field_Control_2016
                 switch (cb.Text) {
                 case "Door Closed":
                     rocketPositionMultiplier = RocketPosition.DoorClosed;
-                    break;
-                case "Crawler Moved":
-                    rocketPositionMultiplier = RocketPosition.CrawlerMoved;
                     break;
                 case "Launch Position":
                     rocketPositionMultiplier = RocketPosition.LaunchPosition;

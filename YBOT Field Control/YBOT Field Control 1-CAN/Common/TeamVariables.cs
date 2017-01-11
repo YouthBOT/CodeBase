@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using YBotSqlWrapper;
 
 namespace YBOT_Field_Control_2016
 {
@@ -228,20 +225,12 @@ namespace YBOT_Field_Control_2016
             set { _rockWeight = value; }
         }
 
-        private int _rockValue;                 //Final rock value
-        public int rockValue
-        {
-            get { return _rockValue; }
-            set { _rockValue = value; }
-        }
-
         private int _rockScore;                 //Final rock score
         public int rockScore
         {
             get { return _rockScore; }
             set { _rockScore = value; }
         }
-
 
         //Team color 
         public Team(string teamColor)
@@ -273,10 +262,38 @@ namespace YBOT_Field_Control_2016
             emergencyCleared = 0;
             rocketPosition = 0;
             rockScore = 0;
-            rockValue = 0;
             rockWeight = 0;
             manSolarPanelScore1 = 0;
             manSolarPanelScore2 = 0;
+        }
+
+        public void StoreTeamVariablesToSqlMatch (ref Match match) {
+            if (teamColor.Equals ("red", StringComparison.OrdinalIgnoreCase)) {
+                match.redScore = finalScore;
+                match.redPenalty = penalty;
+                match.redDq = dq ? 1 : 0;
+                match.redResult = matchResult;
+            } else {
+                match.greenScore = finalScore;
+                match.greenPenalty = penalty;
+                match.greenDq = dq ? 1 : 0;
+                match.greenResult = matchResult;
+            }
+        }
+
+        public void StoreJointVariablesToSqlMatch (ref Match match) {
+            match.autoCornersTested = autoTowerTested;
+            match.autoEmergencyCycled = autoEmergencyTowerCycled;
+            match.autoSolarPanel = autoSolarPanelScore;
+
+            match.manSolarPanel1 = manSolarPanelScore1;
+            match.manSolarPanel2 = manSolarPanelScore2;
+            match.manualEmergencyCleared = emergencyCleared;
+
+            match.rocketPosition = rocketPosition;
+            match.rockWeight = rockWeight;
+            match.rockScore = rockScore;
+            match.rocketBonus = rocketBonus ? 1 : 0;
         }
     }
 }

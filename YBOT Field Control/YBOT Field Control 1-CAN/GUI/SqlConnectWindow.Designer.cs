@@ -40,7 +40,7 @@
             this.serverIpTextBox.Name = "serverIpTextBox";
             this.serverIpTextBox.Size = new System.Drawing.Size(160, 20);
             this.serverIpTextBox.TabIndex = 0;
-            this.serverIpTextBox.Text = "69.61.168.35";
+            this.serverIpTextBox.Text = "149.56.109.90";
             // 
             // serverIpLabel
             // 
@@ -59,6 +59,7 @@
             this.passwordTextBox.PasswordChar = '*';
             this.passwordTextBox.Size = new System.Drawing.Size(160, 20);
             this.passwordTextBox.TabIndex = 2;
+            this.passwordTextBox.Text = "stemwithrobots";
             // 
             // passwordLabel
             // 

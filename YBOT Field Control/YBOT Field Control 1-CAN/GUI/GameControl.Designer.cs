@@ -71,6 +71,9 @@
             this.gameTimer = new System.Windows.Forms.Timer(this.components);
             this.practiceTimer = new System.Windows.Forms.Timer(this.components);
             this.testTimer = new System.Windows.Forms.Timer(this.components);
+            this.btnTournamentNext = new System.Windows.Forms.Button();
+            this.btnTournamentPrev = new System.Windows.Forms.Button();
+            this.lblTournamentName = new System.Windows.Forms.Label();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -89,7 +92,7 @@
             this.btnGreenPlus.ForeColor = System.Drawing.Color.Black;
             this.btnGreenPlus.Location = new System.Drawing.Point(93, 215);
             this.btnGreenPlus.Name = "btnGreenPlus";
-            this.btnGreenPlus.Size = new System.Drawing.Size(100, 60);
+            this.btnGreenPlus.Size = new System.Drawing.Size(103, 60);
             this.btnGreenPlus.TabIndex = 162;
             this.btnGreenPlus.Text = "+";
             this.btnGreenPlus.UseVisualStyleBackColor = false;
@@ -233,7 +236,7 @@
             this.btnRedPlus.ForeColor = System.Drawing.Color.Black;
             this.btnRedPlus.Location = new System.Drawing.Point(1006, 295);
             this.btnRedPlus.Name = "btnRedPlus";
-            this.btnRedPlus.Size = new System.Drawing.Size(100, 60);
+            this.btnRedPlus.Size = new System.Drawing.Size(103, 60);
             this.btnRedPlus.TabIndex = 160;
             this.btnRedPlus.Text = "+";
             this.btnRedPlus.UseVisualStyleBackColor = false;
@@ -249,7 +252,7 @@
             this.btnRedMinus.ForeColor = System.Drawing.Color.Black;
             this.btnRedMinus.Location = new System.Drawing.Point(1006, 215);
             this.btnRedMinus.Name = "btnRedMinus";
-            this.btnRedMinus.Size = new System.Drawing.Size(100, 60);
+            this.btnRedMinus.Size = new System.Drawing.Size(103, 60);
             this.btnRedMinus.TabIndex = 159;
             this.btnRedMinus.Text = "-";
             this.btnRedMinus.UseVisualStyleBackColor = false;
@@ -289,7 +292,7 @@
             this.btnGreenMinus.ForeColor = System.Drawing.Color.Black;
             this.btnGreenMinus.Location = new System.Drawing.Point(93, 295);
             this.btnGreenMinus.Name = "btnGreenMinus";
-            this.btnGreenMinus.Size = new System.Drawing.Size(100, 60);
+            this.btnGreenMinus.Size = new System.Drawing.Size(103, 60);
             this.btnGreenMinus.TabIndex = 161;
             this.btnGreenMinus.Text = "-";
             this.btnGreenMinus.UseVisualStyleBackColor = false;
@@ -306,7 +309,7 @@
             this.lblGreenTeam.Name = "lblGreenTeam";
             this.lblGreenTeam.Size = new System.Drawing.Size(185, 20);
             this.lblGreenTeam.TabIndex = 67;
-            this.lblGreenTeam.Text = "GreenTeam";
+            this.lblGreenTeam.Text = "Green Team";
             this.lblGreenTeam.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnDisableGreen
@@ -317,7 +320,7 @@
             this.btnDisableGreen.ForeColor = System.Drawing.Color.Lime;
             this.btnDisableGreen.Location = new System.Drawing.Point(93, 130);
             this.btnDisableGreen.Name = "btnDisableGreen";
-            this.btnDisableGreen.Size = new System.Drawing.Size(100, 60);
+            this.btnDisableGreen.Size = new System.Drawing.Size(103, 60);
             this.btnDisableGreen.TabIndex = 153;
             this.btnDisableGreen.Text = "Disable Green";
             this.btnDisableGreen.UseVisualStyleBackColor = true;
@@ -331,7 +334,7 @@
             this.btnDisableRed.ForeColor = System.Drawing.Color.Red;
             this.btnDisableRed.Location = new System.Drawing.Point(1006, 130);
             this.btnDisableRed.Name = "btnDisableRed";
-            this.btnDisableRed.Size = new System.Drawing.Size(100, 60);
+            this.btnDisableRed.Size = new System.Drawing.Size(103, 60);
             this.btnDisableRed.TabIndex = 152;
             this.btnDisableRed.Text = "Disable Red";
             this.btnDisableRed.UseVisualStyleBackColor = true;
@@ -353,9 +356,9 @@
             // btnMatchNext
             // 
             this.btnMatchNext.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnMatchNext.Location = new System.Drawing.Point(697, 132);
+            this.btnMatchNext.Location = new System.Drawing.Point(713, 132);
             this.btnMatchNext.Name = "btnMatchNext";
-            this.btnMatchNext.Size = new System.Drawing.Size(41, 31);
+            this.btnMatchNext.Size = new System.Drawing.Size(41, 33);
             this.btnMatchNext.TabIndex = 156;
             this.btnMatchNext.Text = ">>";
             this.btnMatchNext.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -365,9 +368,9 @@
             // btnMatchPrev
             // 
             this.btnMatchPrev.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnMatchPrev.Location = new System.Drawing.Point(456, 132);
+            this.btnMatchPrev.Location = new System.Drawing.Point(440, 132);
             this.btnMatchPrev.Name = "btnMatchPrev";
-            this.btnMatchPrev.Size = new System.Drawing.Size(41, 31);
+            this.btnMatchPrev.Size = new System.Drawing.Size(41, 33);
             this.btnMatchPrev.TabIndex = 155;
             this.btnMatchPrev.Text = "<<";
             this.btnMatchPrev.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -455,13 +458,12 @@
             // lblMatchNumber
             // 
             this.lblMatchNumber.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblMatchNumber.AutoSize = true;
             this.lblMatchNumber.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblMatchNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMatchNumber.Location = new System.Drawing.Point(497, 132);
+            this.lblMatchNumber.Location = new System.Drawing.Point(483, 132);
             this.lblMatchNumber.MinimumSize = new System.Drawing.Size(200, 0);
             this.lblMatchNumber.Name = "lblMatchNumber";
-            this.lblMatchNumber.Size = new System.Drawing.Size(200, 33);
+            this.lblMatchNumber.Size = new System.Drawing.Size(228, 33);
             this.lblMatchNumber.TabIndex = 154;
             this.lblMatchNumber.Text = "Match 00";
             this.lblMatchNumber.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -641,11 +643,54 @@
             // 
             this.testTimer.Tick += new System.EventHandler(this.testTimer_Tick);
             // 
+            // btnTournamentNext
+            // 
+            this.btnTournamentNext.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnTournamentNext.Location = new System.Drawing.Point(713, 172);
+            this.btnTournamentNext.Name = "btnTournamentNext";
+            this.btnTournamentNext.Size = new System.Drawing.Size(41, 33);
+            this.btnTournamentNext.TabIndex = 165;
+            this.btnTournamentNext.Text = ">>";
+            this.btnTournamentNext.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnTournamentNext.UseVisualStyleBackColor = true;
+            this.btnTournamentNext.Visible = false;
+            this.btnTournamentNext.Click += new System.EventHandler(this.btnTournamentNext_Click);
+            // 
+            // btnTournamentPrev
+            // 
+            this.btnTournamentPrev.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnTournamentPrev.Location = new System.Drawing.Point(440, 172);
+            this.btnTournamentPrev.Name = "btnTournamentPrev";
+            this.btnTournamentPrev.Size = new System.Drawing.Size(41, 33);
+            this.btnTournamentPrev.TabIndex = 164;
+            this.btnTournamentPrev.Text = "<<";
+            this.btnTournamentPrev.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnTournamentPrev.UseVisualStyleBackColor = true;
+            this.btnTournamentPrev.Visible = false;
+            this.btnTournamentPrev.Click += new System.EventHandler(this.btnTournamentPrev_Click);
+            // 
+            // lblTournamentName
+            // 
+            this.lblTournamentName.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblTournamentName.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblTournamentName.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTournamentName.Location = new System.Drawing.Point(483, 172);
+            this.lblTournamentName.MinimumSize = new System.Drawing.Size(200, 0);
+            this.lblTournamentName.Name = "lblTournamentName";
+            this.lblTournamentName.Size = new System.Drawing.Size(228, 33);
+            this.lblTournamentName.TabIndex = 163;
+            this.lblTournamentName.Text = "Field Testing";
+            this.lblTournamentName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblTournamentName.Visible = false;
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1177, 637);
+            this.Controls.Add(this.btnTournamentNext);
+            this.Controls.Add(this.btnTournamentPrev);
+            this.Controls.Add(this.lblTournamentName);
             this.Controls.Add(this.btnGreenPlus);
             this.Controls.Add(this.btnRedPlus);
             this.Controls.Add(this.btnRedMinus);
@@ -677,7 +722,6 @@
             this.grbGreenScore.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dsScores)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -725,5 +769,8 @@
         private System.Windows.Forms.Timer practiceTimer;
         public System.Windows.Forms.Button btnTestMode;
         private System.Windows.Forms.Timer testTimer;
+        public System.Windows.Forms.Button btnTournamentNext;
+        public System.Windows.Forms.Button btnTournamentPrev;
+        public System.Windows.Forms.Label lblTournamentName;
     }
 }
