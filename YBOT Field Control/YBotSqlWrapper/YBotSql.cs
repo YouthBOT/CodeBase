@@ -121,7 +121,12 @@ namespace YBotSqlWrapper
                     "INSERT INTO event_log (event_id, event_type, event_message) " +
                     string.Format ("VALUES (NOW(), '{0}', '{1}');", type, text),
                     sql);
-                await command.ExecuteNonQueryAsync ();
+
+                try {
+                    await command.ExecuteNonQueryAsync();
+                } catch (MySqlException) {
+                    //
+                }
             }
         }
 
@@ -193,7 +198,7 @@ namespace YBotSqlWrapper
                             var t = new Tournament (id, date, name);
                             YBotSqlData.Global.tournaments.Add (t);
                         } catch (Exception ex) {
-                            //
+                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(ex.ToString()));
                         }
                     }
                     reader.Close ();
@@ -209,7 +214,7 @@ namespace YBotSqlWrapper
                             var s = new School (id, name);
                             YBotSqlData.Global.schools.Add (s);
                         } catch (Exception ex) {
-                            //
+                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(ex.ToString()));
                         }
                     }
                     reader.Close ();
