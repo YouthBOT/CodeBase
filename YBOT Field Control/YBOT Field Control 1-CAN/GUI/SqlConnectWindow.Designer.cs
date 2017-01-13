@@ -93,8 +93,6 @@
             // sshCheckBox
             // 
             this.sshCheckBox.AutoSize = true;
-            this.sshCheckBox.Checked = true;
-            this.sshCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.sshCheckBox.Location = new System.Drawing.Point(110, 67);
             this.sshCheckBox.Name = "sshCheckBox";
             this.sshCheckBox.Size = new System.Drawing.Size(149, 17);

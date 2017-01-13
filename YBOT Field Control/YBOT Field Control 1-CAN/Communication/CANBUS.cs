@@ -186,7 +186,10 @@ namespace YBOT_Field_Control_2016
                         this.logBuilder.AppendLine(s);
                     }
                 }
-                catch (Exception ex) { this.errorLog("CANBUS-Port_DataReceived() - " + ex); }
+                catch (Exception ex)
+                {
+                    this.errorLog("CANBUS-Port_DataReceived() - " + ex);
+                }
             }
 
 

@@ -732,7 +732,7 @@ void gamePlayCanbus()
 					if (checkInput(0))
 					{
 						nodeStatus[7] = 8;
-						//report(0, commandNode);
+						report(0, commandNode);
 						testedState = true;
 						wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));
 					}

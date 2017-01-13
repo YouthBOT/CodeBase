@@ -352,16 +352,16 @@ namespace YBOT_Field_Control_2016
 
         private void TestMode()
         {
-            autoModeTime = 5;
-            manAutoTime =  2;
-            midModeTime = 30;
+            autoModeTime = 20;
+            manAutoTime =  10;
+            midModeTime = 120;
 
             btnMatchNext.PerformClick();
 
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.countDownStart(0, 30);
+            time.countDownStart(2, 01);
             time.timesUp = false;
             MainGame();
         }
@@ -1005,6 +1005,18 @@ namespace YBOT_Field_Control_2016
             this.btnStop.PerformClick();
             this.fc.ChangeGameMode(GameModes.off);
             this.gameMode = GameModes.off;
+        }
+
+        private void btnHomePanel_Click(object sender, EventArgs e)
+        {
+            if (this.gameMode == GameModes.off)
+            {
+                btnHomePanel.BackColor = Color.Blue;
+                string str = ("7,1,3,");
+                this.fc.SendMessage(solarPanel, str);
+                //Thread.Sleep(15000);
+                btnHomePanel.BackColor = DefaultBackColor;
+            }
         }
     }
 

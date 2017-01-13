@@ -597,7 +597,7 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			homePanel();
+			//homePanel();
 			gameModeChanged = false;
 			fullPull = false;
 			nodeStatus[6] = 0;

@@ -59,7 +59,10 @@ namespace YBOT_Field_Control_2016
         private Time solarTime = new Time();
         private Time solarChange = new Time();
         private int[] emergencyTowers = { 2, 4, 7, 9 };
-        private int emerTower = 0;
+        private int[] eTowers = { };
+        private int alarmCouter = 3;
+        private int emergencyTower = 0;
         private bool solarChanged = false;
+        private int solarPanel = 11;
     }
 }

@@ -27,7 +27,12 @@ namespace YBOT_Field_Control_2016
 
             sunTower = 0;
             solarAligned = false;
-            emerTower = 0;
+            for (int i = 0; i < emergencyTowers.Length; i++)
+            {
+                eTowers[i] = emergencyTowers[i];
+            }
+            //emerTower = -1;
+            alarmCouter = 3;
             solarChanged = false;
         }
 
@@ -41,16 +46,14 @@ namespace YBOT_Field_Control_2016
             practiceMode = false;
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
 
-            //Home The Solar Panel
-            string str = ("7,1,3,");
-            this.fc.SendMessage(sunTower, str);
-            Thread.Sleep(20);
-
-            changeSunTower();
+            //string str = ("7,1,3,");
+            //this.fc.SendMessage(solarPanel, str);
+            //Thread.Sleep(20);
 
             //Wait for the solar panel to home.
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
 
+            ChangeSunTower();
 
             //Ring Bell
             this.fc.RingBell();
@@ -75,15 +78,15 @@ namespace YBOT_Field_Control_2016
             practiceMode = false;
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
 
-            //Home The Solar Panel
-            string str = ("7,1,3,");
-            this.fc.SendMessage(sunTower, str);
-            Thread.Sleep(20);
-
-            changeSunTower();
+            ////Home The Solar Panel
+            //string str = ("7,1,3,");
+            //this.fc.SendMessage(solarPanel, str);
+            //Thread.Sleep(20);
 
             //Wait for the solar panel to home.
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
+
+            ChangeSunTower();
 
             //Ring Bell
             this.fc.RingBell();
@@ -145,18 +148,23 @@ namespace YBOT_Field_Control_2016
                 {
                     this.fc.switchMode = false;
 
-                    changeSunTower();
+                    //Pick new sun tower
+                    ChangeSunTower();
                     solarChanged = false;
-
+                    
                     //this.fc.RobotTransmitters("both", State.off, State.on); //Turn on transmitter to Manual Mode
+
                     this.fc.RingBell();                        //Ring bell
                     Thread.Sleep(200);
+
                     GameLog("AutoMode Over");                   //Update Log
                     GameLog("Transmitters ON");                 //Update Log
 
                     this.fc.ClearNodeState(true);
 
                     solarChange.elapsedTime.Start();
+
+                    GetEmerTower();
 
                 }
                 else ManualMode();
@@ -235,25 +243,49 @@ namespace YBOT_Field_Control_2016
 
                 int tempScore = solarTime.elapsedTime.Elapsed.Seconds * value;
 
+                //If the time is over a minute pick new tower
                 if (solarChange.elapsedTime.Elapsed.Seconds > 59)
                 {
-                    if(!solarChanged) changeSunTower();
+                    if (!solarChanged) ChangeSunTower();
                     this.joint.manSolarPanelScore2 = tempScore;
                 }
                 else
                 {
                     this.joint.manSolarPanelScore1 = tempScore;
                 }
-                
+
             }
 
-            if ((this.fc.node[emerTower].tested) && (!this.fc.node[emerTower].alarmState))
+            //If Alarm has been cleared score the tower
+            if (!this.fc.node[emergencyTower].alarmState)
             {
                 joint.emergencyCleared++;
-                if(joint.emergencyCleared < 4) getEmerTower();
+                if (joint.emergencyCleared < 4) GetEmerTower();
             }
-        }
 
+            //Calculate Scores
+            this.joint.manScore = (this.joint.emergencyCleared * 100);
+            this.joint.manScore += (this.joint.manSolarPanelScore1 + this.joint.manSolarPanelScore2);
+            if (this.joint.emergencyCleared < 4) this.joint.manScore -= 250;
+
+            this.joint.score = (this.joint.autoScore + this.joint.manScore);
+
+            this.red.score = this.joint.score;
+            this.red.autoScore = this.red.score;
+
+            this.green.score = this.joint.score;
+            this.green.autoScore = this.green.score;
+
+            //if (emerTower == -1)
+            //{
+            //    GetEmergencyTower();
+            //}
+            //else if (!fc.node[emerTower].alarmState)
+            //{
+            //    this.joint.emergencyCleared++;
+            //    if (this.joint.emergencyCleared < 4) GetEmergencyTower();
+            //}
+        }
 
         /// <summary>
         /// Writes text to log file
@@ -280,36 +312,90 @@ namespace YBOT_Field_Control_2016
         //Current year's game methods
         //------------------------------------------------------------------------------------------------\\
 
-        private void getEmerTower()
+        private void GetEmerTower()
         {
-            int currentTower = emerTower;
-            do
-            {
-                int num = rndNum.Next(0, 4);
-                emerTower = emergencyTowers[num];
-            } while (emerTower != currentTower);
+            //Get Next Emergency Tower
+            int num = rndNum.Next(0, alarmCouter);
+            emergencyTower = eTowers[num];
 
-            this.fc.node[emerTower].alarmState = true;
+            //Set Alarm State to true
+            this.fc.node[emergencyTower].alarmState = true;
 
+            //Send Alarm to Tower
             string str = null;
             str = ("7,1,2,");
-            this.fc.SendMessage(sunTower, str);
+            this.fc.SendMessage(emergencyTower, str);
             Thread.Sleep(20);
+
+            eTowers[num] = 0;
+            Array.Reverse(eTowers);
+            if (alarmCouter > 0) alarmCouter--;
+
         }
 
-        private void changeSunTower()
+        private void GetEmergencyTower()
         {
+            bool atleastOneTowerTested = false;
+
+            if (emergencyTower == -1) // first emergency tower has not been chosen
+            {
+                foreach (var tower in emergencyTowers)
+                {
+                    atleastOneTowerTested = fc.node[tower].tested;
+                }
+            }
+            else
+            {
+                atleastOneTowerTested = true;
+            }
+
+            if (atleastOneTowerTested)
+            {
+                int towersChecked = 0;
+                int currentTower = emergencyTower;
+
+                while ((currentTower == emergencyTower) && (towersChecked != 15))
+                {
+                    int num = rndNum.Next(0, 3);
+                    emergencyTower = emergencyTowers[num];
+                    if (fc.node[emergencyTower].tested)
+                    {
+                        fc.node[emergencyTower].alarmState = true;
+
+                        string str = null;
+                        str = ("7,1,2,");
+                        this.fc.SendMessage(emergencyTower, str);
+                        Thread.Sleep(20);
+                        break;
+                    }
+                    else
+                    {
+                        emergencyTower = currentTower;
+                        towersChecked &= 1 << num;
+                    }
+                }
+            }
+        }
+
+        private void ChangeSunTower()
+        {
+            //Turn off Current Sun Tower
             string str = ("7,0,0,");
             this.fc.SendMessage(sunTower, str);
             Thread.Sleep(20);
+
+            //Tell Solar Panel what the new sun tower is
             sunTower = rndNum.Next(1, 11);
             str = ("7,1,4," + sunTower.ToString());
             this.fc.SendMessage(11, str);
             Thread.Sleep(20);
+
+            //Tell the new sun tower to turn on
             str = ("7,1,1,");
             this.fc.SendMessage(sunTower, str);
             Thread.Sleep(20);
 
+            //Reset Solar Panel Timers and Flags
             solarTime.elapsedTime.Reset();
             solarAligned = false;
             solarChange.elapsedTime.Stop();

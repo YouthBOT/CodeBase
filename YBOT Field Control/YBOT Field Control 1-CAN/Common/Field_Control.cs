@@ -546,6 +546,8 @@ namespace YBOT_Field_Control_2016
 
                 this.node[nodeID].reportRec = Convert.ToByte(parsedString[1]);
 
+                Console.WriteLine("Report Record for node {1}: {0}", e.canMessage, nodeID);
+
                 if (this.node[nodeID].reportRec == 9)
                 {
                     this.node[nodeID].fromPC = Convert.ToInt32(parsedString[2]);
@@ -569,8 +571,8 @@ namespace YBOT_Field_Control_2016
                     this.node[nodeID].byte6 = Convert.ToByte(parsedString[7]);
                     this.node[nodeID].byte7 = Convert.ToByte(parsedString[8]);
 
-                    if (this.node[nodeID].byte7 == 9) this.node[nodeID].tested = false;
-                    else this.node[nodeID].tested = true;
+                    if (this.node[nodeID].byte7 == 8) this.node[nodeID].tested = true;
+                    else this.node[nodeID].tested = false;
 
                     if (this.node[nodeID].byte7 == 0) this.node[nodeID].deviceCycled = true;
                     else this.node[nodeID].deviceCycled = false;

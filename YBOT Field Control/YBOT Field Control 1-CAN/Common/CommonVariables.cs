@@ -86,7 +86,6 @@ namespace YBOT_Field_Control_2016
         public int transmitterOutput = 5;       //Controller Output number - Enable / Disable
         public int auto_driverOutput = 6;       //Autonomous Mode Output = Auto / Manual
 
-
     }
 
     public class fileStructure

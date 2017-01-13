@@ -103,6 +103,10 @@ boolean complete = false;			//If Mode/Section has completed its task
 uint8_t function = 0;				//Function Type
 uint8_t functionMode = 0;			//Fuction Mode
 uint8_t gameMode = 0;				//Game Mode Value - starts in Debug mode
+int sender = 0;						//What sent the message: 1 = PC; 2 = CANBUS; 3 = XBee
+int pc = 1;
+int canbus = 2;
+int xbee = 3;
 int messagesSent = 0;
 int messagesRecieved = 0;
 int fromPC = 0;
@@ -224,6 +228,7 @@ void loop()
 	while (CAN_MSGAVAIL == CAN.checkReceive())
 	{
 		// read data,  len: data length, incoming: data incoming
+		sender = canbus;
 		CAN.readMsgBuf(&canLength, canIn);
 		messagesRecieved++;
 		execute();				//Execute new message
@@ -287,6 +292,7 @@ void loop()
 
 	while (Serial.available())
 	{
+		sender = pc;
 		char aChar = Serial.read();		//Read data
 
 		if (aChar == '$')
@@ -316,6 +322,7 @@ void loop()
 
 	while (xbSerial.available())
 	{
+		sender = xbee;
 		char aChar = xbSerial.read();		//Read data
 
 		if (aChar == '$')
@@ -374,7 +381,7 @@ void execute()
 
 	if (msgType == 0)						//Report nodeStatus
 	{
-		report(true, sendingNode());		//Send Report to the sending Node
+		report(true, 31);		//Send Report to the sending Node
 	}
 	else if (msgType == 1)					//Set neopixels to desired state
 	{
@@ -450,12 +457,14 @@ void execute()
 		digitalWrite(bellPin, HIGH);
 		delay(100);
 		digitalWrite(bellPin, LOW);
+		delay(100);
 	}
 	else if (msgType == 101)					//Set 1-wire relays to desired state
 	{
 		digitalWrite(buzzerPin, HIGH);
 		delay(1000);
 		digitalWrite(buzzerPin, LOW);
+		delay(100);
 	}
 
 }
@@ -1115,12 +1124,17 @@ uint32_t address(uint32_t _destination, uint32_t _id)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 uint32_t sendingNode()
 {
-	if (destNode != nodeID)
+	if (sender == canbus)
 	{
 		uint32_t node = CAN.getCanId();	//Get whole ID
 		return node >> 5;				//Last 5 bits are the sending nodes ID
 	}
-	else return nodeID;
+
+	else if (sender == xbee)	return 21;
+	
+	else if (destNode == nodeID) return nodeID;
+
+	else return destNode;
 }
 
 void ChangeBaudRate(byte rate)

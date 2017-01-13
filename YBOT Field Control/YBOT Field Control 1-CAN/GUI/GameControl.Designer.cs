@@ -74,6 +74,7 @@
             this.btnTournamentNext = new System.Windows.Forms.Button();
             this.btnTournamentPrev = new System.Windows.Forms.Button();
             this.lblTournamentName = new System.Windows.Forms.Label();
+            this.btnHomePanel = new System.Windows.Forms.Button();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -683,11 +684,25 @@
             this.lblTournamentName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblTournamentName.Visible = false;
             // 
+            // btnHomePanel
+            // 
+            this.btnHomePanel.BackColor = System.Drawing.SystemColors.Control;
+            this.btnHomePanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHomePanel.Location = new System.Drawing.Point(553, 275);
+            this.btnHomePanel.Margin = new System.Windows.Forms.Padding(10);
+            this.btnHomePanel.Name = "btnHomePanel";
+            this.btnHomePanel.Size = new System.Drawing.Size(100, 75);
+            this.btnHomePanel.TabIndex = 166;
+            this.btnHomePanel.Text = "Home Panel";
+            this.btnHomePanel.UseVisualStyleBackColor = false;
+            this.btnHomePanel.Click += new System.EventHandler(this.btnHomePanel_Click);
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1177, 637);
+            this.Controls.Add(this.btnHomePanel);
             this.Controls.Add(this.btnTournamentNext);
             this.Controls.Add(this.btnTournamentPrev);
             this.Controls.Add(this.lblTournamentName);
@@ -772,5 +787,6 @@
         public System.Windows.Forms.Button btnTournamentNext;
         public System.Windows.Forms.Button btnTournamentPrev;
         public System.Windows.Forms.Label lblTournamentName;
+        public System.Windows.Forms.Button btnHomePanel;
     }
 }
