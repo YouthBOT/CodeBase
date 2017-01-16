@@ -275,16 +275,6 @@ namespace YBOT_Field_Control_2016
 
             this.green.score = this.joint.score;
             this.green.autoScore = this.green.score;
-
-            //if (emerTower == -1)
-            //{
-            //    GetEmergencyTower();
-            //}
-            //else if (!fc.node[emerTower].alarmState)
-            //{
-            //    this.joint.emergencyCleared++;
-            //    if (this.joint.emergencyCleared < 4) GetEmergencyTower();
-            //}
         }
 
         /// <summary>
@@ -330,51 +320,6 @@ namespace YBOT_Field_Control_2016
             eTowers[num] = 0;
             Array.Reverse(eTowers);
             if (alarmCouter > 0) alarmCouter--;
-
-        }
-
-        private void GetEmergencyTower()
-        {
-            bool atleastOneTowerTested = false;
-
-            if (emergencyTower == -1) // first emergency tower has not been chosen
-            {
-                foreach (var tower in emergencyTowers)
-                {
-                    atleastOneTowerTested = fc.node[tower].tested;
-                }
-            }
-            else
-            {
-                atleastOneTowerTested = true;
-            }
-
-            if (atleastOneTowerTested)
-            {
-                int towersChecked = 0;
-                int currentTower = emergencyTower;
-
-                while ((currentTower == emergencyTower) && (towersChecked != 15))
-                {
-                    int num = rndNum.Next(0, 3);
-                    emergencyTower = emergencyTowers[num];
-                    if (fc.node[emergencyTower].tested)
-                    {
-                        fc.node[emergencyTower].alarmState = true;
-
-                        string str = null;
-                        str = ("7,1,2,");
-                        this.fc.SendMessage(emergencyTower, str);
-                        Thread.Sleep(20);
-                        break;
-                    }
-                    else
-                    {
-                        emergencyTower = currentTower;
-                        towersChecked &= 1 << num;
-                    }
-                }
-            }
         }
 
         private void ChangeSunTower()

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
 using System.IO.Ports;
+using YBotSqlWrapper;
 
 namespace YBOT_Field_Control_2016
 {
@@ -46,7 +47,7 @@ namespace YBOT_Field_Control_2016
 
             try
             {
-                this.nodeDS.ReadXml(filePath, XmlReadMode.ReadSchema);               //Read Node XML File into the Data Set
+                this.nodeDS.ReadXml(filePath, XmlReadMode.ReadSchema);              //Read Node XML File into the Data Set
                 this.nodeDG.DataSource = this.nodeDS;                               //Set DataSet as Data Source for Grid
                 this.nodeDG.DataMember = xmlHeader;                                 //Populate Grid with data
 
@@ -88,6 +89,10 @@ namespace YBOT_Field_Control_2016
 
             updateDisplay(this, null);
             refreshPortList();
+
+            YbotSql.Instance.SqlConnectedEvent += OnSqlConnect;
+            YbotSql.Instance.SqlMessageEvent += OnSqlMessage;
+            YbotSql.Instance.Connect ("149.56.109.90", "stemwithrobots", false);
         }
 
         private void YBOT_Main_FormClosed(object sender, FormClosedEventArgs e)
@@ -98,6 +103,37 @@ namespace YBOT_Field_Control_2016
             this.fc.ShutDown();
             Application.Exit();
         }
+
+        private void OnSqlConnect (object sender) {
+            sqlConnectButton.Invoke ((MethodInvoker)delegate () {
+                sqlConnectButton.Text = "SQL Database Connected";
+                sqlConnectButton.FlatStyle = FlatStyle.Flat;
+                sqlConnectButton.Enabled = false;
+            });
+
+            YbotSql.Instance.SqlConnectedEvent -= OnSqlConnect;
+            YbotSql.Instance.SqlMessageEvent -= OnSqlMessage;
+        }
+
+        private void OnSqlMessage (object sender, SqlMessageArgs args) {
+            if ((args.type == SqlMessageType.Exception) && (!YbotSql.Instance.IsConnected)) {
+                sqlConnectButton.Invoke ((MethodInvoker)delegate () {
+                    sqlConnectButton.Text = "Connect to SQL Database";
+                    sqlConnectButton.FlatStyle = FlatStyle.Standard;
+                    sqlConnectButton.Enabled = true;
+                });
+            }
+        }
+
+        private void OnSqlMessagePopup (object sender, SqlMessageArgs args) {
+
+        }
+
+        private void sqlConnectButton_Click (object sender, EventArgs e) {
+            SqlConnectWindow sqlConnect = new SqlConnectWindow ();
+            sqlConnect.Show ();
+        }
+
         #endregion
 
         #region Data Source/Grid Buttons
@@ -731,18 +767,7 @@ namespace YBOT_Field_Control_2016
             str = ("7,1,1,");
             this.fc.SendMessage(this.selectedTower, str);
         }
-
-        private void sqlConnectButton_Click(object sender, EventArgs e)
-        {
-            SqlConnectWindow sqlConnect = new SqlConnectWindow();
-            sqlConnect.Show();
-        }
-
-        private void testSqlButton_Click(object sender, EventArgs e)
-        {
-            YBotSqlWrapper.YbotSql.Instance.AddLog("This is a test", "test");
-        }
-
+      
         private void btnDeselect_Click(object sender, EventArgs e)
         {
             string str = ("7,0,");

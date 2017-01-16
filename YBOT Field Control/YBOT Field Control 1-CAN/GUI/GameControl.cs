@@ -24,17 +24,10 @@ namespace YBOT_Field_Control_2016
             InitializeComponent();
             this.fc = fc;
 
-            if (YbotSql.Instance.IsConnected)
-            {
-                btnTournamentNext.Visible = true;
-                btnTournamentPrev.Visible = true;
-                lblTournamentName.Visible = true;
-
-                foreach (var t in YBotSqlData.Global.tournaments) {
-                    if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
-                        lblTournamentName.Text = t.name;
-                    }
-                }
+			if (YbotSql.Instance.IsConnected) {
+                InitializeSqlData ();
+            } else {
+                YbotSql.Instance.SqlConnectedEvent += OnSqlConnect;
             }
         }
 
@@ -394,6 +387,7 @@ namespace YBOT_Field_Control_2016
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GetTeamNames();
                 ClearDisplay();
+                YBotSqlData.Global.currentMatchNuumber = matchNumber;
             }
         }
 
@@ -406,6 +400,7 @@ namespace YBOT_Field_Control_2016
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GetTeamNames();
                 ClearDisplay();
+                YBotSqlData.Global.currentMatchNuumber = matchNumber;
             }
         }
 
@@ -451,7 +446,7 @@ namespace YBOT_Field_Control_2016
 
             score.Close ();
 
-            //ScoreGame(); 
+            //ScoreGame(); // not used this year
             RecordGame ();
 
             btnStop.BackColor = Color.Red;
@@ -502,6 +497,7 @@ namespace YBOT_Field_Control_2016
             if (green.autoMan && red.autoMan) joint.autoMan = true;
         }
 
+        // Not used this year
         private void ScoreGame()
         {
             //Add convert additional points to intergers here
@@ -738,6 +734,7 @@ namespace YBOT_Field_Control_2016
             var index = tournaments.IndexOf (tournaments[lblTournamentName.Text]);
             index = ++index % tournaments.Count;
             lblTournamentName.Text = tournaments[index].name;
+            YBotSqlData.Global.currentTournament = lblTournamentName.Text;
         }
 
         private void btnTournamentPrev_Click (object sender, EventArgs e) {
@@ -748,6 +745,7 @@ namespace YBOT_Field_Control_2016
                 index = tournaments.Count - 1;
             }
             lblTournamentName.Text = tournaments[index].name;
+            YBotSqlData.Global.currentTournament = lblTournamentName.Text;
         }
 
         #endregion
@@ -762,7 +760,23 @@ namespace YBOT_Field_Control_2016
             GD.lblRedScore.Text = this.red.score.ToString();
         }
 
+        private void OnSqlConnect (object sender) {
+            InitializeSqlData ();
+            YbotSql.Instance.SqlConnectedEvent -= OnSqlConnect;
+        }
 
+        private void InitializeSqlData () {
+            btnTournamentNext.Visible = true;
+            btnTournamentPrev.Visible = true;
+            lblTournamentName.Visible = true;
+
+            foreach (var t in YBotSqlData.Global.tournaments) {
+                if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
+                    lblTournamentName.Text = t.name;
+                    YBotSqlData.Global.currentTournament = t.name;
+                }
+            }
+        }
 
         public Screen GetSecondaryScreen()
         {
@@ -842,6 +856,15 @@ namespace YBOT_Field_Control_2016
                 btnGreenMantonomous.ForeColor = Color.Lime;
 
             }
+        }
+
+        private void GameControl_FormClosed (object sender, FormClosedEventArgs e) 
+        {
+            this.btnStop.PerformClick ();
+            this.fc.ChangeGameMode (GameModes.off);
+            this.gameMode = GameModes.off;
+            YBotSqlData.Global.currentMatchNuumber = -1;
+            YBotSqlData.Global.currentTournament = string.Empty;
         }
 
         #endregion
@@ -998,13 +1021,6 @@ namespace YBOT_Field_Control_2016
                 //}
                 this.fc.RobotTransmitters("red", State.off, State.on);
             }
-        }
-
-        private void GameControl_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            this.btnStop.PerformClick();
-            this.fc.ChangeGameMode(GameModes.off);
-            this.gameMode = GameModes.off;
         }
 
         private void btnHomePanel_Click(object sender, EventArgs e)

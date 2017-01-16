@@ -1,8 +1,11 @@
 ﻿<Properties StartupItem="YBOT Field Control 1-CAN/YBOT Field Control.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="YBOT Field Control 1-CAN/GUI/GameControl.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="YBotSqlWrapper/YBotSql.cs">
     <Files>
-      <File FileName="YBOT Field Control 1-CAN/GUI/GameControl.cs" Line="816" Column="29" />
+      <File FileName="YBOT Field Control 1-CAN/GUI/GameControl.cs" Line="44" Column="3" />
+      <File FileName="YBOT Field Control 1-CAN/GUI/YBOT_Main.cs" Line="57" Column="4" />
+      <File FileName="YBotSqlWrapper/YBotSqlData.cs" Line="23" Column="29" />
+      <File FileName="YBotSqlWrapper/YBotSql.cs" Line="41" Column="48" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

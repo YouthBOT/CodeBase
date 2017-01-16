@@ -49,14 +49,15 @@ namespace YBOT_Field_Control_2016
         private void InitScore () {
             var green = game.green;
             var red = game.red;
+			var joint = game.joint;
 
-            tbAutoCornersTested.Text = green.autoTowerTested.ToString ();
-            tbAutoEmergencyCycled.Text = green.autoEmergencyTowerCycled.ToString ();
-            tbAutoSolarScore.Text = green.autoSolarPanelScore.ToString ();
-            tbManualSolar1Score.Text = green.manSolarPanelScore1.ToString ();
-            tbManualSolar2Score.Text = green.manSolarPanelScore2.ToString ();
-            tbManualEmergencyCycled.Text = green.emergencyCleared.ToString ();
-            if (green.emergencyCleared < minimumEmergencyCycled) {
+			tbAutoCornersTested.Text = joint.autoTowerTested.ToString ();
+			tbAutoEmergencyCycled.Text = joint.autoEmergencyTowerCycled.ToString ();
+			tbAutoSolarScore.Text = joint.autoSolarPanelScore.ToString ();
+			tbManualSolar1Score.Text = joint.manSolarPanelScore1.ToString ();
+			tbManualSolar2Score.Text = joint.manSolarPanelScore2.ToString ();
+			tbManualEmergencyCycled.Text = joint.emergencyCleared.ToString ();
+			if (joint.emergencyCleared < minimumEmergencyCycled) {
                 cbEmergencyCycledPenalty.Text = emergencyCycledPenaltyPointValue.ToString ();
             } else {
                 cbEmergencyCycledPenalty.Text = "0";
@@ -148,6 +149,24 @@ namespace YBOT_Field_Control_2016
             if (updateTeams) {
                 var green = game.green;
                 var red = game.red;
+				var joint = game.joint;
+
+				joint.autoTowerTested = autoCornersTested;
+				joint.autoEmergencyTowerCycled = autoEmergencyCycled;
+				joint.autoSolarPanelScore = autoSolar;
+
+				joint.manSolarPanelScore1 = manualSolar1;
+				joint.manSolarPanelScore2 = manualSolar2;
+				joint.emergencyCleared = manualEmergencyCycled;
+
+				joint.rockWeight = rockWeight;
+				joint.rockScore = rockScore;
+				joint.rocketPosition = rocketPositionMultiplier;
+				joint.rocketBonus = cbRocketLaunched.Checked;
+
+				joint.autoScore = autoScore;
+				joint.manScore = manualScore;
+				joint.score = jointScore;
 
                 green.autoTowerTested = autoCornersTested;
                 green.autoEmergencyTowerCycled = autoEmergencyCycled;

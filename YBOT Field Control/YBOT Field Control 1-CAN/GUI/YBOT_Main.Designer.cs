@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
             this.nodeDG = new System.Windows.Forms.DataGridView();
             this.btnSetAllCAN = new System.Windows.Forms.Button();
             this.btnSetAllXBee = new System.Windows.Forms.Button();
@@ -82,6 +82,7 @@
             this.btnLaunchGame = new System.Windows.Forms.Button();
             this.btnMonitorNodes = new System.Windows.Forms.Button();
             this.gbFieldFunctions = new System.Windows.Forms.GroupBox();
+            this.btnDeselect = new System.Windows.Forms.Button();
             this.btnSetSunLocation = new System.Windows.Forms.Button();
             this.btnTransmitterOff = new System.Windows.Forms.Button();
             this.btnTransmitterAuto = new System.Windows.Forms.Button();
@@ -102,8 +103,6 @@
             this.tbDelayMultiplier = new System.Windows.Forms.TextBox();
             this.displayUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.sqlConnectButton = new System.Windows.Forms.Button();
-            this.testSqlButton = new System.Windows.Forms.Button();
-            this.btnDeselect = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDG)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDS)).BeginInit();
             this.cmGridRightClick.SuspendLayout();
@@ -118,8 +117,8 @@
             // 
             this.nodeDG.AllowUserToAddRows = false;
             this.nodeDG.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            this.nodeDG.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            this.nodeDG.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle16;
             this.nodeDG.BackgroundColor = System.Drawing.SystemColors.ControlLight;
             this.nodeDG.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.nodeDG.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
@@ -210,12 +209,12 @@
             this.tsmDeleteRow,
             this.setTypeToolStripMenuItem});
             this.cmGridRightClick.Name = "cmGridRightClick";
-            this.cmGridRightClick.Size = new System.Drawing.Size(120, 48);
+            this.cmGridRightClick.Size = new System.Drawing.Size(134, 48);
             // 
             // tsmDeleteRow
             // 
             this.tsmDeleteRow.Name = "tsmDeleteRow";
-            this.tsmDeleteRow.Size = new System.Drawing.Size(119, 22);
+            this.tsmDeleteRow.Size = new System.Drawing.Size(133, 22);
             this.tsmDeleteRow.Text = "Delete Row";
             this.tsmDeleteRow.Click += new System.EventHandler(this.tsmDeleteRow_Click);
             // 
@@ -226,26 +225,26 @@
             this.xBeeToolStripMenuItem,
             this.wiFiToolStripMenuItem});
             this.setTypeToolStripMenuItem.Name = "setTypeToolStripMenuItem";
-            this.setTypeToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
+            this.setTypeToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
             this.setTypeToolStripMenuItem.Text = "Set Type";
             // 
             // cANBUSToolStripMenuItem
             // 
             this.cANBUSToolStripMenuItem.Name = "cANBUSToolStripMenuItem";
-            this.cANBUSToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.cANBUSToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.cANBUSToolStripMenuItem.Text = "CANBUS";
             this.cANBUSToolStripMenuItem.Click += new System.EventHandler(this.cANBUSToolStripMenuItem_Click);
             // 
             // xBeeToolStripMenuItem
             // 
             this.xBeeToolStripMenuItem.Name = "xBeeToolStripMenuItem";
-            this.xBeeToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.xBeeToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.xBeeToolStripMenuItem.Text = "XBee";
             // 
             // wiFiToolStripMenuItem
             // 
             this.wiFiToolStripMenuItem.Name = "wiFiToolStripMenuItem";
-            this.wiFiToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.wiFiToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.wiFiToolStripMenuItem.Text = "WiFi";
             // 
             // gbLightControls
@@ -680,6 +679,16 @@
             this.gbFieldFunctions.TabStop = false;
             this.gbFieldFunctions.Text = "Field Functions";
             // 
+            // btnDeselect
+            // 
+            this.btnDeselect.Location = new System.Drawing.Point(112, 188);
+            this.btnDeselect.Name = "btnDeselect";
+            this.btnDeselect.Size = new System.Drawing.Size(90, 50);
+            this.btnDeselect.TabIndex = 9;
+            this.btnDeselect.Text = "Deselect Tower";
+            this.btnDeselect.UseVisualStyleBackColor = true;
+            this.btnDeselect.Click += new System.EventHandler(this.btnDeselect_Click);
+            // 
             // btnSetSunLocation
             // 
             this.btnSetSunLocation.Location = new System.Drawing.Point(112, 131);
@@ -882,40 +891,24 @@
             // 
             // sqlConnectButton
             // 
+            this.sqlConnectButton.Enabled = false;
+            this.sqlConnectButton.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.sqlConnectButton.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.ButtonFace;
+            this.sqlConnectButton.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
+            this.sqlConnectButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.sqlConnectButton.Location = new System.Drawing.Point(1076, 529);
             this.sqlConnectButton.Name = "sqlConnectButton";
             this.sqlConnectButton.Size = new System.Drawing.Size(100, 50);
             this.sqlConnectButton.TabIndex = 17;
-            this.sqlConnectButton.Text = "Connect to SQL Server";
+            this.sqlConnectButton.Text = "Connecting to SQL Database";
             this.sqlConnectButton.UseVisualStyleBackColor = true;
             this.sqlConnectButton.Click += new System.EventHandler(this.sqlConnectButton_Click);
-            // 
-            // testSqlButton
-            // 
-            this.testSqlButton.Location = new System.Drawing.Point(970, 529);
-            this.testSqlButton.Name = "testSqlButton";
-            this.testSqlButton.Size = new System.Drawing.Size(100, 50);
-            this.testSqlButton.TabIndex = 18;
-            this.testSqlButton.Text = "Send Test SQL Log";
-            this.testSqlButton.UseVisualStyleBackColor = true;
-            this.testSqlButton.Click += new System.EventHandler(this.testSqlButton_Click);
-            // 
-            // btnDeselect
-            // 
-            this.btnDeselect.Location = new System.Drawing.Point(112, 188);
-            this.btnDeselect.Name = "btnDeselect";
-            this.btnDeselect.Size = new System.Drawing.Size(90, 50);
-            this.btnDeselect.TabIndex = 9;
-            this.btnDeselect.Text = "Deselect Tower";
-            this.btnDeselect.UseVisualStyleBackColor = true;
-            this.btnDeselect.Click += new System.EventHandler(this.btnDeselect_Click);
             // 
             // YBOT_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1186, 641);
-            this.Controls.Add(this.testSqlButton);
             this.Controls.Add(this.sqlConnectButton);
             this.Controls.Add(this.gbTesting);
             this.Controls.Add(this.gbFieldFunctions);
@@ -1022,7 +1015,6 @@
         private System.Windows.Forms.CheckBox cbDTRenable;
         private System.Windows.Forms.Button btnSetSunLocation;
         private System.Windows.Forms.Button sqlConnectButton;
-        private System.Windows.Forms.Button testSqlButton;
         private System.Windows.Forms.Button btnDeselect;
     }
 }

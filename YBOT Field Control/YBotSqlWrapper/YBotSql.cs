@@ -93,14 +93,14 @@ namespace YBotSqlWrapper
                 SqlConnectedEvent?.Invoke (this);
 
                 return;
-            } catch (Exception ex) {
+            } catch (MySqlException ex) {
                 if (ssh != null) {
                     ssh.Disconnect ();
                     ssh.Dispose ();
                 }
 
                 string text = "failure\n" + ex.ToString ();
-                SqlMessageEvent?.Invoke (this, new SqlMessageArgs (text));
+                SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, text));
                 return;
             }
         }
@@ -124,8 +124,8 @@ namespace YBotSqlWrapper
 
                 try {
                     await command.ExecuteNonQueryAsync();
-                } catch (MySqlException) {
-                    //
+                } catch (MySqlException ex) {
+                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
                 }
             }
         }
@@ -158,7 +158,12 @@ namespace YBotSqlWrapper
                         string.Format ("WHERE match_id = {0};", id);
 
                     command = new MySqlCommand (query, sql);
-                    await command.ExecuteNonQueryAsync ();
+
+                    try {
+                        await command.ExecuteNonQueryAsync ();
+                    } catch (MySqlException ex) {
+                        SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                    }
                 } else {
                     reader.Close ();
 
@@ -177,7 +182,12 @@ namespace YBotSqlWrapper
                         string.Format ("{0}, {1}, {2}, {3});", match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus);
 
                     command = new MySqlCommand (query, sql);
-                    await command.ExecuteNonQueryAsync ();
+
+                    try {
+                        await command.ExecuteNonQueryAsync ();
+                    } catch (MySqlException ex) {
+                        SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                    }
                 }
             }
         }
@@ -198,7 +208,7 @@ namespace YBotSqlWrapper
                             var t = new Tournament (id, date, name);
                             YBotSqlData.Global.tournaments.Add (t);
                         } catch (Exception ex) {
-                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(ex.ToString()));
+                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
                         }
                     }
                     reader.Close ();
@@ -214,22 +224,34 @@ namespace YBotSqlWrapper
                             var s = new School (id, name);
                             YBotSqlData.Global.schools.Add (s);
                         } catch (Exception ex) {
-                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(ex.ToString()));
+                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
                         }
                     }
                     reader.Close ();
                 } catch (MySqlException ex) {
-                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (ex.ToString ()));
+                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
                 }
             }
         }
     }
 
+    public enum SqlMessageType {
+        Exception,
+        General
+    }
+
     public class SqlMessageArgs : EventArgs
     {
         public string message;
+        public SqlMessageType type;
 
         public SqlMessageArgs (string message) {
+            type = SqlMessageType.General;
+            this.message = message;
+        }
+
+        public SqlMessageArgs (SqlMessageType type, string message) {
+            this.type = type;
             this.message = message;
         }
     }

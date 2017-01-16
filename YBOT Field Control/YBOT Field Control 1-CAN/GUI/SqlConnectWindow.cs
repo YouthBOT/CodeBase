@@ -17,6 +17,7 @@ namespace YBOT_Field_Control_2016
             sql = YbotSql.Instance;
             if (sql.IsConnected) {
                 connectionButton.Enabled = false;
+                messageTextbox.Text = "SQL database already connected";
             } else {
                 passwordTextBox.KeyDown += KeyPressEvent;
                 serverIpTextBox.KeyDown += KeyPressEvent;
