@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Renci.SshNet;
+using HelpfulUtilites;
 
 namespace YBotSqlWrapper
 {
@@ -117,15 +118,31 @@ namespace YBotSqlWrapper
 
         public async void AddLog (string text, string type) {
             if ((sql != null) && (IsConnected)) {
-                var command = new MySqlCommand (
-                    "INSERT INTO event_log (event_id, event_type, event_message) " +
-                    string.Format ("VALUES (NOW(), '{0}', '{1}');", type, text),
-                    sql);
+                if (text.IsNotEmpty ()) {
+                    var query = "INSERT INTO event_log (event_id, event_type, event_message";
+                    if (YBotSqlData.Global.currentTournament.IsNotEmpty ()) {
+                        query += ", tournament_id";
+                    }
+                    if (YBotSqlData.Global.currentMatchNumber != -1) {
+                        query += ", match_number";
+                    }
+                    query += ") ";
+                    query += string.Format ("VALUES (NOW(), '{0}', '{1}'", type, text);
+                    if (YBotSqlData.Global.currentTournament.IsNotEmpty ()) {
+                        query += string.Format (", '{0}'", YBotSqlData.Global.tournaments[YBotSqlData.Global.currentTournament].id);
+                    }
+                    if (YBotSqlData.Global.currentMatchNumber != -1) {
+                        query += string.Format (", '{0}'", YBotSqlData.Global.currentMatchNumber);
+                    }
+                    query += ");";
 
-                try {
-                    await command.ExecuteNonQueryAsync();
-                } catch (MySqlException ex) {
-                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                    var command = new MySqlCommand (query, sql);
+
+                    try {
+                        await command.ExecuteNonQueryAsync ();
+                    } catch (MySqlException ex) {
+                        SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                    }
                 }
             }
         }

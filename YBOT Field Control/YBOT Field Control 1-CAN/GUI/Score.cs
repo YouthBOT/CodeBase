@@ -82,19 +82,22 @@ namespace YBOT_Field_Control_2016
         }
 
         protected void UpdateScore (bool updateTeams) {
-            var autoCornersTested = Convert.ToInt32 (tbAutoCornersTested.Text) * autoCornersTestedPointValue;
-            var autoEmergencyCycled = Convert.ToInt32 (tbAutoEmergencyCycled.Text) * autoEmergencyCycledPointValue;
+            var autoCornersTested = Convert.ToInt32 (tbAutoCornersTested.Text);
+            var autoCornersTestedScore = autoCornersTested * autoCornersTestedPointValue;
+            var autoEmergencyCycled = Convert.ToInt32 (tbAutoEmergencyCycled.Text);
+            var autoEmergencyCycledScore = autoEmergencyCycled * autoEmergencyCycledPointValue;
             var autoSolar = Convert.ToInt32 (tbAutoSolarScore.Text);
             var manualSolar1 = Convert.ToInt32 (tbManualSolar1Score.Text);
             var manualSolar2 = Convert.ToInt32 (tbManualSolar2Score.Text);
-            var manualEmergencyCycled = Convert.ToInt32 (tbManualEmergencyCycled.Text) * manualEmergencyCycledPointValue;
+            var manualEmergencyCycled = Convert.ToInt32 (tbManualEmergencyCycled.Text);
+            var manualEmergencyCycledScore = manualEmergencyCycled * manualEmergencyCycledPointValue;
             var emergencyCycledPenalty = Convert.ToInt32 (cbEmergencyCycledPenalty.Text);
             var rocketPositionMultiplier = Convert.ToInt32 (lbRocketPositionMulitplier.Text);
             var rockWeight = Convert.ToInt32 (tbRockWeight.Text);
             var rockScore = rockWeight * rocketPositionMultiplier;
             var rocketLaunched = Convert.ToInt32 (lbRocketLaunchedScore.Text);
-            var autoScore = autoCornersTested + autoEmergencyCycled + autoSolar;
-            var manualScore = manualSolar1 + manualSolar2 + manualEmergencyCycled - emergencyCycledPenalty + rockScore + rocketLaunched;
+            var autoScore = autoCornersTestedScore + autoEmergencyCycledScore + autoSolar;
+            var manualScore = manualSolar1 + manualSolar2 + manualEmergencyCycledScore - emergencyCycledPenalty + rockScore + rocketLaunched;
 
             int jointScore;
             if (!manualOverride) {
@@ -131,9 +134,9 @@ namespace YBOT_Field_Control_2016
                 redScore = 0;
             }
 
-            lbAutoCornerTestedScore.Text = autoCornersTested.ToString ();
-            lbAutoEmergencyCycledScore.Text = autoEmergencyCycled.ToString ();
-            lbManualEmergencyCycledScore.Text = manualEmergencyCycled.ToString ();
+            lbAutoCornerTestedScore.Text = autoCornersTestedScore.ToString ();
+            lbAutoEmergencyCycledScore.Text = autoEmergencyCycledScore.ToString ();
+            lbManualEmergencyCycledScore.Text = manualEmergencyCycledScore.ToString ();
             lbRockScore.Text = rockScore.ToString ();
             lbJointScore.Text = jointScore.ToString ();
 

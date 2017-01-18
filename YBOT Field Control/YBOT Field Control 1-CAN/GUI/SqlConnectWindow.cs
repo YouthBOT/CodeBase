@@ -70,8 +70,6 @@ namespace YBOT_Field_Control_2016
             } else {
                 Close ();
             }
-
-            sql.GetGlobalData ();
         }
     }
 }

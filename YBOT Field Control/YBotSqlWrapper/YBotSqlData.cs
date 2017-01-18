@@ -14,13 +14,13 @@ namespace YBotSqlWrapper
         public Tournaments tournaments;
         public Schools schools;
 		public string currentTournament;
-		public int currentMatchNuumber;
+		public int currentMatchNumber;
 
         protected YBotSqlData () {
             tournaments = new Tournaments ();
             schools = new Schools ();
 			currentTournament = string.Empty;
-			currentMatchNuumber = -1;
+			currentMatchNumber = -1;
         }
     }
 }

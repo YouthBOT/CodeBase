@@ -387,7 +387,7 @@ namespace YBOT_Field_Control_2016
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GetTeamNames();
                 ClearDisplay();
-                YBotSqlData.Global.currentMatchNuumber = matchNumber;
+                YBotSqlData.Global.currentMatchNumber = matchNumber;
             }
         }
 
@@ -400,7 +400,7 @@ namespace YBOT_Field_Control_2016
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GetTeamNames();
                 ClearDisplay();
-                YBotSqlData.Global.currentMatchNuumber = matchNumber;
+                YBotSqlData.Global.currentMatchNumber = matchNumber;
             }
         }
 
@@ -766,15 +766,41 @@ namespace YBOT_Field_Control_2016
         }
 
         private void InitializeSqlData () {
-            btnTournamentNext.Visible = true;
-            btnTournamentPrev.Visible = true;
-            lblTournamentName.Visible = true;
+            if (btnTournamentNext.InvokeRequired) {
+                btnTournamentNext.Invoke ((MethodInvoker)delegate () {
+                    btnTournamentNext.Visible = true;
+                });
+            } else {
+                btnTournamentNext.Visible = true;
+            }
+
+            if (btnTournamentPrev.InvokeRequired) {
+                btnTournamentPrev.Invoke ((MethodInvoker)delegate () {
+                    btnTournamentPrev.Visible = true;
+                });
+            } else {
+                btnTournamentPrev.Visible = true;
+            }
 
             foreach (var t in YBotSqlData.Global.tournaments) {
                 if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
-                    lblTournamentName.Text = t.name;
                     YBotSqlData.Global.currentTournament = t.name;
                 }
+            }
+
+            YBotSqlData.Global.currentMatchNumber = 0;
+            if (YBotSqlData.Global.currentTournament.IsEmpty ()) {
+                YBotSqlData.Global.currentTournament = "Field Testing";
+            }
+
+            if (lblTournamentName.InvokeRequired) {
+                lblTournamentName.Invoke ((MethodInvoker)delegate () {
+                    lblTournamentName.Visible = true;
+                    lblTournamentName.Text = YBotSqlData.Global.currentTournament;
+                });
+            } else {
+                lblTournamentName.Visible = true;
+                lblTournamentName.Text = YBotSqlData.Global.currentTournament;
             }
         }
 
@@ -863,7 +889,7 @@ namespace YBOT_Field_Control_2016
             this.btnStop.PerformClick ();
             this.fc.ChangeGameMode (GameModes.off);
             this.gameMode = GameModes.off;
-            YBotSqlData.Global.currentMatchNuumber = -1;
+            YBotSqlData.Global.currentMatchNumber = -1;
             YBotSqlData.Global.currentTournament = string.Empty;
         }
 

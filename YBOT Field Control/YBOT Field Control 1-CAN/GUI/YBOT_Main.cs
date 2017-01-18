@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
 using System.IO.Ports;
+using System.IO;
 using YBotSqlWrapper;
 
 namespace YBOT_Field_Control_2016
@@ -90,9 +91,16 @@ namespace YBOT_Field_Control_2016
             updateDisplay(this, null);
             refreshPortList();
 
+            var passwordFile = Path.Combine (fs.setupFilePath, "sql-password.txt");
+            var password = string.Empty;
+            if (File.Exists (passwordFile)) {
+                var lines = File.ReadAllLines (passwordFile);
+                password = lines[0];
+            }
+
             YbotSql.Instance.SqlConnectedEvent += OnSqlConnect;
             YbotSql.Instance.SqlMessageEvent += OnSqlMessage;
-            YbotSql.Instance.Connect ("149.56.109.90", "stemwithrobots", false);
+            YbotSql.Instance.Connect ("149.56.109.90", password, false);
         }
 
         private void YBOT_Main_FormClosed(object sender, FormClosedEventArgs e)
@@ -101,6 +109,7 @@ namespace YBOT_Field_Control_2016
             this.fc.StopRawData(ComModes.canBus);
             this.fc.FieldAllOff();
             this.fc.ShutDown();
+            YbotSql.Instance.Disconnect ();
             Application.Exit();
         }
 
@@ -111,6 +120,7 @@ namespace YBOT_Field_Control_2016
                 sqlConnectButton.Enabled = false;
             });
 
+            YbotSql.Instance.GetGlobalData ();
             YbotSql.Instance.SqlConnectedEvent -= OnSqlConnect;
             YbotSql.Instance.SqlMessageEvent -= OnSqlMessage;
         }
@@ -122,11 +132,9 @@ namespace YBOT_Field_Control_2016
                     sqlConnectButton.FlatStyle = FlatStyle.Standard;
                     sqlConnectButton.Enabled = true;
                 });
+                MessageBox.Show ("Failed to connect to Sql Server");
+                YbotSql.Instance.SqlMessageEvent -= OnSqlMessage;
             }
-        }
-
-        private void OnSqlMessagePopup (object sender, SqlMessageArgs args) {
-
         }
 
         private void sqlConnectButton_Click (object sender, EventArgs e) {
