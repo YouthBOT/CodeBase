@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.IO.Ports;
 using System.Windows.Forms;
+using System.Data;
 
 namespace YBOT_Field_Control_2016
 {
@@ -183,12 +184,13 @@ namespace YBOT_Field_Control_2016
                         DateTime now = DateTime.Now;
                         string time = now.TimeOfDay.ToString();
                         string s = string.Format("Rcvd {0}: {1} : {2}",messagesReceived, time, dataIn);
+                        Console.WriteLine(s);
                         this.logBuilder.AppendLine(s);
                     }
                 }
                 catch (Exception ex)
                 {
-                    this.errorLog("CANBUS-Port_DataReceived() - " + ex);
+                    //this.errorLog("CANBUS-Port_DataReceived() - " + ex);
                 }
             }
 
@@ -213,6 +215,7 @@ namespace YBOT_Field_Control_2016
                     DateTime now = DateTime.Now;
                     string time = now.TimeOfDay.ToString();
                     string s = string.Format("Sent {0}: {1} : {2}",messagesSent, time, _data);
+                    Console.WriteLine(s);
                     this.logBuilder.AppendLine(s);
                     Thread.Sleep(8);
                 }
