@@ -75,6 +75,8 @@
             this.btnTournamentPrev = new System.Windows.Forms.Button();
             this.lblTournamentName = new System.Windows.Forms.Label();
             this.btnHomePanel = new System.Windows.Forms.Button();
+            this.solarTimer = new System.Windows.Forms.Timer(this.components);
+            this.sunChangeTimer = new System.Windows.Forms.Timer(this.components);
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -697,6 +699,16 @@
             this.btnHomePanel.UseVisualStyleBackColor = false;
             this.btnHomePanel.Click += new System.EventHandler(this.btnHomePanel_Click);
             // 
+            // solarTimer
+            // 
+            this.solarTimer.Interval = 1000;
+            this.solarTimer.Tick += new System.EventHandler(this.solarTimer_Tick);
+            // 
+            // sunChangeTimer
+            // 
+            this.sunChangeTimer.Interval = 60000;
+            this.sunChangeTimer.Tick += new System.EventHandler(this.sunChangeTimer_Tick);
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -788,5 +800,7 @@
         public System.Windows.Forms.Button btnTournamentPrev;
         public System.Windows.Forms.Label lblTournamentName;
         public System.Windows.Forms.Button btnHomePanel;
+        private System.Windows.Forms.Timer solarTimer;
+        private System.Windows.Forms.Timer sunChangeTimer;
     }
 }

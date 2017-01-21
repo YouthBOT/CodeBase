@@ -270,7 +270,7 @@ namespace YBOT_Field_Control_2016
         {
             autoModeTime = 30;
             manAutoTime = 20;
-            midModeTime = 120;
+            midModeTime = 150;
 
             disableGameButtons();
             btnStop.BackColor = GameControl.DefaultBackColor;
@@ -278,7 +278,7 @@ namespace YBOT_Field_Control_2016
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.countDownStart(2, 1);
+            time.countDownStart(2, 31);
             time.timesUp = false;
             MainGame();
         }
@@ -345,16 +345,16 @@ namespace YBOT_Field_Control_2016
 
         private void TestMode()
         {
-            autoModeTime = 20;
-            manAutoTime =  10;
-            midModeTime = 120;
+            autoModeTime = 15;
+            manAutoTime =  0;
+            midModeTime = 30;
 
             btnMatchNext.PerformClick();
 
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.countDownStart(2, 01);
+            time.countDownStart(0, 31);
             time.timesUp = false;
             MainGame();
         }
@@ -373,6 +373,7 @@ namespace YBOT_Field_Control_2016
             btnPracticeMode.BackColor = GameControl.DefaultBackColor;
             btnTestMode.BackColor = GameControl.DefaultBackColor;
             gameMode = GameModes.off;
+            GameShutDown();
             enableGameButtons();
             GameLog("Field Off");
             LogGame();
