@@ -10,30 +10,33 @@ namespace YBOT_Field_Control_2016
 {
     public partial class GameControl
     {
-        #region Game and Scoring Variables
-
-
-
-        #endregion
-
         //Initiate game class
         public void begin()
         {
             this.red.reset();                   //Reset Red variables
             this.green.reset();                 //Reset Green variables
-            gameMode = this.fc.ChangeGameMode(GameModes.reset);
+            this.joint.reset();                 //Reset Joint variables
 
+            //Switch Game Mode to Reset Field
+            this.gameMode = this.fc.ChangeGameMode(GameModes.reset);
+
+            //Clear all the nodes' information
             this.fc.ClearNodeState();
 
+            //Reset Solar Variables
             sunTower = 0;
+            value = 0;
             solarAligned = false;
+            solarChanged = false;
+            secondManSun = false;
+
+            //Reset Emergency Variables
             for (int i = 0; i < emergencyTowers.Length; i++)
             {
                 eTowers[i] = emergencyTowers[i];
             }
-            //emerTower = -1;
             alarmCouter = 3;
-            solarChanged = false;
+
         }
 
         /// <summary>
@@ -43,16 +46,13 @@ namespace YBOT_Field_Control_2016
         {
             begin();        //reset variables and flags       
 
+            //Not practice Mode
             practiceMode = false;
+
+            //Set Field Ready
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
 
-            //string str = ("7,1,3,");
-            //this.fc.SendMessage(solarPanel, str);
-            //Thread.Sleep(20);
-
-            //Wait for the solar panel to home.
-            //Thread.Sleep(10000);
-
+            //Pick new sun tower
             ChangeSunTower();
 
             //Ring Bell
@@ -63,9 +63,6 @@ namespace YBOT_Field_Control_2016
             gameMode = this.fc.ChangeGameMode(GameModes.autonomous);
             GameLog("Game Started");
 
-            //Turn on Robot Transmiters
-            //this.fc.RobotTransmitters("both", State.on, State.on);
-            //GameLog("Transmitters On");
         }
 
         /// <summary>
@@ -75,17 +72,13 @@ namespace YBOT_Field_Control_2016
         {
             begin();        //reset variables and flags       
 
+            //Not pratice mode
             practiceMode = false;
+
+            //Set game field to ready
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
 
-            ////Home The Solar Panel
-            //string str = ("7,1,3,");
-            //this.fc.SendMessage(solarPanel, str);
-            //Thread.Sleep(20);
-
-            //Wait for the solar panel to home.
-            //Thread.Sleep(10000);
-
+            //Pick new sun tower
             ChangeSunTower();
 
             //Ring Bell
@@ -95,11 +88,6 @@ namespace YBOT_Field_Control_2016
             //Set to Automode
             gameMode = this.fc.ChangeGameMode(mode);
             GameLog("Game Started");
-
-            //Turn on Robot Transmiters
-            //if (mode == GameModes.autonomous) this.fc.RobotTransmitters("both", State.on, State.on);
-            //else this.fc.RobotTransmitters("both", State.off, State.on);
-            //GameLog("Transmitters On");
 
             //If practice mode
             if (mode == GameModes.debug)
@@ -113,13 +101,14 @@ namespace YBOT_Field_Control_2016
         /// </summary>
         public void GameShutDown()
         {
-            //Turn off Transmitters
-            //this.fc.RobotTransmitters("both", State.off, State.off);
-            //GameLog("Transmitters Off");
-
             //Sound buzzer
             this.fc.SoundBuzzer();
 
+            //Stop all timers
+            solarTimer.Stop();
+            sunChangeTimer.Stop();
+
+            //Record to logs
             GameLog("Towers Off");
             GameLog("Game End");
         }
@@ -146,13 +135,13 @@ namespace YBOT_Field_Control_2016
                 //Do this between rounds
                 if (this.fc.switchMode)
                 {
+                    value = 0;
+                    solarTimer.Stop();
                     this.fc.switchMode = false;
 
                     //Pick new sun tower
                     ChangeSunTower();
                     solarChanged = false;
-                    
-                    //this.fc.RobotTransmitters("both", State.off, State.on); //Turn on transmitter to Manual Mode
 
                     this.fc.RingBell();                        //Ring bell
                     Thread.Sleep(200);
@@ -160,12 +149,12 @@ namespace YBOT_Field_Control_2016
                     GameLog("AutoMode Over");                   //Update Log
                     GameLog("Transmitters ON");                 //Update Log
 
+                    //Clear Selective Nodes information
                     this.fc.ClearNodeState(true);
 
-                    solarChange.elapsedTime.Start();
-
+                    //Pick Emergency Tower
                     GetEmerTower();
-
+                    sunChangeTimer.Start();
                 }
                 else ManualMode();
             }
@@ -179,19 +168,27 @@ namespace YBOT_Field_Control_2016
                 //if aligned start timer
                 if(!solarAligned)
                 {
-                    solarTime.elapsedTime.Reset();
+                    //Reset and Start timer
+                    solarTimer.Start();
                     solarAligned = true;
                 }
 
                 //Calculate score
-                int value = 0;
-                if (this.fc.node[11].byte6 == 1) value = 4;
-                else if (this.fc.node[11].byte6 == 2) value = 7;
-                else if (this.fc.node[11].byte6 == 3) value = 10;
-
-                int tempScore = solarTime.elapsedTime.Elapsed.Seconds * value;
-                this.joint.autoSolarPanelScore = tempScore;          
+                if (this.fc.node[11].byte6 == 1)
+                {
+                    value = 4;        
+                }
+                else if (this.fc.node[11].byte6 == 2)
+                {
+                    value = 7;
+                }
+                else if (this.fc.node[11].byte6 == 3)
+                {
+                    value = 10;
+                }
+                
              }
+            else value = 0;
 
             int testedTowers = 0;
             int cycledTowers = 0;
@@ -204,8 +201,8 @@ namespace YBOT_Field_Control_2016
                 if (this.fc.node[tower].deviceCycled == true) cycledTowers++;
             }
 
-            joint.autoEmergencyTowerCycled = cycledTowers;
-            joint.autoTowerTested = testedTowers;
+            this.joint.autoEmergencyTowerCycled = cycledTowers;
+            this.joint.autoTowerTested = testedTowers;
 
             //Calculate scores
             if (!this.joint.autoMan)
@@ -231,36 +228,27 @@ namespace YBOT_Field_Control_2016
                 //if aligned start timer
                 if (!solarAligned)
                 {
-                    solarTime.elapsedTime.Reset();
+                    solarTimer.Start();
                     solarAligned = true;
                 }
 
                 //Calculate score
-                int value = 0;
-                if (this.fc.node[11].byte6 == 1) value = 4;
-                else if (this.fc.node[11].byte6 == 2) value = 7;
-                else if (this.fc.node[11].byte6 == 3) value = 10;
-
-                int tempScore = solarTime.elapsedTime.Elapsed.Seconds * value;
-
-                //If the time is over a minute pick new tower
-                if (solarChange.elapsedTime.Elapsed.Seconds > 59)
-                {
-                    if (!solarChanged) ChangeSunTower();
-                    this.joint.manSolarPanelScore2 = tempScore;
-                }
-                else
-                {
-                    this.joint.manSolarPanelScore1 = tempScore;
-                }
-
+                if (this.fc.node[11].byte6 == 1) value = 1;
+                else if (this.fc.node[11].byte6 == 2) value = 2;
+                else if (this.fc.node[11].byte6 == 3) value = 4;
+                
             }
+            else value = 0;
 
             //If Alarm has been cleared score the tower
-            if (!this.fc.node[emergencyTower].alarmState)
+            if (emergencyTower != 15)
             {
-                joint.emergencyCleared++;
-                if (joint.emergencyCleared < 4) GetEmerTower();
+                if (!this.fc.node[emergencyTower].alarmState)
+                {
+                    this.joint.emergencyCleared++;
+                    emergencyTower = 15;
+                    if (this.joint.emergencyCleared < 4) GetEmerTower();
+                }
             }
 
             //Calculate Scores
@@ -315,11 +303,12 @@ namespace YBOT_Field_Control_2016
             string str = null;
             str = ("7,1,2,");
             this.fc.SendMessage(emergencyTower, str);
-            Thread.Sleep(20);
+            Thread.Sleep(50);
 
-            eTowers[num] = 0;
-            Array.Reverse(eTowers);
+            eTowers[num] = 15;
+            Array.Sort(eTowers);
             if (alarmCouter > 0) alarmCouter--;
+
         }
 
         private void ChangeSunTower()
@@ -327,13 +316,13 @@ namespace YBOT_Field_Control_2016
             //Turn off Current Sun Tower
             string str = ("7,0,0,");
             this.fc.SendMessage(sunTower, str);
-            Thread.Sleep(20);
+            Thread.Sleep(50);
 
             //Tell Solar Panel what the new sun tower is
             sunTower = rndNum.Next(1, 11);
             str = ("7,1,4," + sunTower.ToString());
             this.fc.SendMessage(11, str);
-            Thread.Sleep(20);
+            Thread.Sleep(50);
 
             //Tell the new sun tower to turn on
             str = ("7,1,1,");
@@ -341,10 +330,40 @@ namespace YBOT_Field_Control_2016
             Thread.Sleep(20);
 
             //Reset Solar Panel Timers and Flags
-            solarTime.elapsedTime.Reset();
+            solarTimer.Stop();
+            fc.node[solarPanel].byte6 = 0;
+            value = 0;
             solarAligned = false;
-            solarChange.elapsedTime.Stop();
             solarChanged = true;
+        }
+
+        //Change Sun Tower after 1 min
+        private void sunChangeTimer_Tick(object sender, EventArgs e)
+        {
+            sunChangeTimer.Stop();
+            secondManSun = true;
+            ChangeSunTower();
+        }
+
+        //Score Solar Panel every min
+        private void solarTimer_Tick(object sender, EventArgs e)
+        {
+            if (gameMode == GameModes.autonomous)
+            {
+                this.joint.autoSolarPanelScore += value;
+            }
+            else if (gameMode == GameModes.manual)
+            {
+                //If Second sun tower
+                if (!secondManSun)
+                {
+                    this.joint.manSolarPanelScore1 += value;
+                }
+                else
+                {
+                    this.joint.manSolarPanelScore2 += value;
+                }
+            }
         }
     }
 }

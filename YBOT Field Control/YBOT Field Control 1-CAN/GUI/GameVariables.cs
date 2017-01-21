@@ -56,13 +56,13 @@ namespace YBOT_Field_Control_2016
         private int sunTower = 0;               //Tower number to be the sun tower
         public Team joint = new Team("joint");  //Joint team values
         private bool solarAligned = false;
-        private Time solarTime = new Time();
-        private Time solarChange = new Time();
         private int[] emergencyTowers = { 2, 4, 7, 9 };
-        private int[] eTowers = { };
+        private int[] eTowers = { 2, 4, 7, 9 };
         private int alarmCouter = 3;
         private int emergencyTower = 0;
         private bool solarChanged = false;
         private int solarPanel = 11;
+        private int value = 0;
+        private bool secondManSun = false;
     }
 }

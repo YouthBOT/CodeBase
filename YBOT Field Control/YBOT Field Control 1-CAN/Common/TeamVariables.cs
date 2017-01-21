@@ -243,28 +243,28 @@ namespace YBOT_Field_Control_2016
         /// </summary>
         public void reset()
         {
-            score = 0;
-            autoCount = 0;
-            finalScore = 0;
-            penalty = 0;
-            dq = false;
-            matchResult = null;
-            autoFinished = false;
-            autoScore = 0;
-            manScore = 0;
-            endGameScore = 0;
-            autoMan = false;
+            this.score = 0;
+            this.autoCount = 0;
+            this.finalScore = 0;
+            this.penalty = 0;
+            this.dq = false;
+            this.matchResult = null;
+            this.autoFinished = false;
+            this.autoScore = 0;
+            this.manScore = 0;
+            this.endGameScore = 0;
+            this.autoMan = false;
 
-            autoEmergencyTowerCycled = 0;
-            autoSolarPanelScore = 0;
-            autoTowerTested = 0;
-            rocketBonus = false;
-            emergencyCleared = 0;
-            rocketPosition = 0;
-            rockScore = 0;
-            rockWeight = 0;
-            manSolarPanelScore1 = 0;
-            manSolarPanelScore2 = 0;
+            this.autoEmergencyTowerCycled = 0;
+            this.autoSolarPanelScore = 0;
+            this.autoTowerTested = 0;
+            this.rocketBonus = false;
+            this.emergencyCleared = 0;
+            this.rocketPosition = 0;
+            this.rockScore = 0;
+            this.rockWeight = 0;
+            this.manSolarPanelScore1 = 0;
+            this.manSolarPanelScore2 = 0;
         }
 
         public void StoreTeamVariablesToSqlMatch (ref Match match) {

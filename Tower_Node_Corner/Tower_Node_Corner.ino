@@ -76,8 +76,8 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
 //Oxy Towers = 11, Fire Towers = 5 (Fire Towrs need to have condition set to false)
-uint8_t inputPins[6] = { 11, 99, 99, 99, 99, 99 };
-boolean conditioned = true;
+uint8_t inputPins[6] = { 5, 99, 99, 99, 99, 99 };
+boolean conditioned = false;
 //Output Pin number - Pin# of Output - 99 if not used
 uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
 //LED Pin number (Uno 13, Leonardo 23)
@@ -574,7 +574,7 @@ void gamePlayCanbus()
 				//If valve is fully opened
 				if (fullPull)
 				{
-					nodeStatus[7] = 0;
+					nodeStatus[7] = 2;
 					alarmState = false;
 					report(0, commandNode);
 					wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
@@ -629,7 +629,7 @@ void gamePlayCanbus()
 					//If valve is fully opened
 					if (fullPull)
 					{
-						nodeStatus[7] = 0;
+						nodeStatus[7] = 2;
 						alarmState = false;
 						report(0, commandNode);
 						wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
@@ -713,7 +713,7 @@ void gamePlayCanbus()
 					//Report if full pull
 					if (fullPull)
 					{
-						nodeStatus[7] = 0;
+						nodeStatus[7] = 2;
 						alarmState = false;
 						report(0, commandNode);
 						wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
@@ -791,7 +791,7 @@ void gamePlayCanbus()
 		{
 			if (fullPull)
 			{
-				nodeStatus[7] = 0;
+				nodeStatus[7] = 2;
 				alarmState = false;
 				report(0, commandNode);
 				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
@@ -1009,7 +1009,7 @@ void gamePlaySpeedTest()
 			//If the tower has been tested look to see if the valve has opened.
 			if (testedState)
 			{
-				nodeStatus[7] = 0;
+				nodeStatus[7] = 2;
 				alarmState = false;
 				report(0, commandNode);
 				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
@@ -1075,7 +1075,7 @@ void gamePlaySpeedTest()
 			//If the tower has been tested look to see if the valve has opened.
 			if (testedState)
 			{
-				nodeStatus[7] = 0;
+				nodeStatus[7] = 2;
 				alarmState = false;
 				report(0, commandNode);
 				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));
@@ -1134,7 +1134,8 @@ void gamePlaySpeedTest()
 		{
 			if (fullPull)
 			{
-				nodeStatus[7] = 0;
+				nodeStatus[7] = 2
+					;
 				alarmState = false;
 				report(0, commandNode);
 				wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));

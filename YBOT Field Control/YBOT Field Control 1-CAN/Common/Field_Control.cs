@@ -273,6 +273,7 @@ namespace YBOT_Field_Control_2016
                 case ComModes.canBus:
                     int nodeAddress = Convert.ToInt32(this.node[_nodeID].address);
                     this.cb.TestConnection(nodeAddress);
+                    Thread.Sleep(30);
                     if (this.node[_nodeID].reportRec > 0) return true;
                     else return false;
 
@@ -333,6 +334,8 @@ namespace YBOT_Field_Control_2016
         {
             if (canbusPresent)
             {
+                this.cb.Send("0,7,0,0,");
+                Thread.Sleep(20);
                 this.cb.ChangeGameMode(0, GameModes.off);
             }
             ClearNodeState();
@@ -535,7 +538,7 @@ namespace YBOT_Field_Control_2016
         /// Update All Nodes state
         /// </summary>
         public void UpdateNodeState(object sender, CanMessageEventArgs e)
-        {
+        { 
             try
             {
                 //Parse incoming data
@@ -543,10 +546,11 @@ namespace YBOT_Field_Control_2016
 
                 int nodeID = Convert.ToInt32(parsedString[0]);
                 if (nodeID == cv.canControlID) nodeID = 0;
+                else if (nodeID > 20) nodeID -= 10;
 
                 this.node[nodeID].reportRec = Convert.ToByte(parsedString[1]);
 
-                Console.WriteLine("Report Record for node {1}: {0}", e.canMessage, nodeID);
+                //Console.WriteLine("Incomming Message : Node {1}: {0}", e.canMessage, nodeID);
 
                 if (this.node[nodeID].reportRec == 9)
                 {
@@ -571,14 +575,25 @@ namespace YBOT_Field_Control_2016
                     this.node[nodeID].byte6 = Convert.ToByte(parsedString[7]);
                     this.node[nodeID].byte7 = Convert.ToByte(parsedString[8]);
 
-                    if (this.node[nodeID].byte7 == 8) this.node[nodeID].tested = true;
-                    else this.node[nodeID].tested = false;
+                    if (!this.node[nodeID].tested)
+                    {
+                        if (this.node[nodeID].byte7 == 8) this.node[nodeID].tested = true;
+                        else this.node[nodeID].tested = false;
+                    }
 
-                    if (this.node[nodeID].byte7 == 0) this.node[nodeID].deviceCycled = true;
-                    else this.node[nodeID].deviceCycled = false;
+                    if (!this.node[nodeID].deviceCycled)
+                    {
+                        if (this.node[nodeID].byte7 == 2)
+                        {
+                            this.node[nodeID].deviceCycled = true;
+                            this.node[nodeID].alarmState = false;
+                        }
+                        else this.node[nodeID].deviceCycled = false;
+                    }
+
 
                     if (this.node[nodeID].byte7 == 1) this.node[nodeID].alarmState = true;
-                    else this.node[nodeID].alarmState = false;
+
                 }
             }
             catch (Exception ex) { logWrite("Update Node Failed - " + ex); }
@@ -685,8 +700,9 @@ namespace YBOT_Field_Control_2016
 
                 if (!selective)
                 {
-                    this.node[nd.id].tested = false;
+
                     this.node[nd.id].alarmState = false;
+                    this.node[nd.id].tested = false;                  
                     this.node[nd.id].gameMode = "off";
                 }
             }

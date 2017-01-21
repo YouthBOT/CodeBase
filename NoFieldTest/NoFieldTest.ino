@@ -3,8 +3,6 @@
 /// Used to control the command node and send data to the Tower Nodes
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <SoftwareSerial.h>
-#include <mcp_can.h>
 #include <SPI.h>
 #include <string.h>
 #include <Adafruit_NeoPixel.h>
@@ -53,7 +51,7 @@ uint32_t nodeID = 31;//(uint32_t)EEPROM.read(0);
 uint32_t commandNode = 31;
 
 // Set CanBus pin
-MCP_CAN CAN(canPin);
+//MCP_CAN CAN(canPin);
 //Can-bus message
 byte canOut[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 //Interrupt flag
@@ -92,7 +90,7 @@ char inData[32];	//Incoming serial data
 boolean newserial = false;
 int xbRX = 3;		//xb RX pin
 int xbTX = 2;		//xb TX pin
-SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
+//SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <summary> Program Flags Variables </summary>
@@ -111,6 +109,8 @@ int messagesSent = 0;
 int messagesRecieved = 0;
 int fromPC = 0;
 int toPC = 0;
+int alarmTower = 0;
+int towerCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <method> Ardiuno Setup Method</method>
@@ -118,7 +118,7 @@ int toPC = 0;
 void setup()
 {
 	Serial.begin(115200);	//Start serial communication
-	xbSerial.begin(9600);	//Start xb serial communication
+	//xbSerial.begin(9600);	//Start xb serial communication
 
 	Serial.print("Node ID: ");
 	Serial.println(nodeID);
@@ -170,40 +170,6 @@ void setup()
 
 	}
 
-
-	//Start CAN BUS
-	Serial.println("-----Can Bus----");
-START_INIT:
-
-	Serial.print("CAN-BUS Startup: ");
-	//If CANBUS begins 
-	if (CAN_OK == CAN.begin(CAN_50KBPS))						// init can bus : baudrate = 50k
-	{
-		wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));	//If okay light ring green
-		Serial.println("OK");									//Report Okay
-
-	}
-	else
-	{
-		Serial.println("Not Good, check your pin# and connections");	//Report a problem
-		wipeColor(yellow, 0, 0, firstPixel(2), lastPixel(2));			//If not okay light ring yellow
-		goto START_INIT;												//If startup failed try again
-	}
-
-	// There are 2 mask in mcp2515
-	// Set both Masks
-	CAN.init_Mask(0, 0, 0x1f);
-	CAN.init_Mask(1, 0, 0x1f);
-
-	// set filter, we can receive
-	CAN.init_Filt(0, 0, nodeID);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(1, 0, 0x00);                            // there are 6 filter in mcp2515
-
-	CAN.init_Filt(2, 0, nodeID);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(3, 0, 0x00);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(4, 0, 0x08);							// there are 6 filter in mcp2515
-	//CAN.init_Filt(5, 0, 0x09);							// there are 6 filter in mcp2515
-
 	//Check to see if we can talk to the command node	
 	Serial.println("CAN-BUS Communication: Command Node");
 
@@ -216,6 +182,8 @@ START_INIT:
 
 	solidColor(off, 0, 0, stripLength);	//Turn off light
 
+	Serial.println("Ready");
+
 
 }
 
@@ -224,16 +192,6 @@ START_INIT:
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
-	//While there is CANBUS data available
-	while (CAN_MSGAVAIL == CAN.checkReceive())
-	{
-		// read data,  len: data length, incoming: data incoming
-		sender = canbus;
-		CAN.readMsgBuf(&canLength, canIn);
-		messagesRecieved++;
-		execute();				//Execute new message
-	}
-
 	if (newserial)
 	{
 		newserial = false;
@@ -247,49 +205,38 @@ void loop()
 			}
 			execute();					//Execute Command
 		}
-		else if (destNode == 0) //This message is for everyone so send it to all towers
+		else
 		{
-			messagesSent++;
-			//Send it to CANBUS nodes
-			uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
-			CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
-
-			delay(10);
-
-			//Build string and send it to xbee nodes
-			String stringOut = "$,";
-			String dest = String(destNode);
-			stringOut += dest;
-			stringOut += ",";
-			for (uint8_t i = 0; i < sizeof(canOut); i++)
+			if (destNode == 0)
 			{
-				stringOut += String(canOut[i]);	
-				stringOut += ",";
-			}
-			xbSerial.println(stringOut);
-		}
-		else if (destNode > 20)		//It's an xbee node
-		{
-			messagesSent++;
-			//Build Message String
-			String stringOut = "$,";
-			String dest = String(destNode);
-			stringOut += dest;
-			stringOut += ",";
+				for (int i = 1; i < 10; i++)
+				{
+					if (canOut[7] == 1) alarmTower = i;
 
-			for (uint8_t i = 0; i < sizeof(canOut); i++)
-			{
-				stringOut += String(canOut[i]);	
-				stringOut += ",";
+					if (canOut[0] == 0) report(i);
+					else if (canOut[0] == 2)
+					{
+						gameMode = canOut[1];
+						gameModeChanged = true;
+						nodeStatus[3] = gameMode;
+					}
+				}
 			}
-			xbSerial.println(stringOut);	//Send it to XBee nodes
-			delay(10);
-		}
-		else //Else send it out to CANBUS
-		{
-			messagesSent++;
-			uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
-			CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
+			else
+			{
+				if ((canOut[2] == 2) && (canOut[0] == 7))
+				{
+					alarmTower = destNode;
+				}
+
+				if (canOut[0] == 0) report(destNode);
+				else if (canOut[0] == 2)
+				{
+					gameMode = canOut[1];
+					gameModeChanged = true;
+					nodeStatus[3] = gameMode;
+				}
+			}
 		}
 	}
 
@@ -323,48 +270,6 @@ void loop()
 		}
 	}
 
-	while (xbSerial.available())
-	{
-		sender = xbee;
-		char aChar = xbSerial.read();		//Read data
-
-		if (aChar == '$')
-		{
-			inData[0] = aChar;
-			index = 1;
-		}
-		else								//If no new line keep collecting the serial data
-		{
-			if (inData[0] = '$')
-			{
-				if (aChar == '\n')				//If there is a new line
-				{
-					messagesRecieved++;
-					parseData();				//Parse the data that was received
-					//newserial = true;
-
-					//If this came in on xbSerial it is the solar panel reporting so send it to the PC
-					toPC++;
-					Serial.print(destNode);
-					Serial.print(",");
-					for (int i = 0; i < sizeof(canIn); i++)
-					{
-						Serial.print(canOut[i]);
-						Serial.print(",");
-					}
-					Serial.println();
-				}
-				else
-				{
-					inData[index] = aChar;			//Add next character received to the buffer
-					index++;						//Increment index
-					inData[index] = '\0';			//Keep NULL Terminated as last the last character
-				}
-			}
-		}
-	}
-
-
 	if (function == 9)
 	{
 		if (functionMode == 5) NetworkResponseTest();
@@ -384,7 +289,7 @@ void execute()
 
 	if (msgType == 0)						//Report nodeStatus
 	{
-		report(true, 31);		//Send Report to the sending Node
+		report(31);		//Send Report to the sending Node
 	}
 	else if (msgType == 1)					//Set neopixels to desired state
 	{
@@ -546,6 +451,34 @@ void gamePlayCanbus()
 	}
 	else if (gameMode == 3)	//Autonomous
 	{
+		if (gameModeChanged)
+		{
+			complete = false;
+			gameMode = false;
+		}
+		if (!complete)
+		{
+			nodeStatus[6] = 0;
+			nodeStatus[7] = 8;
+			report(2);
+			report(4);
+			report(7);
+			report(9);
+			delay(250);
+
+			nodeStatus[7] = 2;
+
+			delay(250);
+			report(2);
+			report(4);
+			report(7);
+			report(9);
+			nodeStatus[7] = 0;
+			nodeStatus[6] = 3;
+			report(21);
+
+			complete = true;
+		}
 
 	}
 	else if (gameMode == 4)	//Man-Tonomous
@@ -554,6 +487,62 @@ void gamePlayCanbus()
 	}
 	else if (gameMode == 5)	//Manual Mode
 	{
+		if (gameModeChanged)
+		{
+			complete = false;
+			alarmTower = 0;
+			towerCounter = 0;
+			gameModeChanged = false;
+		}
+		if (!complete)
+		{
+			//nodeStatus[6] = 0;
+			//nodeStatus[7] = 8;
+			//report(2);
+			//report(4);
+			//report(7);
+			//report(9);
+			//delay(1000);
+
+			//Serial.print("Alarm Tower MM:");
+			//Serial.println(alarmTower);
+
+			nodeStatus[7] = 2;
+			if (alarmTower == 2)
+			{
+				report(2);
+				towerCounter++;
+				alarmTower = 0;
+			}
+			else if (alarmTower == 4)
+			{
+				report(4);
+				towerCounter++;
+				alarmTower = 0;
+			}
+			else if (alarmTower == 7)
+			{
+				report(7);
+				towerCounter++;
+				alarmTower = 0;
+			}
+			else if (alarmTower == 9) 
+			{
+				report(9);
+				towerCounter++;
+				alarmTower = 0;
+			}
+			delay(250);
+
+			if (towerCounter == 4)
+			{
+				nodeStatus[7] = 0;
+				nodeStatus[6] = 3;
+				report(21);
+				complete = true;
+			}
+
+		}
 
 	}
 	else if (gameMode == 6)	//End
@@ -614,7 +603,7 @@ void NetworkResponseTest()
 			messagesSent++;
 			nodeStatus[7] = messagesSent;
 			nodeStatus[6] = messagesRecieved;
-			report(0, commandNode);
+			report(commandNode);
 		}
 
 	}
@@ -622,7 +611,7 @@ void NetworkResponseTest()
 	{
 		if (gameModeChanged)
 		{
-			report(0, commandNode);
+			report(commandNode);
 			solidColor(off, 0, 0, stripLength);
 			gameModeChanged = false;
 		}
@@ -674,14 +663,14 @@ void NetworkSpeedTest()
 			messagesSent++;
 			nodeStatus[7] = messagesSent;
 			nodeStatus[6] = messagesRecieved;
-			report(0, commandNode);
+			report(commandNode);
 		}
 	}
 	else if (gameMode == 7)	//Field Off
 	{
 		if (gameModeChanged)
 		{
-			report(0, commandNode);
+			report(commandNode);
 			solidColor(off, 0, 0, stripLength);
 			gameModeChanged = false;
 		}
@@ -1003,27 +992,9 @@ void flashColorLatch(uint32_t _color, uint8_t _wait, uint8_t _times, uint8_t _st
 ///
 /// <summary>Used to Report Status of Node </summary>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void report(uint8_t check, uint32_t dAddress)
+void report(uint32_t _address)
 {
-	if (check) updateInputs();									//Update Inputs
-	uint32_t dA = address(dAddress, nodeID);					//Get address
-	int stat = CAN_FAIL;
-	int timeOut = 0;
-
-	if (dAddress != nodeID)
-	{
-		uint32_t dA = address(dAddress, nodeID);				//Get address
-		stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus, 2);	//Send message using only one buffer
-
-		//do
-		//{
-		//	timeOut++;
-		//	stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus);	//Send message using only one buffer
-		//} while ((stat != CAN_OK) && (timeOut < TIMEOUTVALUE));
-	}
-	else
-	{
-		Serial.print(commandNode);
+		Serial.print(_address);
 		Serial.print(",");
 		for (int i = 0; i < sizeof(nodeStatus); i++)
 		{
@@ -1031,7 +1002,7 @@ void report(uint8_t check, uint32_t dAddress)
 			Serial.print(",");
 		}
 		Serial.println();
-	}
+		delay(10);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1127,35 +1098,35 @@ uint32_t address(uint32_t _destination, uint32_t _id)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 uint32_t sendingNode()
 {
-	if (sender == canbus)
-	{
-		uint32_t node = CAN.getCanId();	//Get whole ID
-		return node >> 5;				//Last 5 bits are the sending nodes ID
-	}
+	//if (sender == canbus)
+	//{
+	//	uint32_t node = CAN.getCanId();	//Get whole ID
+	//	return node >> 5;				//Last 5 bits are the sending nodes ID
+	//}
 
-	else if (sender == xbee)	return 21;
-	
-	else if (destNode == nodeID) return nodeID;
+	//else if (sender == xbee)	return 21;
+	//
+	//else if (destNode == nodeID) return nodeID;
 
-	else return destNode;
+	//else return destNode;
 }
 
 void ChangeBaudRate(byte rate)
 {
-	Serial.print("CAN-BUS Startup: ");
-	//If CANBUS begins 
-	if (CAN_OK == CAN.begin(rate))						// init can bus : baudrate = 50k
-	{
-		wipeColor(green, 0, 0, firstPixel(3), lastPixel(3));	//If okay light ring green
-		Serial.print(rate);
-		Serial.println(" - OK");									//Report Okay
+	//Serial.print("CAN-BUS Startup: ");
+	////If CANBUS begins 
+	//if (CAN_OK == CAN.begin(rate))						// init can bus : baudrate = 50k
+	//{
+	//	wipeColor(green, 0, 0, firstPixel(3), lastPixel(3));	//If okay light ring green
+	//	Serial.print(rate);
+	//	Serial.println(" - OK");									//Report Okay
 
-	}
-	else
-	{
-		Serial.println("Not Good, check your pin# and connections");	//Report a problem
-		wipeColor(yellow, 0, 0, firstPixel(3), lastPixel(3));			//If not okay light ring yellow												//If startup failed try again
-	}
+	//}
+	//else
+	//{
+	//	Serial.println("Not Good, check your pin# and connections");	//Report a problem
+	//	wipeColor(yellow, 0, 0, firstPixel(3), lastPixel(3));			//If not okay light ring yellow												//If startup failed try again
+	//}
 }
 #pragma endregion
 

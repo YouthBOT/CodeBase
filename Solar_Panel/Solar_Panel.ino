@@ -412,7 +412,8 @@ void execute()
 
 	if (msgType == 0)						//Report nodeStatus
 	{
-		report(true, sendingNode());		//Send Report to the sending Node
+		//report(true, sendingNode());		//Send Report to the sending Node
+		xbReport();
 	}
 	else if (msgType == 1)					//Set neopixels to desired state
 	{
@@ -629,9 +630,10 @@ void gamePlayCanbus()
 			potValL = analogRead(potInputL);
 			potValR = analogRead(potInputR);
 
-			int potVal = 0;
-			if (potValR < 450 || potValR > 550) potVal = potValR;
-			else potVal = potValL;
+			int potVal = potValR;
+			//int potVal = 0;
+			//if (potValR < 450 || potValR > 550) potVal = potValR;
+			//else potVal = potValL;
 
 			//Serial.println(potVal);
 
@@ -689,7 +691,7 @@ void gamePlayCanbus()
 			int minAngle1 = 0;
 
 			//If sun location is 0 do special math
-			if (sunLocation = 0)
+			if (sunLocation == 0)
 			{
 				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
 				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
@@ -704,22 +706,27 @@ void gamePlayCanbus()
 			if ((currentLocation < maxAngle1) && (currentLocation > minAngle1))
 			{
 				//Angle Range Variables
+
 				int maxAngle2 = maxAngle1 - angle_2;
 				int minAngle2 = minAngle1 + angle_2;
-				int maxAngle3 = maxAngle1 - angle_3;
-				int minAngle3 = minAngle1 + angle_3;
+				int maxAngle3 = maxAngle1 - (angle_1 - angle_3);
+				int minAngle3 = minAngle1 + (angle_1 - angle_3);
 
 				//If current panel location is within 2nd angle
 				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
 				{
-					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
-					nodeStatus[6] = 2;
-				}
-				//If current panel location is within 3rd angle
-				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
-				{
-					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
-					nodeStatus[6] = 3;
+					if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+					{
+						analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+						nodeStatus[6] = 3;
+						//Serial.println("Align = 3");
+					}
+					else
+					{
+						analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+						nodeStatus[6] = 2;
+						//Serial.println("Align = 2");
+					}
 				}
 				else
 				{
@@ -743,9 +750,10 @@ void gamePlayCanbus()
 			potValL = analogRead(potInputL);
 			potValR = analogRead(potInputR);
 
-			int potVal = 0;
-			if (potValR < 450 || potValR > 550) potVal = potValR;
-			else potVal = potValL;
+			int potVal = potValR;
+			//int potVal = 0;
+			//if (potValR < 450 || potValR > 550) potVal = potValR;
+			//else potVal = potValL;
 
 			if (potVal > 550)
 			{
@@ -798,7 +806,7 @@ void gamePlayCanbus()
 			int minAngle1 = 0;
 
 			//If sun location is 0 do special math
-			if (sunLocation = 0)
+			if (sunLocation == 0)
 			{
 				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
 				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
@@ -815,20 +823,24 @@ void gamePlayCanbus()
 				//Angle Range Variables
 				int maxAngle2 = maxAngle1 - angle_2;
 				int minAngle2 = minAngle1 + angle_2;
-				int maxAngle3 = maxAngle1 - angle_3;
-				int minAngle3 = minAngle1 + angle_3;
+				int maxAngle3 = maxAngle1 - (angle_1 - angle_3);
+				int minAngle3 = minAngle1 + (angle_1 - angle_3);
 
 				//If current panel location is within 2nd angle
 				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
 				{
-					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
-					nodeStatus[6] = 2;
-				}
-				//If current panel location is within 3rd angle
-				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
-				{
-					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
-					nodeStatus[6] = 3;
+					if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+					{
+						analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+						nodeStatus[6] = 3;
+						//Serial.println("Align = 3");
+					}
+					else
+					{
+						analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+						nodeStatus[6] = 2;
+						//Serial.println("Align = 2");
+					}
 				}
 				else
 				{
@@ -863,9 +875,10 @@ void gamePlayCanbus()
 			potValL = analogRead(potInputL);
 			potValR = analogRead(potInputR);
 
-			int potVal = 0;
-			if (potValR < 450 || potValR > 550) potVal = potValR;
-			else potVal = potValL;
+			int potVal = potValR;
+			//int potVal = 0;
+			//if (potValR < 450 || potValR > 550) potVal = potValR;
+			//else potVal = potValL;
 
 			if (potVal > 550)
 			{
@@ -918,7 +931,7 @@ void gamePlayCanbus()
 			int minAngle1 = 0;
 
 			//If sun location is 0 do special math
-			if (sunLocation = 0)
+			if (sunLocation == 0)
 			{
 				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
 				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
@@ -935,20 +948,24 @@ void gamePlayCanbus()
 				//Angle Range Variables
 				int maxAngle2 = maxAngle1 - angle_2;
 				int minAngle2 = minAngle1 + angle_2;
-				int maxAngle3 = maxAngle1 - angle_3;
-				int minAngle3 = minAngle1 + angle_3;
+				int maxAngle3 = maxAngle1 - (angle_1 - angle_3);
+				int minAngle3 = minAngle1 + (angle_1 - angle_3);
 
 				//If current panel location is within 2nd angle
 				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
 				{
-					analogWrite(solarLED, 50);	//Turn on the LED at 50/255
-					nodeStatus[6] = 2;
-				}
-				//If current panel location is within 3rd angle
-				else if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
-				{
-					analogWrite(solarLED, 150);	//Turn on the LED at 150/255
-					nodeStatus[6] = 3;
+					if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+					{
+						analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+						nodeStatus[6] = 3;
+						//Serial.println("Align = 3");
+					}
+					else
+					{
+						analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+						nodeStatus[6] = 2;
+						//Serial.println("Align = 2");
+					}
 				}
 				else
 				{
@@ -1011,10 +1028,10 @@ void gamePlayCanbus()
 			//Serial.print("Right = ");
 			//Serial.println(potValR);
 
-
-			int potVal = 0;
-			if (potValR < 450 || potValR > 550) potVal = potValR;
-			else potVal = potValL;
+			int potVal = potValR;
+			//int potVal = 0;
+			//if (potValR < 450 || potValR > 550) potVal = potValR;
+			//else potVal = potValL;
 
 			//Serial.print("Pot Value = ");
 			//Serial.println(potVal);
@@ -1061,39 +1078,76 @@ void gamePlayCanbus()
 				if (currentLocation < 0) currentLocation = (maxSteps-1);
 			}
 
-			int max = sunLocation + angle_1;
-			int min = sunLocation - angle_1;
+			//Angle Range Variables
+			int maxAngle1 = 0;
+			int minAngle1 = 0;
 
-			if (max > maxSteps)
+			//If sun location is 0 do special math
+			if (sunLocation == 0)
 			{
-				int limitShift = max - maxSteps;
-
-				if (currentLocation < limitShift)
-				{
-					int delta = abs((currentLocation + maxSteps) - sunLocation);
-					int ledPower = map(delta, 0, angle_1, 255, 0);
-					analogWrite(solarLED, ledPower);
-				}
-				else if (currentLocation > min)
-				{
-					int delta = abs(sunLocation - currentLocation);
-					int ledPower = map(delta, 0, angle_1, 255, 0);
-					analogWrite(solarLED, ledPower);
-				}
-				else
-				{
-					analogWrite(solarLED, LOW);
-				}
-			}
-			else if ((currentLocation > min) && (currentLocation < max))
-			{
-				int delta = abs(sunLocation - currentLocation);
-				int ledPower = map(delta, 0, angle_1, 255, 0);
-				analogWrite(solarLED, ledPower);
+				maxAngle1 = 0 + angle_1;		//Set max angle starting from 0
+				minAngle1 = 1600 - angle_1;		//Set min angle starting from 1600
 			}
 			else
 			{
+				maxAngle1 = sunLocation + angle_1;	//Calculate Max angle
+				minAngle1 = sunLocation - angle_1;	//Calculate Min angle
+			}
+
+			//If current panel location is within greatest angle
+			if ((currentLocation < maxAngle1) && (currentLocation > minAngle1))
+			{
+				//Angle Range Variables
+				int maxAngle2 = maxAngle1 - angle_2;
+				int minAngle2 = minAngle1 + angle_2;
+				int maxAngle3 = maxAngle1 - (angle_1 - angle_3);
+				int minAngle3 = minAngle1 + (angle_1 - angle_3);
+
+				//Serial.print("Current Location = ");
+				//Serial.println(currentLocation);
+				//Serial.print("Angle 1 = ");
+				//Serial.print(minAngle1);
+				//Serial.print(" - ");
+				//Serial.println(maxAngle1);
+				//Serial.print("Angle 2 = ");
+				//Serial.print(minAngle2);
+				//Serial.print(" - ");
+				//Serial.println(maxAngle2);
+				//Serial.print("Angle 3 = ");
+				//Serial.print(minAngle3);
+				//Serial.print(" - ");
+				//Serial.println(maxAngle3);
+
+				//If current panel location is within 2nd angle
+				if ((currentLocation < maxAngle2) && (currentLocation > minAngle2))
+				{
+					if ((currentLocation < maxAngle3) && (currentLocation > minAngle3))
+					{
+						analogWrite(solarLED, 150);	//Turn on the LED at 150/255
+						nodeStatus[6] = 3;
+						//Serial.println("Align = 3");
+					}
+					else
+					{
+						analogWrite(solarLED, 50);	//Turn on the LED at 50/255
+						nodeStatus[6] = 2;
+						//Serial.println("Align = 2");
+					}
+				}
+				//If current panel location is within 3rd angle
+
+				else
+				{
+					analogWrite(solarLED, 30);	//Turn on the LED 30/255
+					nodeStatus[6] = 1;
+					//Serial.println("Align = 1");
+				}
+			}
+			//Else turn off the LED
+			else
+			{
 				analogWrite(solarLED, LOW);
+				nodeStatus[6] = 0;
 			}
 		}
 
