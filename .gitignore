@@ -6,3 +6,4 @@ obj/
 *.suo
 *.exe
 .directory
+sql-password.txt
