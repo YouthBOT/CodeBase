@@ -345,9 +345,9 @@ namespace YBOT_Field_Control_2016
 
         private void TestMode()
         {
-            autoModeTime = 15;
+            autoModeTime = 5;
             manAutoTime =  0;
-            midModeTime = 30;
+            midModeTime = 10;
 
             btnMatchNext.PerformClick();
 
@@ -964,6 +964,7 @@ namespace YBOT_Field_Control_2016
                 this.gameMode = this.fc.ChangeGameMode(GameModes.end);
                 this.updateDisplays();
                 this.GameShutDown();
+                Thread.Sleep(1000);
                 this.GameLog("Game Stopped");
             }
         }
@@ -972,21 +973,28 @@ namespace YBOT_Field_Control_2016
         {
             if(this.gameMode == GameModes.end)
             {
-                this.red.finalScore = this.red.score;
-                this.green.finalScore = this.green.score;
-                this.ScoreGame();
-                this.RecordGame();
+                //this.red.finalScore = this.red.score;
+                //this.green.finalScore = this.green.score;
+                //this.ScoreGame();
+                //this.RecordGame();
+                Thread.Sleep(200);
                 this.fc.FieldAllOff();
+                Thread.Sleep(1000);
                 this.gameMode = GameModes.off;
+                Thread.Sleep(100);
+                //GameShutDown();
 
-                if(this.red.score != this.green.score)
-                {
-                    string file = "\\Match - BAD Scores";
-                    string folder = "Matches\\";
-                    string text = string.Format("Match# {0} - Red = {1} | Green = {2}", matchNumber, this.red.finalScore, this.green.finalScore);
-                    this.lw.WriteLog(text, file, folder);
-                }
 
+                //if (this.red.score != this.green.score)
+                //{
+                //    string file = "\\Match - BAD Scores";
+                //    string folder = "Matches\\";
+                //    string text = string.Format("Match# {0} - Red = {1} | Green = {2}", matchNumber, this.red.finalScore, this.green.finalScore);
+                //    this.lw.WriteLog(text, file, folder);
+                //}
+
+                //Thread.Sleep(100);
+                gameTimer.Stop();
                 this.TestMode();
             }
         }
