@@ -62,7 +62,6 @@ namespace YBOT_Field_Control_2016
             //Set to Automode
             gameMode = this.fc.ChangeGameMode(GameModes.autonomous);
             GameLog("Game Started");
-
         }
 
         /// <summary>
@@ -77,6 +76,7 @@ namespace YBOT_Field_Control_2016
 
             //Set game field to ready
             gameMode = this.fc.ChangeGameMode(GameModes.ready);
+            Thread.Sleep(100);
 
             //Pick new sun tower
             ChangeSunTower();
@@ -88,7 +88,7 @@ namespace YBOT_Field_Control_2016
             //Set to Automode
             gameMode = this.fc.ChangeGameMode(mode);
             GameLog("Game Started");
-
+ 
             //If practice mode
             if (mode == GameModes.debug)
             {
@@ -103,6 +103,7 @@ namespace YBOT_Field_Control_2016
         {
             //Sound buzzer
             this.fc.SoundBuzzer();
+            Thread.Sleep(500);
 
             //Stop all timers
             solarTimer.Stop();
@@ -303,7 +304,6 @@ namespace YBOT_Field_Control_2016
             string str = null;
             str = ("7,1,2,");
             this.fc.SendMessage(emergencyTower, str);
-            Thread.Sleep(50);
 
             eTowers[num] = 15;
             Array.Sort(eTowers);
@@ -316,18 +316,15 @@ namespace YBOT_Field_Control_2016
             //Turn off Current Sun Tower
             string str = ("7,0,0,");
             this.fc.SendMessage(sunTower, str);
-            Thread.Sleep(50);
 
             //Tell Solar Panel what the new sun tower is
             sunTower = rndNum.Next(1, 11);
             str = ("7,1,4," + sunTower.ToString());
             this.fc.SendMessage(11, str);
-            Thread.Sleep(50);
 
             //Tell the new sun tower to turn on
             str = ("7,1,1,");
             this.fc.SendMessage(sunTower, str);
-            Thread.Sleep(20);
 
             //Reset Solar Panel Timers and Flags
             solarTimer.Stop();

@@ -3,7 +3,6 @@
 /// Used to control the command node and send data to the Tower Nodes
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <SoftwareSerial.h>
 #include <mcp_can.h>
 #include <SPI.h>
 #include <string.h>
@@ -90,9 +89,6 @@ uint8_t buzzerPin = 5;
 byte index = 0;		//Counter for serial data
 char inData[32];	//Incoming serial data
 boolean newserial = false;
-int xbRX = 3;		//xb RX pin
-int xbTX = 2;		//xb TX pin
-SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <summary> Program Flags Variables </summary>
@@ -118,7 +114,6 @@ int toPC = 0;
 void setup()
 {
 	Serial.begin(115200);	//Start serial communication
-	xbSerial.begin(9600);	//Start xb serial communication
 
 	Serial.print("Node ID: ");
 	Serial.println(nodeID);
@@ -207,10 +202,6 @@ START_INIT:
 	//Check to see if we can talk to the command node	
 	Serial.println("CAN-BUS Communication: Command Node");
 
-	Serial.println("-----XBee-----");
-	//xbSerial.println("$,21,7,1,3,");
-	//Serial.println("$,21,7,1,3,");
-
 
 	delay(2000); //Visual Delay
 
@@ -246,44 +237,6 @@ void loop()
 				canIn[i] = canOut[i];	//Move message to canIn
 			}
 			execute();					//Execute Command
-		}
-		else if (destNode == 0) //This message is for everyone so send it to all towers
-		{
-			messagesSent++;
-			//Send it to CANBUS nodes
-			uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
-			CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
-
-			delay(10);
-
-			//Build string and send it to xbee nodes
-			String stringOut = "$,";
-			String dest = String(destNode);
-			stringOut += dest;
-			stringOut += ",";
-			for (uint8_t i = 0; i < sizeof(canOut); i++)
-			{
-				stringOut += String(canOut[i]);	
-				stringOut += ",";
-			}
-			xbSerial.println(stringOut);
-		}
-		else if (destNode > 20)		//It's an xbee node
-		{
-			messagesSent++;
-			//Build Message String
-			String stringOut = "$,";
-			String dest = String(destNode);
-			stringOut += dest;
-			stringOut += ",";
-
-			for (uint8_t i = 0; i < sizeof(canOut); i++)
-			{
-				stringOut += String(canOut[i]);	
-				stringOut += ",";
-			}
-			xbSerial.println(stringOut);	//Send it to XBee nodes
-			delay(10);
 		}
 		else //Else send it out to CANBUS
 		{
@@ -322,48 +275,6 @@ void loop()
 			}
 		}
 	}
-
-	while (xbSerial.available())
-	{
-		sender = xbee;
-		char aChar = xbSerial.read();		//Read data
-
-		if (aChar == '$')
-		{
-			inData[0] = aChar;
-			index = 1;
-		}
-		else								//If no new line keep collecting the serial data
-		{
-			if (inData[0] = '$')
-			{
-				if (aChar == '\n')				//If there is a new line
-				{
-					messagesRecieved++;
-					parseData();				//Parse the data that was received
-					//newserial = true;
-
-					//If this came in on xbSerial it is the solar panel reporting so send it to the PC
-					toPC++;
-					Serial.print(destNode);
-					Serial.print(",");
-					for (int i = 0; i < sizeof(canIn); i++)
-					{
-						Serial.print(canOut[i]);
-						Serial.print(",");
-					}
-					Serial.println();
-				}
-				else
-				{
-					inData[index] = aChar;			//Add next character received to the buffer
-					index++;						//Increment index
-					inData[index] = '\0';			//Keep NULL Terminated as last the last character
-				}
-			}
-		}
-	}
-
 
 	if (function == 9)
 	{
@@ -1014,12 +925,6 @@ void report(uint8_t check, uint32_t dAddress)
 	{
 		uint32_t dA = address(dAddress, nodeID);				//Get address
 		stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus, 2);	//Send message using only one buffer
-
-		//do
-		//{
-		//	timeOut++;
-		//	stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus);	//Send message using only one buffer
-		//} while ((stat != CAN_OK) && (timeOut < TIMEOUTVALUE));
 	}
 	else
 	{

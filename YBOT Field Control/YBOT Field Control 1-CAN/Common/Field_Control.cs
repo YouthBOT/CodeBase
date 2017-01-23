@@ -337,6 +337,7 @@ namespace YBOT_Field_Control_2016
                 this.cb.Send("0,7,0,0,");
                 Thread.Sleep(20);
                 this.cb.ChangeGameMode(0, GameModes.off);
+                Thread.Sleep(20);
             }
             ClearNodeState();
         }

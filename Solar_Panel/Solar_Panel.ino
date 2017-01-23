@@ -3,7 +3,6 @@
 /// Used to control the command node and send data to the Tower Nodes
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <SoftwareSerial.h>
 #include <mcp_can.h>
 #include <SPI.h>
 #include <string.h>
@@ -42,7 +41,7 @@ uint32_t off = light.Color(0, 0, 0);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region CANBUS Variables
 //Can-bus pin (Uno Shield pin 9 ; Leonardo Boards pin 17)
-uint8_t canPin = 4;
+uint8_t canPin = 9;
 //Can-bus Interrupt Pin (Uno Shield 0 ; Leonardo 4)
 uint8_t canIntrPin = 0;
 //Tower Node Number
@@ -119,9 +118,7 @@ boolean fullPull = false;					//If Max pull was acheived
 byte index = 0;		//Counter for serial data
 char inData[32];	//Incoming serial data
 boolean newserial = false;
-int xbRX = 3;		//xb RX pin
-int xbTX = 2;		//xb TX pin
-SoftwareSerial xbSerial(xbRX, xbTX);	//Start serial for XBee
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <summary> Program Flags Variables </summary>
@@ -165,7 +162,6 @@ int potValR = 0;
 void setup()
 {
 	Serial.begin(115200);	//Start serial communication
-	xbSerial.begin(9600);	//Start xb serial communication
 
 	Serial.print("Node ID: ");
 	Serial.println(nodeID);
@@ -200,12 +196,12 @@ void setup()
 
 			if (!checkInput(i))
 			{
-				wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));	//If okay light ring green
+				//wipeColor(green, 0, 0, firstPixel(1), lastPixel(1));	//If okay light ring green
 				Serial.println(" - OK");
 			}
 			else
 			{
-				wipeColor(yellow, 0, 0, firstPixel(1), lastPixel(1));	//If not light ring yellow
+				//wipeColor(yellow, 0, 0, firstPixel(1), lastPixel(1));	//If not light ring yellow
 				Serial.println(" - PRESSED");
 			}
 			delay(250);	//Delay so we can see the result
@@ -214,44 +210,68 @@ void setup()
 	}
 
 
-//	//Start CAN BUS
-//	Serial.println("-----Can Bus----");
-//START_INIT:
-//
-//	Serial.print("CAN-BUS Startup: ");
-//	//If CANBUS begins 
-//	if (CAN_OK == CAN.begin(CAN_50KBPS))						// init can bus : baudrate = 50k
-//	{
-//		wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));	//If okay light ring green
-//		Serial.println("OK");									//Report Okay
-//
-//	}
-//	else
-//	{
-//		Serial.println("Not Good, check your pin# and connections");	//Report a problem
-//		wipeColor(yellow, 0, 0, firstPixel(2), lastPixel(2));			//If not okay light ring yellow
-//		goto START_INIT;												//If startup failed try again
-//	}
-//
-//	// There are 2 mask in mcp2515
-//	// Set both Masks
-//	CAN.init_Mask(0, 0, 0x1f);
-//	CAN.init_Mask(1, 0, 0x1f);
-//
-//	// set filter, we can receive
-//	CAN.init_Filt(0, 0, nodeID);							// there are 6 filter in mcp2515
-//	//CAN.init_Filt(1, 0, 0x00);                            // there are 6 filter in mcp2515
-//
-//	CAN.init_Filt(2, 0, nodeID);							// there are 6 filter in mcp2515
-//	//CAN.init_Filt(3, 0, 0x00);							// there are 6 filter in mcp2515
-//	//CAN.init_Filt(4, 0, 0x08);							// there are 6 filter in mcp2515
-//	//CAN.init_Filt(5, 0, 0x09);							// there are 6 filter in mcp2515
-//
-//	//Check to see if we can talk to the command node	
-//	Serial.println("CAN-BUS Communication: Command Node");
+	//Start CAN BUS
+	Serial.println("-----Can Bus----");
+START_INIT:
 
-	Serial.println("-----XBee-----");
-	xbSerial.println("31,0,0");
+	Serial.print("CAN-BUS Startup: ");
+	//If CANBUS begins 
+	if (CAN_OK == CAN.begin(CAN_50KBPS))						// init can bus : baudrate = 50k
+	{
+		//wipeColor(green, 0, 0, firstPixel(2), lastPixel(2));	//If okay light ring green
+		Serial.println("OK");									//Report Okay
+
+	}
+	else
+	{
+		Serial.println("Not Good, check your pin# and connections");	//Report a problem
+		//wipeColor(yellow, 0, 0, firstPixel(2), lastPixel(2));			//If not okay light ring yellow
+		goto START_INIT;												//If startup failed try again
+	}
+
+	attachInterrupt(canIntrPin, MCP2515_ISR, FALLING); // start interrupt for can-bus
+
+													   // There are 2 mask in mcp2515
+													   // Set both Masks
+	CAN.init_Mask(0, 0, 0x1f);
+	CAN.init_Mask(1, 0, 0x1f);
+
+	// set filter, we can receive id
+	CAN.init_Filt(0, 0, nodeID);                          // there are 6 filter in mcp2515
+	CAN.init_Filt(1, 0, 0x00);                            // there are 6 filter in mcp2515
+
+	CAN.init_Filt(2, 0, nodeID);                          // there are 6 filter in mcp2515
+	CAN.init_Filt(3, 0, 0x00);							  // there are 6 filter in mcp2515
+	CAN.init_Filt(4, 0, 0x00);                          // there are 6 filter in mcp2515
+	CAN.init_Filt(5, 0, nodeID);                          // there are 6 filter in mcp2515
+
+														  //Check to see if we can talk to the command node
+	delay(1000 * nodeID);								//Delay so all nodes don't talk at the same time				
+	uint32_t dA = address(commandNode, nodeID);		//create an unique address
+	CAN.sendMsgBuf(dA, 0, sizeof(canOut), canOut, 2); 	//Send a blank message
+	delay(100);										//Give the command node time to send it back
+
+	if (canRecv)// check if get data
+	{
+		canRecv = 0;                   // clear flag
+
+									   // iterate over all pending messages
+									   // If either the bus is saturated or the MCU is busy,
+									   // both RX buffers may be in use and reading a single
+									   // message does not clear the IRQ condition.
+		while (CAN_MSGAVAIL == CAN.checkReceive())
+		{
+			// read data,  canLength: data length, canIn: data incoming
+			CAN.readMsgBuf(&canLength, canIn);
+		}
+		//wipeColor(green, 0, 0, firstPixel(3), lastPixel(3));	//If okay light ring green
+		Serial.println("Message Received");
+	}
+	else
+	{
+		//wipeColor(yellow, 0, 0, firstPixel(3), lastPixel(3));  //If not okay light ring yellow
+		Serial.println("Nothing Received");
+	}
 
 	//Solar Panel Pins
 	Serial.println("-----Solar Panel-----");
@@ -285,120 +305,40 @@ void setup()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop()
 {
-	////While there is CANBUS data available
-	//while (CAN_MSGAVAIL == CAN.checkReceive())
-	//{
-	//	// read data,  len: data length, incoming: data incoming
-	//	CAN.readMsgBuf(&canLength, canIn);
-	//	messagesRecieved++;
-	//	execute();				//Execute new message
-	//}
-
-	if (newserial)
+	//While there is data in the buffers
+	while (CAN_MSGAVAIL == CAN.checkReceive())
 	{
-		newserial = false;
-
-		//If message is for the command node process the data
-		if ((destNode == nodeID) || (destNode == 0))
-		{
-			for (uint8_t i = 0; i < sizeof(canIn); i++)
-			{
-				canIn[i] = canOut[i];	//Move message to canIn
-			}
-
-			Serial.print("Destination Node#");
-			Serial.print(destNode);
-			Serial.print(" : Message = ");
-			for (int i = 0; i < 8; i++)
-			{
-				Serial.print(canIn[i]);
-				Serial.print("|");
-			}
-			Serial.println();
-
-			execute();					//Execute Command
-		}
-		else if (destNode == commandNode)			//It's an xbee node
-		{
-			for (uint8_t i = 0; i < sizeof(canIn); i++)
-			{
-				xbSerial.print(canOut[i]);	//send data
-			}
-			xbSerial.println();
-		}
-		//else							//Else send it out
-		//{
-		//	messagesSent++;
-		//	uint32_t _destinationAddress = address(destNode, nodeID);			//Build Address		
-		//	CAN.sendMsgBuf(_destinationAddress, 0, sizeof(canOut), canOut);		//Send Message
-		//}
+		// read data,  canLength: data length, canIn: data incoming
+		CAN.readMsgBuf(&canLength, canIn);
+		messagesRecieved++;
+		//Process incoming data
+		execute();
 	}
 
-	while (Serial.available())
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// Main Game Code Bellow
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (function == 8)
 	{
-		char aChar = Serial.read();		//Read data
-
-		if (aChar == '$')
-		{
-			inData[0] = aChar;
-			index = 1;
-		}
-		else								//If no new line keep collecting the serial data
-		{
-			if (inData[0] = '$')
-			{
-				if (aChar == '\n')				//If there is a new line
-				{
-					parseData();				//Parse the data that was received
-					newserial = true;
-				}
-				else
-				{
-					inData[index] = aChar;			//Add next character received to the buffer
-					index++;						//Increment index
-					inData[index] = '\0';			//Keep NULL Terminated as last the last character
-				}
-			}
-		}
+		if (functionMode == 1) gamePlayRandomTest();
+		else if (functionMode == 2) gamePlaySpeedTest();
 	}
-
-	while (xbSerial.available())
-	{
-		char aChar = xbSerial.read();		//Read data
-
-		//Serial.print(aChar);
-
-		if (aChar == '$')
-		{
-			inData[0] = aChar;
-			index = 1;
-		}
-		else								//If no new line keep collecting the serial data
-		{
-			if (inData[0] = '$')
-			{
-				if (aChar == '\n')				//If there is a new line
-				{
-					//Serial.println();
-					parseData();				//Parse the data that was received
-					newserial = true;
-				}
-				else
-				{
-					inData[index] = aChar;			//Add next character received to the buffer
-					index++;						//Increment index
-					inData[index] = '\0';			//Keep NULL Terminated as last the last character
-				}
-			}
-		}
-	}
-
 	if (function == 9)
 	{
-		if (functionMode == 5) NetworkResponseTest();
-		else if (functionMode == 6) NetworkSpeedTest();
+		if (functionMode == 1) NetworkResponseTest();
+		else if (functionMode == 2) NetworkSpeedTest();
 	}
 	else gamePlayCanbus();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// <method>Mcp2515isr()</method>
+///
+/// <summary>	YBOT, 11/20/2015. </summary>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void MCP2515_ISR()
+{
+	canRecv = 1;	//Set Receive Flag to one when interrupt is triggered
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -412,8 +352,7 @@ void execute()
 
 	if (msgType == 0)						//Report nodeStatus
 	{
-		//report(true, sendingNode());		//Send Report to the sending Node
-		xbReport();
+		report(true, sendingNode());		//Send Report to the sending Node
 	}
 	else if (msgType == 1)					//Set neopixels to desired state
 	{
@@ -598,7 +537,6 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			//homePanel();
 			gameModeChanged = false;
 			fullPull = false;
 			nodeStatus[6] = 0;
@@ -680,7 +618,7 @@ void gamePlayCanbus()
 
 				if (!reportSent)	//If report not sent
 				{
-					xbReport();
+					report(0, commandNode);
 					reportSent = true;													//Reset flag
 					//Serial.println("Report Sent");
 				}
@@ -796,7 +734,7 @@ void gamePlayCanbus()
 			{
 				if (!reportSent)	//If report not sent
 				{
-					xbReport();
+					report(0, commandNode);
 					reportSent = true;													//Reset flag
 				}
 			}
@@ -921,7 +859,7 @@ void gamePlayCanbus()
 			{
 				if (!reportSent)	//If report not sent
 				{
-					xbReport();
+					report(0, commandNode);
 					reportSent = true;													//Reset flag
 				}
 			}
@@ -1301,7 +1239,6 @@ void gamePlaySpeedTest()
 	{
 		if (gameModeChanged)
 		{
-			homePanel();
 			gameModeChanged = false;
 			fullPull = false;
 			nodeStatus[6] = 0;
@@ -1374,7 +1311,7 @@ void gamePlaySpeedTest()
 				if (!reportSent)	//If report not sent
 				{
 					Serial.println("Neutral");
-					xbReport();
+					report(0, commandNode);
 					reportSent = true;													//Reset flag
 					complete = true;
 				}
@@ -1510,7 +1447,7 @@ void gamePlaySpeedTest()
 			{
 				if (!reportSent)	//If report not sent
 				{
-					xbReport();
+					report(0, commandNode);
 					reportSent = true;													//Reset flag
 					complete = true;
 				}
@@ -2127,52 +2064,22 @@ void flashColorLatch(uint32_t _color, uint8_t _wait, uint8_t _times, uint8_t _st
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void report(uint8_t check, uint32_t dAddress)
 {
+	int r = random(1, 11);
 	if (check) updateInputs();									//Update Inputs
 	uint32_t dA = address(dAddress, nodeID);					//Get address
+																//delay(r * delayMultiplier);									//Delay a random amount of time
+	delay(delayMultiplier);
 	int stat = CAN_FAIL;
 	int timeOut = 0;
 
-	if (dAddress != nodeID)
+	do
 	{
-		uint32_t dA = address(dAddress, nodeID);				//Get address
+		timeOut++;
 		stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus, 2);	//Send message using only one buffer
-
-		//do
-		//{
-		//	timeOut++;
-		//	stat = CAN.sendMsgBuf(dA, 0, sizeof(nodeStatus), nodeStatus);	//Send message using only one buffer
-		//} while ((stat != CAN_OK) && (timeOut < TIMEOUTVALUE));
-	}
-	else
-	{
-		Serial.print(commandNode);
-		Serial.print(",");
-		for (int i = 0; i < sizeof(nodeStatus); i++)
-		{
-			Serial.print(nodeStatus[i]);
-			Serial.print(",");
-		}
-		Serial.println();
-	}
-}
-
-void xbReport()
-{
-	//xbSerial.print("$,");
-	//xbSerial.print(nodeID);
-	//xbSerial.print(",");
-
-	String stringOut = "$,";
-	String dest = String(nodeID);
-	stringOut += dest;
-	stringOut += ",";
-	for (int i = 0; i < sizeof(nodeStatus); i++)
-	{
-		stringOut += String(nodeStatus[i]);	//send data
-		stringOut += ",";
-	}
-	xbSerial.println(stringOut);
-
+																			//Serial.print(messagesSent);
+																			//Serial.print(" - Stat = ");
+																			//Serial.println(stat);
+	} while ((stat != CAN_OK) && (timeOut < 5));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2384,7 +2291,7 @@ void homePanel()
 	}
 
 	nodeStatus[6] = 9;
-	xbReport();
+	report(0, commandNode);
 	Serial.println("-----Panel Homed-----");
 	
 }
@@ -2398,8 +2305,6 @@ void homePanel()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 int towerLocation(int towerNum)
 {
-	homePanel();
-
 	if (towerNum == 1) sunLocation = 1318;
 	else if (towerNum == 2) sunLocation = 1450;
 	else if (towerNum == 3) sunLocation = 0;
