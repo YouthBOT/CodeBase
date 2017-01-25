@@ -24,10 +24,17 @@ namespace YBOT_Field_Control_2016
             InitializeComponent();
             this.fc = fc;
 
-			if (YbotSql.Instance.IsConnected) {
-                InitializeSqlData ();
-            } else {
-                YbotSql.Instance.SqlConnectedEvent += OnSqlConnect;
+            if (YbotSql.Instance.IsConnected)
+            {
+                btnTournamentNext.Visible = true;
+                btnTournamentPrev.Visible = true;
+                lblTournamentName.Visible = true;
+
+                foreach (var t in YBotSqlData.Global.tournaments) {
+                    if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
+                        lblTournamentName.Text = t.name;
+                    }
+                }
             }
         }
 
@@ -354,7 +361,7 @@ namespace YBOT_Field_Control_2016
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.countDownStart(0, 31);
+            time.countDownStart(0, 11);
             time.timesUp = false;
             MainGame();
         }
@@ -388,7 +395,6 @@ namespace YBOT_Field_Control_2016
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GetTeamNames();
                 ClearDisplay();
-                YBotSqlData.Global.currentMatchNumber = matchNumber;
             }
         }
 
@@ -401,7 +407,6 @@ namespace YBOT_Field_Control_2016
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GetTeamNames();
                 ClearDisplay();
-                YBotSqlData.Global.currentMatchNumber = matchNumber;
             }
         }
 
@@ -447,7 +452,7 @@ namespace YBOT_Field_Control_2016
 
             score.Close ();
 
-            //ScoreGame(); // not used this year
+            //ScoreGame(); 
             RecordGame ();
 
             btnStop.BackColor = Color.Red;
@@ -498,7 +503,6 @@ namespace YBOT_Field_Control_2016
             if (green.autoMan && red.autoMan) joint.autoMan = true;
         }
 
-        // Not used this year
         private void ScoreGame()
         {
             //Add convert additional points to intergers here
@@ -735,7 +739,6 @@ namespace YBOT_Field_Control_2016
             var index = tournaments.IndexOf (tournaments[lblTournamentName.Text]);
             index = ++index % tournaments.Count;
             lblTournamentName.Text = tournaments[index].name;
-            YBotSqlData.Global.currentTournament = lblTournamentName.Text;
         }
 
         private void btnTournamentPrev_Click (object sender, EventArgs e) {
@@ -746,7 +749,6 @@ namespace YBOT_Field_Control_2016
                 index = tournaments.Count - 1;
             }
             lblTournamentName.Text = tournaments[index].name;
-            YBotSqlData.Global.currentTournament = lblTournamentName.Text;
         }
 
         #endregion
@@ -761,49 +763,7 @@ namespace YBOT_Field_Control_2016
             GD.lblRedScore.Text = this.red.score.ToString();
         }
 
-        private void OnSqlConnect (object sender) {
-            InitializeSqlData ();
-            YbotSql.Instance.SqlConnectedEvent -= OnSqlConnect;
-        }
 
-        private void InitializeSqlData () {
-            if (btnTournamentNext.InvokeRequired) {
-                btnTournamentNext.Invoke ((MethodInvoker)delegate () {
-                    btnTournamentNext.Visible = true;
-                });
-            } else {
-                btnTournamentNext.Visible = true;
-            }
-
-            if (btnTournamentPrev.InvokeRequired) {
-                btnTournamentPrev.Invoke ((MethodInvoker)delegate () {
-                    btnTournamentPrev.Visible = true;
-                });
-            } else {
-                btnTournamentPrev.Visible = true;
-            }
-
-            foreach (var t in YBotSqlData.Global.tournaments) {
-                if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
-                    YBotSqlData.Global.currentTournament = t.name;
-                }
-            }
-
-            YBotSqlData.Global.currentMatchNumber = 0;
-            if (YBotSqlData.Global.currentTournament.IsEmpty ()) {
-                YBotSqlData.Global.currentTournament = "Field Testing";
-            }
-
-            if (lblTournamentName.InvokeRequired) {
-                lblTournamentName.Invoke ((MethodInvoker)delegate () {
-                    lblTournamentName.Visible = true;
-                    lblTournamentName.Text = YBotSqlData.Global.currentTournament;
-                });
-            } else {
-                lblTournamentName.Visible = true;
-                lblTournamentName.Text = YBotSqlData.Global.currentTournament;
-            }
-        }
 
         public Screen GetSecondaryScreen()
         {
@@ -883,15 +843,6 @@ namespace YBOT_Field_Control_2016
                 btnGreenMantonomous.ForeColor = Color.Lime;
 
             }
-        }
-
-        private void GameControl_FormClosed (object sender, FormClosedEventArgs e) 
-        {
-            this.btnStop.PerformClick ();
-            this.fc.ChangeGameMode (GameModes.off);
-            this.gameMode = GameModes.off;
-            YBotSqlData.Global.currentMatchNumber = -1;
-            YBotSqlData.Global.currentTournament = string.Empty;
         }
 
         #endregion
@@ -1058,6 +1009,13 @@ namespace YBOT_Field_Control_2016
             }
         }
 
+        private void GameControl_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            this.btnStop.PerformClick();
+            this.fc.ChangeGameMode(GameModes.off);
+            this.gameMode = GameModes.off;
+        }
+
         private void btnHomePanel_Click(object sender, EventArgs e)
         {
             if (this.gameMode == GameModes.off)
@@ -1069,6 +1027,7 @@ namespace YBOT_Field_Control_2016
                 btnHomePanel.BackColor = DefaultBackColor;
             }
         }
+
     }
 
     //Vertical Progress Bar 
