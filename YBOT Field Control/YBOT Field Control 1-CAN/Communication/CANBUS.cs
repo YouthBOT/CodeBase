@@ -217,7 +217,7 @@ namespace YBOT_Field_Control_2016
                     string s = string.Format("Sent {0}: {1} : {2}",messagesSent, time, _data);
                     Console.WriteLine(s);
                     this.logBuilder.AppendLine(s);
-                    Thread.Sleep(8);
+                    Thread.Sleep(10);
                 }
             }
             catch (Exception ex) { this.errorLog("CANBUS-Send(_data) - " + ex); };

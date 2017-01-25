@@ -501,8 +501,11 @@ void execute()
 			}
 			if (alarmState)
 			{
-				alarmState = false;
-				solidColor(blue, 0, firstPixel(2), lastPixel(2));
+				if ((gameMode != 2) && (gameMode != 3) && (gameMode != 4) && (gameMode != 5))
+				{
+					alarmState = false;
+					solidColor(blue, 0, firstPixel(2), lastPixel(2));
+				}
 			}
 		}
 	}
@@ -681,7 +684,7 @@ void gamePlayCanbus()
 			gameModeChanged = false;
 			complete = false;
 			nodeStatus[6] = 0;
-			//nodeStatus[7] = 0;
+			nodeStatus[7] = 0;
 			//nodeStatus[4] = 0;
 
 			//Get current pull value so we can see if it has been moved
@@ -689,13 +692,6 @@ void gamePlayCanbus()
 			if (pullValue >= (maxRange - 1)) fullPull = true;
 			else fullPull = false;
 			oldPull = pullValue;
-
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, LOW);
-			}
 		}
 
 		if (!complete)
