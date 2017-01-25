@@ -354,7 +354,7 @@ namespace YBOT_Field_Control_2016
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.countDownStart(0, 31);
+            time.countDownStart(0, 11);
             time.timesUp = false;
             MainGame();
         }
