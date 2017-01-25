@@ -102,7 +102,6 @@
             this.tbDelayMultiplier = new System.Windows.Forms.TextBox();
             this.displayUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.sqlConnectButton = new System.Windows.Forms.Button();
-            this.testSqlButton = new System.Windows.Forms.Button();
             this.btnDeselect = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDG)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nodeDS)).BeginInit();
@@ -890,16 +889,6 @@
             this.sqlConnectButton.UseVisualStyleBackColor = true;
             this.sqlConnectButton.Click += new System.EventHandler(this.sqlConnectButton_Click);
             // 
-            // testSqlButton
-            // 
-            this.testSqlButton.Location = new System.Drawing.Point(970, 529);
-            this.testSqlButton.Name = "testSqlButton";
-            this.testSqlButton.Size = new System.Drawing.Size(100, 50);
-            this.testSqlButton.TabIndex = 18;
-            this.testSqlButton.Text = "Send Test SQL Log";
-            this.testSqlButton.UseVisualStyleBackColor = true;
-            this.testSqlButton.Click += new System.EventHandler(this.testSqlButton_Click);
-            // 
             // btnDeselect
             // 
             this.btnDeselect.Location = new System.Drawing.Point(112, 188);
@@ -915,7 +904,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1186, 641);
-            this.Controls.Add(this.testSqlButton);
             this.Controls.Add(this.sqlConnectButton);
             this.Controls.Add(this.gbTesting);
             this.Controls.Add(this.gbFieldFunctions);
@@ -1022,7 +1010,6 @@
         private System.Windows.Forms.CheckBox cbDTRenable;
         private System.Windows.Forms.Button btnSetSunLocation;
         private System.Windows.Forms.Button sqlConnectButton;
-        private System.Windows.Forms.Button testSqlButton;
         private System.Windows.Forms.Button btnDeselect;
     }
 }
