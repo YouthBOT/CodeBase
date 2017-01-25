@@ -332,6 +332,7 @@ namespace YBOT_Field_Control_2016
             value = 0;
             solarAligned = false;
             solarChanged = true;
+            Thread.Sleep(100);
         }
 
         //Change Sun Tower after 1 min

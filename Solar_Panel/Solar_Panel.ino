@@ -76,7 +76,7 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 uint8_t inputPins[6] = { 8, 99, 99, 99, 99, 99 };
 //LED Pin number - 13 Uno - 23 Leonardo
 uint8_t ledPin = 13;
-uint8_t solarLED = 9; //Solar Panels LED
+uint8_t solarLED = 5; //Solar Panels LED
 //Button State of the Filtered Digital Inputs - 0 = open; 1 = closed
 byte inputStates[6] = { 0, 0, 0, 0, 0, 0 };
 byte outputState[6] = { 0, 0, 0, 0, 0, 0 };
@@ -149,8 +149,8 @@ int angle_2 = 22;					//Second angle to score
 int angle_3 = 4;					//Aligned angle
 int maxSpeed = 2;					//Max speed delay (smaller = faster)
 int minSpeed = 50;					//Min speed delay (larger = slower)
-int dirPin = 11;						//Stepper Direction Pin
-int stepPin = 10;					//Stepper step Pin
+int dirPin = 7;						//Stepper Direction Pin
+int stepPin = 6;					//Stepper step Pin
 int potInputL = A2;					//Left Pot pin
 int potInputR = A0;					//Right Pot pin
 int potValL = 0;
@@ -186,7 +186,7 @@ void setup()
 		if (inputPins[i] != 99)
 		{
 			// Setup the button with an internal pull-up :
-			pinMode(inputPins[i], INPUT_PULLUP);
+			pinMode(inputPins[i], INPUT);
 
 			//Print the input state for each button
 			Serial.print("Pin#");
@@ -246,7 +246,7 @@ START_INIT:
 	CAN.init_Filt(5, 0, nodeID);                          // there are 6 filter in mcp2515
 
 														  //Check to see if we can talk to the command node
-	delay(1000 * nodeID);								//Delay so all nodes don't talk at the same time				
+	delay(250);								//Delay so all nodes don't talk at the same time				
 	uint32_t dA = address(commandNode, nodeID);		//create an unique address
 	CAN.sendMsgBuf(dA, 0, sizeof(canOut), canOut, 2); 	//Send a blank message
 	delay(100);										//Give the command node time to send it back
@@ -435,6 +435,7 @@ void execute()
 				towerLocation(canIn[3]);
 				reportSent = false;
 				complete = false;
+				nodeStatus[6] = 0;
 			}
 			else if (selectedState == 9)
 			{
@@ -568,10 +569,9 @@ void gamePlayCanbus()
 			potValL = analogRead(potInputL);
 			potValR = analogRead(potInputR);
 
-			int potVal = potValR;
-			//int potVal = 0;
-			//if (potValR < 450 || potValR > 550) potVal = potValR;
-			//else potVal = potValL;
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
 
 			//Serial.println(potVal);
 
@@ -688,10 +688,9 @@ void gamePlayCanbus()
 			potValL = analogRead(potInputL);
 			potValR = analogRead(potInputR);
 
-			int potVal = potValR;
-			//int potVal = 0;
-			//if (potValR < 450 || potValR > 550) potVal = potValR;
-			//else potVal = potValL;
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
 
 			if (potVal > 550)
 			{
@@ -813,10 +812,9 @@ void gamePlayCanbus()
 			potValL = analogRead(potInputL);
 			potValR = analogRead(potInputR);
 
-			int potVal = potValR;
-			//int potVal = 0;
-			//if (potValR < 450 || potValR > 550) potVal = potValR;
-			//else potVal = potValL;
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
 
 			if (potVal > 550)
 			{
@@ -966,10 +964,10 @@ void gamePlayCanbus()
 			//Serial.print("Right = ");
 			//Serial.println(potValR);
 
-			int potVal = potValR;
-			//int potVal = 0;
-			//if (potValR < 450 || potValR > 550) potVal = potValR;
-			//else potVal = potValL;
+			//int potVal = potValR;
+			int potVal = 0;
+			if (potValR < 450 || potValR > 550) potVal = potValR;
+			else potVal = potValL;
 
 			//Serial.print("Pot Value = ");
 			//Serial.println(potVal);
@@ -982,7 +980,9 @@ void gamePlayCanbus()
 
 				int stepDelay = map(potVal, 550, 1000, minSpeed, maxSpeed);
 
-				//Serial.println("Direction = CCW");
+				//Serial.print("Direction = CCW = ");
+        //int i = digitalRead(dirPin);
+        //Serial.println(i);
 				//Serial.print("Delay = ");
 				//Serial.println(stepDelay);
 
@@ -999,10 +999,13 @@ void gamePlayCanbus()
 			else if (potVal < 450)
 			{
 				digitalWrite(dirPin, LOW);
+        
 				if (potVal < 200)potVal = 0;
 				int stepDelay = map(potVal, 450, 0, minSpeed, maxSpeed);
 
-				//Serial.println("Direction = CW");
+				//Serial.print("Direction = CW = ");
+        //int i = digitalRead(dirPin);
+        //Serial.println(i);
 				//Serial.print("Delay = ");
 				//Serial.println(stepDelay);
 
@@ -2341,6 +2344,8 @@ int towerLocation(int towerNum)
 		//Serial.println(currentLocation);
 	}
 	
+	nodeStatus[6] = 0;
+
 	return sunLocation;
 }
 
