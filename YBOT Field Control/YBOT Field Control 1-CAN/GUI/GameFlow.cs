@@ -320,6 +320,7 @@ namespace YBOT_Field_Control_2016
 
         private void ChangeSunTower()
         {
+            
             //Turn off Current Sun Tower
             string str = ("7,0,0,");
             this.fc.SendMessage(sunTower, str);

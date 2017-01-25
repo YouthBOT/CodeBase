@@ -2319,15 +2319,15 @@ int towerLocation(int towerNum)
 	else if (towerNum == 9) sunLocation = 950;
 	else sunLocation = 1082;
 
-	Serial.print("Sun Location = ");
-	Serial.println(sunLocation);
+	//Serial.print("Sun Location = ");
+	//Serial.println(sunLocation);
 
 	int half = 800;
 	if(sunLocation >= 800) half = sunLocation - 800;
 	else half = sunLocation + 800;
 
-	Serial.print("Half = ");
-	Serial.println(half);
+	//Serial.print("Half = ");
+	//Serial.println(half);
 
 	while (currentLocation != half)
 	{
