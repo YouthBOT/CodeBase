@@ -8,7 +8,12 @@ namespace YBotSqlWrapper
     {
         public School this[int index] {
             get {
-                return objectList[index];
+                foreach (var s in objectList) {
+					if (index == s.id) {
+						return s;
+					}
+				}
+				return null;
             }
         }
 

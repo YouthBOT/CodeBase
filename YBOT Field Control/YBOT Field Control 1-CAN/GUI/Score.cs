@@ -51,6 +51,11 @@ namespace YBOT_Field_Control_2016
             var red = game.red;
 			var joint = game.joint;
 
+			var jointScore = joint.score.ToString();
+			tbJointScore.Text = jointScore;
+			tbRedScore.Text = jointScore;
+			tbGreenScore.Text = jointScore;
+
 			tbAutoCornersTested.Text = joint.autoTowerTested.ToString ();
 			tbAutoEmergencyCycled.Text = joint.autoEmergencyTowerCycled.ToString ();
 			tbAutoSolarScore.Text = joint.autoSolarPanelScore.ToString ();
@@ -58,10 +63,10 @@ namespace YBOT_Field_Control_2016
 			tbManualSolar2Score.Text = joint.manSolarPanelScore2.ToString ();
 			tbManualEmergencyCycled.Text = joint.emergencyCleared.ToString ();
 			if (joint.emergencyCleared < minimumEmergencyCycled) {
-                cbEmergencyCycledPenalty.Text = emergencyCycledPenaltyPointValue.ToString ();
-            } else {
-                cbEmergencyCycledPenalty.Text = "0";
-            }
+				cbEmergencyCycledPenalty.Text = emergencyCycledPenaltyPointValue.ToString();
+			} else {
+				cbEmergencyCycledPenalty.Text = "0";
+			}
 
             tbGreenPenalty.Text = green.penalty.ToString ();
             tbRedPenalty.Text = red.penalty.ToString ();
@@ -73,6 +78,12 @@ namespace YBOT_Field_Control_2016
             if (red.dq || (red.penalty >= 3)) {
                 cbRedDq.Checked = true;
             }
+
+			if (game.IsChampionshipMatch()) {
+				grRedFinalScore.Visible = false;
+				gbGreenFinalScore.Text = "Individual Final Score";
+				gbGreenFinalScore.ForeColor = System.Drawing.Color.SteelBlue;
+			}
 
             UpdateScore ();
         }
@@ -320,7 +331,8 @@ namespace YBOT_Field_Control_2016
                         }
                     }
                 } catch (FormatException) {
-                    MessageBox.Show ("Invalid integer format");
+					Console.WriteLine("error with {0}", tb.Name);
+					MessageBox.Show ("Invalid integer format");
                     e.Cancel = true;
                 } catch (OverflowException) {
                     MessageBox.Show ("Number too large");

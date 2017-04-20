@@ -77,6 +77,9 @@
             this.btnHomePanel = new System.Windows.Forms.Button();
             this.solarTimer = new System.Windows.Forms.Timer(this.components);
             this.sunChangeTimer = new System.Windows.Forms.Timer(this.components);
+            this.lblChampionshipRounds = new System.Windows.Forms.Label();
+            this.btnChampionshipRoundNext = new System.Windows.Forms.Button();
+            this.btnChampionshipRoundPrevious = new System.Windows.Forms.Button();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -709,11 +712,54 @@
             this.sunChangeTimer.Interval = 60000;
             this.sunChangeTimer.Tick += new System.EventHandler(this.sunChangeTimer_Tick);
             // 
+            // lblChampionshipRounds
+            // 
+            this.lblChampionshipRounds.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblChampionshipRounds.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblChampionshipRounds.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblChampionshipRounds.Location = new System.Drawing.Point(483, 212);
+            this.lblChampionshipRounds.MinimumSize = new System.Drawing.Size(200, 0);
+            this.lblChampionshipRounds.Name = "lblChampionshipRounds";
+            this.lblChampionshipRounds.Size = new System.Drawing.Size(228, 33);
+            this.lblChampionshipRounds.TabIndex = 167;
+            this.lblChampionshipRounds.Text = "Practice";
+            this.lblChampionshipRounds.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblChampionshipRounds.Visible = false;
+            // 
+            // btnChampionshipRoundNext
+            // 
+            this.btnChampionshipRoundNext.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnChampionshipRoundNext.Location = new System.Drawing.Point(713, 212);
+            this.btnChampionshipRoundNext.Name = "btnChampionshipRoundNext";
+            this.btnChampionshipRoundNext.Size = new System.Drawing.Size(41, 33);
+            this.btnChampionshipRoundNext.TabIndex = 169;
+            this.btnChampionshipRoundNext.Text = ">>";
+            this.btnChampionshipRoundNext.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnChampionshipRoundNext.UseVisualStyleBackColor = true;
+            this.btnChampionshipRoundNext.Visible = false;
+            this.btnChampionshipRoundNext.Click += new System.EventHandler(this.btnChampionshipRound_Click);
+            // 
+            // btnChampionshipRoundPrevious
+            // 
+            this.btnChampionshipRoundPrevious.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnChampionshipRoundPrevious.Location = new System.Drawing.Point(440, 212);
+            this.btnChampionshipRoundPrevious.Name = "btnChampionshipRoundPrevious";
+            this.btnChampionshipRoundPrevious.Size = new System.Drawing.Size(41, 33);
+            this.btnChampionshipRoundPrevious.TabIndex = 168;
+            this.btnChampionshipRoundPrevious.Text = "<<";
+            this.btnChampionshipRoundPrevious.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnChampionshipRoundPrevious.UseVisualStyleBackColor = true;
+            this.btnChampionshipRoundPrevious.Visible = false;
+            this.btnChampionshipRoundPrevious.Click += new System.EventHandler(this.btnChampionshipRound_Click);
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1177, 637);
+            this.Controls.Add(this.btnChampionshipRoundNext);
+            this.Controls.Add(this.btnChampionshipRoundPrevious);
+            this.Controls.Add(this.lblChampionshipRounds);
             this.Controls.Add(this.btnHomePanel);
             this.Controls.Add(this.btnTournamentNext);
             this.Controls.Add(this.btnTournamentPrev);
@@ -802,5 +848,8 @@
         public System.Windows.Forms.Button btnHomePanel;
         private System.Windows.Forms.Timer solarTimer;
         private System.Windows.Forms.Timer sunChangeTimer;
+        public System.Windows.Forms.Label lblChampionshipRounds;
+        public System.Windows.Forms.Button btnChampionshipRoundNext;
+        public System.Windows.Forms.Button btnChampionshipRoundPrevious;
     }
 }

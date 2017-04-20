@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace YBOT_Field_Control_2016
 {
@@ -81,18 +78,47 @@ namespace YBOT_Field_Control_2016
         public int controlBoard = 0;           //Control Board tower number
         public int canControlID = 31;
 
-        public int redTeam_Node = 3;           //Red team's controller Node    
-        public int greenTeam_Node = 8;         //Green teams' controller Node
+        public int redTeam_Node = 3;           	//Red team's controller Node    
+        public int greenTeam_Node = 8;         	//Green teams' controller Node
         public int transmitterOutput = 5;       //Controller Output number - Enable / Disable
-        public int auto_driverOutput = 6;       //Autonomous Mode Output = Auto / Manual
+        public int auto_driverOutput = 6;		//Autonomous Mode Output = Auto / Manual
 
     }
 
-    public class fileStructure
-    {
-        public string filePath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Desktop\YBOT Field Files\");
-        public string setupFilePath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Desktop\YBOT Field Files\Setup");
-        public string xmlFilePath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Desktop\YBOT Field Files\Setup\YBOT_Nodes.xml");
-        public string xmlHeader = "YBOT_Nodes";
+	public class fileStructure
+	{
+		public string filePath {
+			get {
+				if (Environment.OSVersion.Platform == PlatformID.Unix) {
+					return Path.Combine (Environment.GetEnvironmentVariable ("HOME"), "Desktop/YBOT Field Files/");
+				} 
+
+				Console.WriteLine ("Using windows version");
+				return Environment.ExpandEnvironmentVariables (@"%USERPROFILE%\Desktop\YBOT Field Files\");
+			}
+		}
+
+		public string setupFilePath {
+			get {
+				if (Environment.OSVersion.Platform == PlatformID.Unix) {
+					return Path.Combine (Environment.GetEnvironmentVariable ("HOME"), "Desktop/YBOT Field Files/Setup/");
+				}
+
+				Console.WriteLine ("Using windows version");
+				return Environment.ExpandEnvironmentVariables (@"%USERPROFILE%\Desktop\YBOT Field Files\Setup");
+			}
+		}
+
+		public string xmlFilePath {
+			get {
+				if (Environment.OSVersion.Platform == PlatformID.Unix) {
+					return Path.Combine (Environment.GetEnvironmentVariable ("HOME"), "Desktop/YBOT Field Files/Setup/YBOT_Nodes.xml");
+				}
+
+				return Environment.ExpandEnvironmentVariables (@"%USERPROFILE%\Desktop\YBOT Field Files\Setup\YBOT_Nodes.xml");
+			}
+		}
+
+		public string xmlHeader = "YBOT_Nodes";
     }
 }

@@ -24,18 +24,18 @@ namespace YBOT_Field_Control_2016
         {
             get
             {
-                string path = fs.xmlFilePath;
-                return path;
+                return fs.xmlFilePath;
             }
         }
+
         string xmlHeader                        //Construct xml Header
         {
             get
             {
-                string header = fs.xmlHeader;
-                return header;
+                return fs.xmlHeader;
             }
         }
+
         public bool finishedStartup = false;    //Finished Flag
 
         private int selectedTower = 0;
@@ -48,7 +48,7 @@ namespace YBOT_Field_Control_2016
 
             try
             {
-                this.nodeDS.ReadXml(filePath, XmlReadMode.ReadSchema);              //Read Node XML File into the Data Set
+				this.nodeDS.ReadXml (filePath, XmlReadMode.ReadSchema); 			//Read Node XML File into the Data Set
                 this.nodeDG.DataSource = this.nodeDS;                               //Set DataSet as Data Source for Grid
                 this.nodeDG.DataMember = xmlHeader;                                 //Populate Grid with data
 
@@ -100,7 +100,8 @@ namespace YBOT_Field_Control_2016
 
             YbotSql.Instance.SqlConnectedEvent += OnSqlConnect;
             YbotSql.Instance.SqlMessageEvent += OnSqlMessage;
-            YbotSql.Instance.Connect ("149.56.109.90", password, false);
+            //YbotSql.Instance.Connect ("149.56.109.90", password, false);
+			YbotSql.Instance.Connect("127.0.0.1", string.Empty, false);
         }
 
         private void YBOT_Main_FormClosed(object sender, FormClosedEventArgs e)

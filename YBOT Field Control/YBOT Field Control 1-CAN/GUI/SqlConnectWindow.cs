@@ -34,11 +34,6 @@ namespace YBOT_Field_Control_2016
             if (string.IsNullOrWhiteSpace (serverIpTextBox.Text)) {
                 MessageBox.Show ("Please enter a IP address or host name");
                 return;
-            } 
-
-            if (string.IsNullOrWhiteSpace (passwordTextBox.Text)) {
-                MessageBox.Show ("Please enter a password");
-                return;
             }
 
             messageTextbox.Text = string.Empty;

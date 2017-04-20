@@ -16,8 +16,8 @@ using HelpfulUtilites;
 namespace YBOT_Field_Control_2016
 {
     public partial class GameControl : Form
-    {           
-        public GameControl() : this (new Field_Control ()) { }
+    {          
+		public GameControl() : this (new Field_Control ()) { }
 
         public GameControl(Field_Control fc)
         {
@@ -533,6 +533,8 @@ namespace YBOT_Field_Control_2016
 
         private void RecordGame()
         {
+			
+
             string file = @"\Match " + matchNumber.ToString() + " - Score";
             string file2 = @"\Match Scores";
             string folder = @"Matches\" + "Match " + matchNumber.ToString();
@@ -552,58 +554,64 @@ namespace YBOT_Field_Control_2016
                 green.rockScore,
                 green.rocketBonus);
 
-            string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text + "\t" + red.finalScore.ToString()
-                             + "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
-            string redTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
-                red.autoTowerTested,
-                red.autoEmergencyTowerCycled,
-                red.autoSolarPanelScore,
-                red.manSolarPanelScore1,
-                red.manSolarPanelScore2,
-                red.emergencyCleared,
-                red.rocketPosition,
-                red.rockWeight,
-                red.rockScore,
-                red.rocketBonus);
 
             string field = ("Match Number" + "\t" + "Team Name" + "\t" + "Final Score" + "\t" + "Penalties" + "\t" + "DQ" + "\t" + "Result");
             string field2 = ("Auto Tested" + "\t" + "Auto Cycled" + "\t" + "Auto Solar" + "\t" + "Manual Solar 1" + "\t" + "Manual Solar 2" + "\t" + 
                 "Emergencies Clear" + "\t" + "Rocket Position" + "\t" + "Rock Weight" + "\t" + "Rock Score" + "\t" + "Rocket Bonus");
 
-            string text = ("\r\n" + field + "\t" + field2 + "\r\n" + greenTeam + "\t" + greenTeam2 + "\r\n" + redTeam + "\t" + redTeam2);
+            string text = "\r\n" + field + "\t" + field2 + "\r\n" + greenTeam + "\t" + greenTeam2;
 
-            try
-            {
-                lw.WriteLog(text, file, folder);
-                lw.WriteLog(text, file2, folder2);
-            }
-            catch
-            {
-                MessageBox.Show("Game score was not recorded");
-                return;
-            }
+			if (!IsChampionshipMatch()) {
+				string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text + "\t" + red.finalScore.ToString()
+								 + "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
 
-            if (YbotSql.Instance.IsConnected) {
-                var schools = YBotSqlData.Global.schools;
-                var schoolNames = new List<string> ();
-                schools.ForEach (s => schoolNames.Add (s.name));
+				string redTeam2 = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
+					red.autoTowerTested,
+					red.autoEmergencyTowerCycled,
+					red.autoSolarPanelScore,
+					red.manSolarPanelScore1,
+					red.manSolarPanelScore2,
+					red.emergencyCleared,
+					red.rocketPosition,
+					red.rockWeight,
+					red.rockScore,
+					red.rocketBonus);
 
-                var match = new Match ();
-                match.tournamentId = YBotSqlData.Global.tournaments[lblTournamentName.Text].id;
-                match.matchNumber = matchNumber;
-                green.StoreJointVariablesToSqlMatch (ref match);
+				text += "\r\n" + redTeam + "\t" + redTeam2;
+			}
 
-                green.StoreTeamVariablesToSqlMatch (ref match);
-                match.greenTeam = FindSchoolId (schools, lblGreenTeam.Text, "Green Team");
+			try {
+				lw.WriteLog(text, file, folder);
+				lw.WriteLog(text, file2, folder2);
+			} catch {
+				MessageBox.Show("Game score was not recorded to file");
+			} finally {
+				if (YbotSql.Instance.IsConnected) {
+					var schools = YBotSqlData.Global.schools;
 
-                red.StoreTeamVariablesToSqlMatch (ref match);
-                match.redTeam = FindSchoolId (schools, lblRedTeam.Text, "Red Team");
+					var match = new Match();
+					match.tournamentId = YBotSqlData.Global.tournaments[lblTournamentName.Text].id;
+					if (IsChampionshipBracketMatch()) {
+						match.matchNumber = ChampionshipMatchMap.Instance[matchNumber];
+					} else {
+						match.matchNumber = matchNumber;
+					}
+					green.StoreJointVariablesToSqlMatch(ref match);
 
-                YbotSql.Instance.AddMatch (match);
-            }
+					green.StoreTeamVariablesToSqlMatch(ref match);
+					match.greenTeam = FindSchoolId(schools, lblGreenTeam.Text, "Green Team");
+
+					if (!IsChampionshipMatch()) {
+						red.StoreTeamVariablesToSqlMatch(ref match);
+						match.redTeam = FindSchoolId(schools, lblRedTeam.Text, "Red Team");
+					}
+
+					YbotSql.Instance.AddMatch(match);
+				}
+			}
         }
 
-        protected int FindSchoolId (Schools schools, string schoolName, string team) {
+        protected int FindSchoolId(Schools schools, string schoolName, string team) {
             int id = schools["TOBy"].id;
 
             if (schoolName != team) {
@@ -616,7 +624,7 @@ namespace YBOT_Field_Control_2016
                     var teamNameFound = false;
 
                     foreach (var s in schoolNames) {
-                        if (s.StartsWith (schoolName)) {
+                        if (s.StartsWith(schoolName)) {
                             var result = MessageBox.Show (
                                 string.Format ("Is {0} the same as {1}", schoolName, s), 
                                 "Matching " + team, 
@@ -653,63 +661,91 @@ namespace YBOT_Field_Control_2016
             return id;
         }
 
-        private void GetTeamNames()
+		private void GetTeamNames()
         {
-            string greenTeam = null;
-            string redTeam = null;
-            string content = null;
-            string path = filePath;
-            string file = this.fs.setupFilePath + @"\Teams.txt";
+			if (YbotSql.Instance.IsConnected) {
+				int matchId;
+				if (IsChampionshipBracketMatch()) {
+					matchId = ChampionshipMatchMap.Instance[matchNumber];
+				} else {
+					matchId = matchNumber;
+				}
+				var match = YbotSql.Instance.GetMatch(YBotSqlData.Global.tournaments[YBotSqlData.Global.currentTournament].id, matchId);
+				while (match.Status == TaskStatus.Running
+				       || match.Status == TaskStatus.Created 
+				       || match.Status == TaskStatus.WaitingForActivation
+				       || match.Status == TaskStatus.WaitingForChildrenToComplete
+				       || match.Status == TaskStatus.WaitingToRun) 
+				{
+					continue;
+				}
 
-            try
-            {
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-            }
-            catch
-            {
-                path = null;
-            }
+				if (match.Status == TaskStatus.RanToCompletion) {
+					var greenTeam = YBotSqlData.Global.schools[match.Result.greenTeam];
+					var redTeam = YBotSqlData.Global.schools[match.Result.redTeam];
 
-            try
-            {
-                if (File.Exists(file))
-                {
-                    //StreamReader sr = new StreamReader(file, System.Text.Encoding.Default);
-                    Stream stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    StreamReader sr = new StreamReader(stream);
+					if (greenTeam != null) {
+						lblGreenTeam.Text = greenTeam.name;
+						GD.lblGreenTeam.Text = greenTeam.name;
+					} else {
+						lblGreenTeam.Text = "Green Team";
+						GD.lblGreenTeam.Text = "Green Team";
+					}
 
-                    for (int i = 0; i < matchNumber; i++)
-                    {
-                        content = sr.ReadLine();
-                        string[] teams = content.Split(new string[] { "\t" }, StringSplitOptions.None);//Delimited the Tab keycode
-                        greenTeam = teams[0];
-                        redTeam = teams[1];
-                    }
-                    sr.Close();
-                    sr.Dispose();
-                }
-                else
-                {
-                    greenTeam = "Green Team";
-                    redTeam = "Red Team";
-                }
-            }
-            catch
-            {
-                greenTeam = "Green Team";
-                redTeam = "Red Team";
-            }
-            if (greenTeam == null) greenTeam = "Green Team";
-            if (redTeam == null) redTeam = "Red Team";
+					if (redTeam != null) {
+						lblRedTeam.Text = redTeam.name;
+						GD.lblRedTeam.Text = redTeam.name;
+					} else {
+						lblRedTeam.Text = "Red Team";
+						GD.lblRedTeam.Text = "Red Team";
+					}
+				}
+			} else {
+				string greenTeam = null;
+				string redTeam = null;
+				string content = null;
+				string path = filePath;
+				string file = this.fs.setupFilePath + @"\Teams.txt";
+
+				try {
+					if (!Directory.Exists(path)) {
+						Directory.CreateDirectory(path);
+					}
+				} catch {
+					path = null;
+				}
+
+				try {
+					if (File.Exists(file)) {
+						//StreamReader sr = new StreamReader(file, System.Text.Encoding.Default);
+						Stream stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+						StreamReader sr = new StreamReader(stream);
+
+						for (int i = 0; i < matchNumber; i++) {
+							content = sr.ReadLine();
+							string[] teams = content.Split(new string[] { "\t" }, StringSplitOptions.None);//Delimited the Tab keycode
+							greenTeam = teams[0];
+							redTeam = teams[1];
+						}
+						sr.Close();
+						sr.Dispose();
+					} else {
+						greenTeam = "Green Team";
+						redTeam = "Red Team";
+					}
+				} catch {
+					greenTeam = "Green Team";
+					redTeam = "Red Team";
+				}
+				if (greenTeam == null) greenTeam = "Green Team";
+				if (redTeam == null) redTeam = "Red Team";
 
 
-            lblGreenTeam.Text = greenTeam;
-            lblRedTeam.Text = redTeam;
-            GD.lblGreenTeam.Text = greenTeam;
-            GD.lblRedTeam.Text = redTeam;
+				lblGreenTeam.Text = greenTeam;
+				lblRedTeam.Text = redTeam;
+				GD.lblGreenTeam.Text = greenTeam;
+				GD.lblRedTeam.Text = redTeam;
+			}
         }
 
         private void disableGameButtons()
@@ -730,24 +766,99 @@ namespace YBOT_Field_Control_2016
             btnTestMode.Enabled = true;
         }
 
-        private void btnTournamentNext_Click (object sender, EventArgs e) {
-            var tournaments = YBotSqlData.Global.tournaments;
-            var index = tournaments.IndexOf (tournaments[lblTournamentName.Text]);
-            index = ++index % tournaments.Count;
-            lblTournamentName.Text = tournaments[index].name;
-            YBotSqlData.Global.currentTournament = lblTournamentName.Text;
-        }
+		private void btnTournamentNext_Click(object sender, EventArgs e) {
+			var tournaments = YBotSqlData.Global.tournaments;
+			var index = tournaments.IndexOf(tournaments[lblTournamentName.Text]);
+
+			if (tournaments[index].name == "Championship") {
+				EnableRedTeam();
+			}
+
+			index = ++index % tournaments.Count;
+
+			if (tournaments[index].name == "Championship") {
+				DisableRedTeam();
+			}
+
+			lblTournamentName.Text = tournaments[index].name;
+			YBotSqlData.Global.currentTournament = lblTournamentName.Text;
+		}
 
         private void btnTournamentPrev_Click (object sender, EventArgs e) {
             var tournaments = YBotSqlData.Global.tournaments;
             var index = tournaments.IndexOf (tournaments[lblTournamentName.Text]);
+
+			if (tournaments[index].name == "Championship") {
+				EnableRedTeam();
+			}
+
             index = --index;
             if (index < 0) {
                 index = tournaments.Count - 1;
             }
+
+			if (tournaments[index].name == "Championship") {
+				DisableRedTeam();
+			}
+
             lblTournamentName.Text = tournaments[index].name;
             YBotSqlData.Global.currentTournament = lblTournamentName.Text;
         }
+
+		private void EnableRedTeam() {
+			btnDisableRed.Click += btnDisableRed_Click;
+			btnDisableRed.PerformClick();
+
+            lblChampionshipRounds.Visible = false;
+            btnChampionshipRoundNext.Visible = false;
+            btnChampionshipRoundPrevious.Visible = false;
+			lblRedDQ.Visible = true;
+			lblRedPenalty1.Visible = true;
+			lblRedPenalty3.Visible = true;
+			lblRedPenalty2.Visible = true;
+			grbRedScore.Visible = true;
+			grbRedPenalty.Visible = true;
+			lblRedTeam.Visible = true;
+			lblRedScore.Visible = true;
+			grbRedScore.Visible = true;
+			btnRedMantonomous.Visible = true;
+		}
+
+		private void DisableRedTeam() {
+			btnDisableRed.PerformClick();
+			btnDisableRed.Click -= btnDisableRed_Click;
+
+            lblChampionshipRounds.Visible = true;
+            btnChampionshipRoundNext.Visible = true;
+            btnChampionshipRoundPrevious.Visible = true;
+            lblRedDQ.Visible = false;
+			lblRedPenalty1.Visible = false;
+			lblRedPenalty3.Visible = false;
+			lblRedPenalty2.Visible = false;
+			grbRedScore.Visible = false;
+			grbRedPenalty.Visible = false;
+			lblRedTeam.Visible = false;
+			lblRedScore.Visible = false;
+			grbRedScore.Visible = false;
+			btnRedMantonomous.Visible = false;
+		}
+
+        private void btnChampionshipRound_Click (object sender, EventArgs e) {
+            if (lblChampionshipRounds.Text == "Practice") {
+                lblChampionshipRounds.Text = "Bracket";
+            } else {
+                lblChampionshipRounds.Text = "Practice";
+            }
+			GetTeamNames();
+        }
+
+		public bool IsChampionshipBracketMatch() {
+			return (lblTournamentName.Text == "Championship") && (lblChampionshipRounds.Text == "Bracket");
+		}
+
+		public bool IsChampionshipMatch() {
+			return lblTournamentName.Text == "Championship";
+		}
 
         #endregion
 
