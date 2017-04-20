@@ -80,6 +80,9 @@
             this.lblChampionshipRounds = new System.Windows.Forms.Label();
             this.btnChampionshipRoundNext = new System.Windows.Forms.Button();
             this.btnChampionshipRoundPrevious = new System.Windows.Forms.Button();
+            this.btnStopScoringPanel = new System.Windows.Forms.Button();
+            this.btnScorePanel = new System.Windows.Forms.Button();
+            this.btnResetSolarPanelPosistion = new System.Windows.Forms.Button();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -281,7 +284,7 @@
             // 
             this.lblGameClock.AutoSize = true;
             this.lblGameClock.Font = new System.Drawing.Font("Microsoft Sans Serif", 72F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblGameClock.Location = new System.Drawing.Point(263, 99);
+            this.lblGameClock.Location = new System.Drawing.Point(260, 64);
             this.lblGameClock.Name = "lblGameClock";
             this.lblGameClock.Size = new System.Drawing.Size(235, 108);
             this.lblGameClock.TabIndex = 9;
@@ -496,9 +499,9 @@
             this.grbFieldDisplay.BackColor = System.Drawing.SystemColors.Control;
             this.grbFieldDisplay.Controls.Add(this.lblGameClock);
             this.grbFieldDisplay.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.grbFieldDisplay.Location = new System.Drawing.Point(216, 368);
+            this.grbFieldDisplay.Location = new System.Drawing.Point(216, 432);
             this.grbFieldDisplay.Name = "grbFieldDisplay";
-            this.grbFieldDisplay.Size = new System.Drawing.Size(761, 264);
+            this.grbFieldDisplay.Size = new System.Drawing.Size(761, 200);
             this.grbFieldDisplay.TabIndex = 151;
             this.grbFieldDisplay.TabStop = false;
             // 
@@ -691,12 +694,13 @@
             // 
             // btnHomePanel
             // 
+            this.btnHomePanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnHomePanel.BackColor = System.Drawing.SystemColors.Control;
             this.btnHomePanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHomePanel.Location = new System.Drawing.Point(553, 275);
+            this.btnHomePanel.Location = new System.Drawing.Point(440, 255);
             this.btnHomePanel.Margin = new System.Windows.Forms.Padding(10);
             this.btnHomePanel.Name = "btnHomePanel";
-            this.btnHomePanel.Size = new System.Drawing.Size(100, 75);
+            this.btnHomePanel.Size = new System.Drawing.Size(314, 55);
             this.btnHomePanel.TabIndex = 166;
             this.btnHomePanel.Text = "Home Panel";
             this.btnHomePanel.UseVisualStyleBackColor = false;
@@ -752,11 +756,56 @@
             this.btnChampionshipRoundPrevious.Visible = false;
             this.btnChampionshipRoundPrevious.Click += new System.EventHandler(this.btnChampionshipRound_Click);
             // 
+            // btnStopScoringPanel
+            // 
+            this.btnStopScoringPanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnStopScoringPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.btnStopScoringPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnStopScoringPanel.Location = new System.Drawing.Point(663, 380);
+            this.btnStopScoringPanel.Margin = new System.Windows.Forms.Padding(10);
+            this.btnStopScoringPanel.Name = "btnStopScoringPanel";
+            this.btnStopScoringPanel.Size = new System.Drawing.Size(314, 50);
+            this.btnStopScoringPanel.TabIndex = 170;
+            this.btnStopScoringPanel.Text = "Stop Scoring Panel";
+            this.btnStopScoringPanel.UseVisualStyleBackColor = false;
+            this.btnStopScoringPanel.Click += new System.EventHandler(this.btnStopScoringPanel_Click);
+            // 
+            // btnScorePanel
+            // 
+            this.btnScorePanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnScorePanel.BackColor = System.Drawing.SystemColors.Control;
+            this.btnScorePanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnScorePanel.Location = new System.Drawing.Point(216, 380);
+            this.btnScorePanel.Margin = new System.Windows.Forms.Padding(10);
+            this.btnScorePanel.Name = "btnScorePanel";
+            this.btnScorePanel.Size = new System.Drawing.Size(314, 50);
+            this.btnScorePanel.TabIndex = 171;
+            this.btnScorePanel.Text = "Score Panel";
+            this.btnScorePanel.UseVisualStyleBackColor = false;
+            this.btnScorePanel.Click += new System.EventHandler(this.btnScorePanel_Click);
+            // 
+            // btnResetSolarPanelPosistion
+            // 
+            this.btnResetSolarPanelPosistion.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnResetSolarPanelPosistion.BackColor = System.Drawing.SystemColors.Control;
+            this.btnResetSolarPanelPosistion.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnResetSolarPanelPosistion.Location = new System.Drawing.Point(440, 321);
+            this.btnResetSolarPanelPosistion.Margin = new System.Windows.Forms.Padding(10);
+            this.btnResetSolarPanelPosistion.Name = "btnResetSolarPanelPosistion";
+            this.btnResetSolarPanelPosistion.Size = new System.Drawing.Size(314, 39);
+            this.btnResetSolarPanelPosistion.TabIndex = 172;
+            this.btnResetSolarPanelPosistion.Text = "Reset Solar Panel Posistion";
+            this.btnResetSolarPanelPosistion.UseVisualStyleBackColor = false;
+            this.btnResetSolarPanelPosistion.Click += new System.EventHandler(this.btnResetSolarPanelPosistion_Click);
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1177, 637);
+            this.Controls.Add(this.btnScorePanel);
+            this.Controls.Add(this.btnStopScoringPanel);
+            this.Controls.Add(this.btnResetSolarPanelPosistion);
             this.Controls.Add(this.btnChampionshipRoundNext);
             this.Controls.Add(this.btnChampionshipRoundPrevious);
             this.Controls.Add(this.lblChampionshipRounds);
@@ -851,5 +900,8 @@
         public System.Windows.Forms.Label lblChampionshipRounds;
         public System.Windows.Forms.Button btnChampionshipRoundNext;
         public System.Windows.Forms.Button btnChampionshipRoundPrevious;
+        public System.Windows.Forms.Button btnStopScoringPanel;
+        public System.Windows.Forms.Button btnScorePanel;
+        public System.Windows.Forms.Button btnResetSolarPanelPosistion;
     }
 }
