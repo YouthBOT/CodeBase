@@ -437,6 +437,10 @@ void execute()
 				complete = false;
 				nodeStatus[6] = 0;
 			}
+			else if (selectedState == 5)
+			{
+				currentLocation = sunLocation;
+			}
 			else if (selectedState == 9)
 			{
 				//Don't calibrate FoS in game

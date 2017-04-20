@@ -268,9 +268,9 @@ namespace YBOT_Field_Control_2016
 
         private void btnStartGame_Click(object sender, EventArgs e)
         {
-            autoModeTime = 30;
+            autoModeTime = 60;
             manAutoTime = 20;
-            midModeTime = 150;
+            midModeTime = 240;
 
             disableGameButtons();
             btnStop.BackColor = GameControl.DefaultBackColor;
@@ -278,7 +278,7 @@ namespace YBOT_Field_Control_2016
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.countDownStart(2, 31);
+            time.countDownStart(4, 1);
             time.timesUp = false;
             MainGame();
         }
@@ -870,6 +870,9 @@ namespace YBOT_Field_Control_2016
             lblRedScore.Text = this.red.score.ToString();
             GD.lblGreenScore.Text = this.green.score.ToString();
             GD.lblRedScore.Text = this.red.score.ToString();
+
+            if (solarOverride) btnScorePanel.BackColor = Color.LimeGreen;
+            else btnScorePanel.BackColor = DefaultBackColor;
         }
 
         private void OnSqlConnect (object sender) {
@@ -938,8 +941,8 @@ namespace YBOT_Field_Control_2016
         {
             if (this.gameMode == GameModes.off)
             {
-                lblGameClock.Text = "2:00";
-                GD.lblGameClock.Text = "2:00";
+                lblGameClock.Text = "4:00";
+                GD.lblGameClock.Text = "4:00";
 
                 lblRedScore.Text = "000";
                 lblGreenScore.Text = "000";
@@ -1176,9 +1179,30 @@ namespace YBOT_Field_Control_2016
                 btnHomePanel.BackColor = Color.Blue;
                 string str = ("7,1,3,");
                 this.fc.SendMessage(solarPanel, str);
-                //Thread.Sleep(15000);
+                Thread.Sleep(15000);
                 btnHomePanel.BackColor = DefaultBackColor;
             }
+        }
+
+        private void btnResetSolarPanelPosistion_Click(object sender, EventArgs e)
+        {
+            if (this.gameMode != GameModes.off)
+            {
+                string str = ("7,1,5,");
+                this.fc.SendMessage(solarPanel, str);
+            }
+        }
+
+        private void btnScorePanel_Click(object sender, EventArgs e)
+        {
+            this.fc.node[11].byte6 = 1;
+            solarOverride = true;
+        }
+
+        private void btnStopScoringPanel_Click(object sender, EventArgs e)
+        {
+            this.fc.node[11].byte6 = 0;
+            solarOverride = false;
         }
     }
 

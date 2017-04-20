@@ -64,5 +64,6 @@ namespace YBOT_Field_Control_2016
         private int solarPanel = 11;
         private int value = 0;
         private bool secondManSun = false;
+        private bool solarOverride = false;
     }
 }

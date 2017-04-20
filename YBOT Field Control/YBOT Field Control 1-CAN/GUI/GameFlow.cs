@@ -29,6 +29,7 @@ namespace YBOT_Field_Control_2016
             solarAligned = false;
             solarChanged = false;
             secondManSun = false;
+            solarOverride = false;
 
             //Reset Emergency Variables
             for (int i = 0; i < emergencyTowers.Length; i++)
@@ -150,6 +151,7 @@ namespace YBOT_Field_Control_2016
                     //Pick new sun tower
                     ChangeSunTower();
                     solarChanged = false;
+                    solarOverride = false;
 
                     this.fc.RingBell();                        //Ring bell
                     Thread.Sleep(200);
@@ -171,8 +173,9 @@ namespace YBOT_Field_Control_2016
         public void AutoMode()
         {
             //if solar panel is aligned
-            if(this.fc.node[11].byte6 > 0)
+            if(this.fc.node[11].byte6 > 0 || solarOverride)
             {
+                if (solarOverride) this.fc.node[11].byte6 = 1;
                 //if aligned start timer
                 if(!solarAligned)
                 {
@@ -231,8 +234,10 @@ namespace YBOT_Field_Control_2016
         public void ManualMode()
         {
             //if solar panel is aligned
-            if (this.fc.node[11].byte6 > 0)
+            if (this.fc.node[11].byte6 > 0 || solarOverride)
             {
+                if (solarOverride) this.fc.node[11].byte6 = 1;
+
                 //if aligned start timer
                 if (!solarAligned)
                 {
@@ -349,6 +354,7 @@ namespace YBOT_Field_Control_2016
             sunChangeTimer.Stop();
             secondManSun = true;
             ChangeSunTower();
+            solarOverride = false;
         }
 
         //Score Solar Panel every min
