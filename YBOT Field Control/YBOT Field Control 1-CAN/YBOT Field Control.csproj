@@ -146,7 +146,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Common\ChampionshipMatchMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
