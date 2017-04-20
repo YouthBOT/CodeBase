@@ -592,8 +592,15 @@ namespace YBOT_Field_Control_2016
                         else this.node[nodeID].deviceCycled = false;
                     }
 
-
-                    if (this.node[nodeID].byte7 == 1) this.node[nodeID].alarmState = true;
+                    if (!this.node[nodeID].alarmState)
+                    {
+                        if (this.node[nodeID].byte7 == 1)
+                        {
+                            this.node[nodeID].alarmState = true;
+                            this.node[nodeID].deviceCycled = false;
+                        }
+                        else this.node[nodeID].alarmState = false;
+                    }
 
                 }
             }

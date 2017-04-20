@@ -76,8 +76,8 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
 //Oxy Towers = 11, Fire Towers = 5 (Fire Towrs need to have condition set to false)
-uint8_t inputPins[6] = { 5, 99, 99, 99, 99, 99 };
-boolean conditioned = false;
+uint8_t inputPins[6] = { 11, 99, 99, 99, 99, 99 };
+boolean conditioned = true;
 //Output Pin number - Pin# of Output - 99 if not used
 uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
 //LED Pin number (Uno 13, Leonardo 23)
@@ -132,6 +132,7 @@ uint8_t delayMultiplier = 0;		//Report Delay Multiplier
 int messagesSent = 0;
 int messagesRecieved = 0;
 int currentPullValue = 0;
+int oldPull = 0;
 
 
 boolean sunState = false;			//Sun's state True = on, False = off
@@ -501,8 +502,11 @@ void execute()
 			}
 			if (alarmState)
 			{
-				alarmState = false;
-				solidColor(blue, 0, firstPixel(2), lastPixel(2));
+				if ((gameMode != 2) && (gameMode != 3) && (gameMode != 4) && (gameMode != 5))
+				{
+					alarmState = false;
+					solidColor(blue, 0, firstPixel(2), lastPixel(2));
+				}
 			}
 		}
 	}
@@ -659,7 +663,7 @@ void gamePlayCanbus()
 	}
 	else if (gameMode == 5)	//Manual Mode
 	{
-		int oldPull = 0;
+		
 		if (gameModeChanged)
 		{
 			wipeColor(blue, 0, 1, 0, stripLength);
@@ -681,21 +685,13 @@ void gamePlayCanbus()
 			gameModeChanged = false;
 			complete = false;
 			nodeStatus[6] = 0;
-			//nodeStatus[7] = 0;
+			nodeStatus[7] = 0;
 			//nodeStatus[4] = 0;
 
 			//Get current pull value so we can see if it has been moved
 			int pullValue = getScaledAnalog();
-			if (pullValue >= (maxRange - 1)) fullPull = true;
-			else fullPull = false;
+			fullPull = false;
 			oldPull = pullValue;
-
-
-			if ((nodeID == 3) || (nodeID == 8))
-			{
-				digitalWrite(autoPin, HIGH);
-				digitalWrite(manPin, LOW);
-			}
 		}
 
 		if (!complete)

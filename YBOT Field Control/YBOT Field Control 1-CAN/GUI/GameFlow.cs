@@ -139,6 +139,13 @@ namespace YBOT_Field_Control_2016
                     value = 0;
                     solarTimer.Stop();
                     this.fc.switchMode = false;
+                    //Reset Emergency Variables
+                    for (int i = 0; i < emergencyTowers.Length; i++)
+                    {
+                        int id = emergencyTowers[i];
+                        this.fc.node[id].deviceCycled = false;
+                        this.fc.node[id].alarmState = false;
+                    }
 
                     //Pick new sun tower
                     ChangeSunTower();
@@ -313,6 +320,7 @@ namespace YBOT_Field_Control_2016
 
         private void ChangeSunTower()
         {
+            
             //Turn off Current Sun Tower
             string str = ("7,0,0,");
             this.fc.SendMessage(sunTower, str);
@@ -332,7 +340,7 @@ namespace YBOT_Field_Control_2016
             value = 0;
             solarAligned = false;
             solarChanged = true;
-            Thread.Sleep(100);
+            Thread.Sleep(50);
         }
 
         //Change Sun Tower after 1 min
