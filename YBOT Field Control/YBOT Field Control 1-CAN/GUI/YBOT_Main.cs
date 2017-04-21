@@ -100,8 +100,8 @@ namespace YBOT_Field_Control_2016
 
             YbotSql.Instance.SqlConnectedEvent += OnSqlConnect;
             YbotSql.Instance.SqlMessageEvent += OnSqlMessage;
-            YbotSql.Instance.Connect ("149.56.109.90", password, false);
-			//YbotSql.Instance.Connect("127.0.0.1", string.Empty, false);
+            //YbotSql.Instance.Connect ("149.56.109.90", password, false);
+			YbotSql.Instance.Connect("127.0.0.1", string.Empty, false);
         }
 
         private void YBOT_Main_FormClosed(object sender, FormClosedEventArgs e)

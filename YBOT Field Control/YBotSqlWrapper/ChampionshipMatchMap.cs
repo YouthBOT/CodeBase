@@ -45,10 +45,10 @@ namespace YBotSqlWrapper
             _matchMap[20] = 242;
             _matchMap[21] = 331;
             _matchMap[22] = 341;
-            _matchMap[23] = 332;
-            _matchMap[24] = 342;
-            _matchMap[25] = 311;
-            _matchMap[26] = 321;
+            _matchMap[23] = 311;
+            _matchMap[24] = 321;
+            _matchMap[25] = 332;
+            _matchMap[26] = 342;
             _matchMap[27] = 312;
             _matchMap[28] = 322;
         }
