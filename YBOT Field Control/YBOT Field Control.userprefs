@@ -1,7 +1,9 @@
 ﻿<Properties StartupConfiguration="{45037B3E-1276-44D3-B4D6-E2C0CE14B681}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="YBOT Field Control 1-CAN/GUI/YBOT_Main.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="YBOT Field Control 1-CAN/GUI/GameControl.cs">
     <Files>
-      <File FileName="YBOT Field Control 1-CAN/GUI/YBOT_Main.cs" Line="104" Column="6" />
+      <File FileName="YBOT Field Control 1-CAN/GUI/YBOT_Main.cs" Line="103" Column="15" />
+      <File FileName="YBotSqlWrapper/YBotSql.cs" Line="201" Column="120" />
+      <File FileName="YBOT Field Control 1-CAN/GUI/GameControl.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

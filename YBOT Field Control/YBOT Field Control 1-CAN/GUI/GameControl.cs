@@ -687,7 +687,11 @@ namespace YBOT_Field_Control_2016
 			if (YbotSql.Instance.IsConnected) {
 				int matchId;
 				if (IsChampionshipBracketMatch()) {
-					matchId = ChampionshipMatchMap.Instance[matchNumber];
+                    try {
+                        matchId = ChampionshipMatchMap.Instance[matchNumber];
+                    } catch {
+                        matchId = matchNumber;
+                    }
 				} else {
 					matchId = matchNumber;
 				}

@@ -1,6 +1,0 @@
-16:03:26.8705257 : Game Started
-16:03:26.8735287 : Start AutoMode
-16:03:28.6924506 : Field Off
-
-16:03:29.9700915 : Field Off
-

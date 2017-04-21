@@ -154,191 +154,70 @@ namespace YBotSqlWrapper
                     string.Format("WHERE tournament_id={0} and match_number={1};", match.tournamentId, match.matchNumber);
 
                 var command = new MySqlCommand(query, sql);
-                var reader = await command.ExecuteReaderAsync();
+
+                System.Data.Common.DbDataReader reader;
+                try {
+                    reader = await command.ExecuteReaderAsync();
+                } catch (MySqlException ex) {
+                    SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                    return;
+                }
 
                 if (await reader.ReadAsync()) {
                     var obj = reader[0];
                     if (obj.GetType() != typeof(System.DBNull)) {
-                        var id = Convert.ToInt32(obj);
-                        reader.Close();
-
-                        if (match.tournamentId == 5) {
-                            query = "UPDATE matches " +
-                                "SET played = 1, " +
-                                string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
-                                    match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, "S") +
-                                string.Format("auto_corners_tested = {0}, auto_emergency_cycled = {1}, auto_solar_panel = {2}, ",
-                                    match.autoCornersTested, match.autoEmergencyCycled, match.autoSolarPanel) +
-                                string.Format("manual_solar_panel_1 = {0}, manual_solar_panel_2 = {1}, manual_emergency_cleared = {2}, ",
-                                    match.manSolarPanel1, match.manSolarPanel2, match.manualEmergencyCleared) +
-                                string.Format("rocket_position = {0}, rock_weight = {1}, rock_score = {2}, rocket_bonus = {3} ",
-                                    match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus) +
-                                string.Format("WHERE match_id = {0};", id);
-                        } else {
-                            query = "UPDATE matches " +
-                                "SET played = 1, " +
-                                string.Format("red_team = {0}, red_score = {1}, red_penalty = {2}, red_dq = {3}, red_result = '{4}', ",
-                                    match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
-                                string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
-                                    match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) +
-                                string.Format("auto_corners_tested = {0}, auto_emergency_cycled = {1}, auto_solar_panel = {2}, ",
-                                    match.autoCornersTested, match.autoEmergencyCycled, match.autoSolarPanel) +
-                                string.Format("manual_solar_panel_1 = {0}, manual_solar_panel_2 = {1}, manual_emergency_cleared = {2}, ",
-                                    match.manSolarPanel1, match.manSolarPanel2, match.manualEmergencyCleared) +
-                                string.Format("rocket_position = {0}, rock_weight = {1}, rock_score = {2}, rocket_bonus = {3} ",
-                                    match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus) +
-                                string.Format("WHERE match_id = {0};", id);
-                        }
-
-                        command = new MySqlCommand(query, sql);
-
+                        query = String.Empty;
                         try {
-                            await command.ExecuteNonQueryAsync();
-                        } catch (MySqlException ex) {
+                            var id = Convert.ToInt32(obj);
+
+                            if (match.tournamentId == 5) {
+                                query = "UPDATE matches " +
+                                    "SET played = 1, " +
+                                    string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
+                                        match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, "S") +
+                                    string.Format("auto_corners_tested = {0}, auto_emergency_cycled = {1}, auto_solar_panel = {2}, ",
+                                        match.autoCornersTested, match.autoEmergencyCycled, match.autoSolarPanel) +
+                                    string.Format("manual_solar_panel_1 = {0}, manual_solar_panel_2 = {1}, manual_emergency_cleared = {2}, ",
+                                        match.manSolarPanel1, match.manSolarPanel2, match.manualEmergencyCleared) +
+                                    string.Format("rocket_position = {0}, rock_weight = {1}, rock_score = {2}, rocket_bonus = {3} ",
+                                        match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus) +
+                                    string.Format("WHERE match_id = {0};", id);
+                            } else {
+                                query = "UPDATE matches " +
+                                    "SET played = 1, " +
+                                    string.Format("red_team = {0}, red_score = {1}, red_penalty = {2}, red_dq = {3}, red_result = '{4}', ",
+                                        match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
+                                    string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
+                                        match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) +
+                                    string.Format("auto_corners_tested = {0}, auto_emergency_cycled = {1}, auto_solar_panel = {2}, ",
+                                        match.autoCornersTested, match.autoEmergencyCycled, match.autoSolarPanel) +
+                                    string.Format("manual_solar_panel_1 = {0}, manual_solar_panel_2 = {1}, manual_emergency_cleared = {2}, ",
+                                        match.manSolarPanel1, match.manSolarPanel2, match.manualEmergencyCleared) +
+                                    string.Format("rocket_position = {0}, rock_weight = {1}, rock_score = {2}, rocket_bonus = {3} ",
+                                        match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus) +
+                                    string.Format("WHERE match_id = {0};", id);
+                            }
+                        } catch (Exception ex) {
                             SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                        } finally {
+                            reader.Close();
                         }
 
-                        #region Championship Hacking
+                        if (query.IsNotEmpty()) {
+                            command = new MySqlCommand(query, sql);
 
-                        if ((match.tournamentId == 5) && (match.matchNumber > 100)) {
-                            if (match.matchNumber.ToString().EndsWith("2")) {
-                                query = "SELECT green_score FROM matches " +
-                                    string.Format("WHERE tournament_id=5 and match_number={0};", match.matchNumber - 1);
+                            try {
+                                await command.ExecuteNonQueryAsync();
+                            } catch (MySqlException ex) {
+                                SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                            }
 
-                                command = new MySqlCommand(query, sql);
-                                reader = await command.ExecuteReaderAsync();
-
-                                if (await reader.ReadAsync()) {
-                                    obj = reader[0];
-                                    if (obj.GetType() != typeof(System.DBNull)) {
-                                        var firstMatchScore = Convert.ToInt32(obj);
-                                        reader.Close();
-
-                                        var averageScore = (double)(firstMatchScore + match.greenScore) / 2.0;
-
-                                        query = "UPDATE matches " +
-                                            "SET played = 1, " +
-                                            string.Format("green_team = {0}, green_score = {1}, green_result = 'A' ",
-                                                match.greenTeam, averageScore) +
-                                            string.Format("WHERE match_id = {0};", id - 2);
-
-                                        command = new MySqlCommand(query, sql);
-
-                                        try {
-                                            await command.ExecuteNonQueryAsync();
-                                        } catch (MySqlException ex) {
-                                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
-                                        }
-
-
-                                        var roundNumber = match.matchNumber / 10;
-                                        if ((roundNumber % 2 == 0) && (roundNumber < 30)) {
-                                            var lowerBound = (roundNumber - 1) * 10;
-                                            var upperBound = roundNumber * 10 + 9;
-
-                                            query = "SELECT * FROM matches " +
-                                                string.Format("WHERE match_number BETWEEN {0} AND {1};", lowerBound, upperBound);
-
-                                            command = new MySqlCommand(query, sql);
-                                            reader = await command.ExecuteReaderAsync();
-
-                                            List<Match> matches = new List<Match>();
-                                            while (await reader.ReadAsync()) {
-                                                if (reader[13].ToString() == "S") {
-                                                    var m = new Match();
-                                                    m.greenTeam = Convert.ToInt32(reader[9]);
-                                                    m.greenScore = Convert.ToInt32(reader[10]);
-
-                                                    matches.Add(m);
-                                                }
-                                            }
-
-                                            reader.Close();
-
-                                            if (matches.Count == 4) {
-                                                var team1Score = (double)(matches[0].greenScore + matches[1].greenScore) / 2.0;
-                                                var team2Score = (double)(matches[2].greenScore + matches[3].greenScore) / 2.0;
-
-                                                int winningTeam = 0;
-                                                int losingTeam = 0;
-
-                                                if (team1Score > team2Score) {
-                                                    winningTeam = matches[0].greenTeam;
-                                                    losingTeam = matches[2].greenTeam;
-                                                } else if (team2Score > team1Score) {
-                                                    winningTeam = matches[2].greenTeam;
-                                                    losingTeam = matches[0].greenTeam;
-                                                } else { // the average scores are equal
-                                                    int highestTeam = -1;
-                                                    int highestScore = -250;
-                                                    for (int i = 0; i < 4; ++i) {
-                                                        if (matches[i].greenScore > highestScore) {
-                                                            highestScore = matches[i].greenScore;
-                                                            highestTeam = i;
-                                                        } else if ((matches[i].greenScore == highestScore) && (matches[i].greenTeam != highestTeam)) {
-                                                            highestTeam = -1;
-                                                        }
-                                                    }
-
-                                                    if (highestTeam != -1) {
-                                                        if (highestTeam <= 1) {
-                                                            winningTeam = matches[0].greenTeam;
-                                                            losingTeam = matches[2].greenTeam;
-                                                        } else {
-                                                            winningTeam = matches[2].greenTeam;
-                                                            losingTeam = matches[0].greenTeam;
-                                                        }
-                                                    }
-                                                }
-
-                                                if (winningTeam != 0) {
-                                                    for (int i = 0; i < 3; ++i) {
-                                                        query = "INSERT INTO matches " +
-                                                            "(tournament_id, match_number, played, green_team) " +
-                                                            string.Format("VALUES ({0}, {1}, 0, {2});",
-                                                                          match.tournamentId,
-                                                                          ChampionshipBracketMap.Instance[roundNumber] + i,
-                                                                          winningTeam);
-
-                                                        command = new MySqlCommand(query, sql);
-
-                                                        try {
-                                                            await command.ExecuteNonQueryAsync();
-                                                        } catch (MySqlException ex) {
-                                                            Console.WriteLine(ex.ToString());
-                                                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
-                                                        }
-                                                    }
-                                                }
-
-                                                if ((roundNumber >= 20) && (losingTeam != 0)) { // finals loser round 3rd and 4th place
-                                                    for (int i = 0; i < 3; ++i) {
-                                                        query = "INSERT INTO matches " +
-                                                            "(tournament_id, match_number, played, green_team) " +
-                                                            string.Format("VALUES ({0}, {1}, 0, {2});",
-                                                                          match.tournamentId,
-                                                                          ChampionshipBracketMap.Instance[roundNumber - 1] + i,
-                                                                          losingTeam);
-
-                                                        command = new MySqlCommand(query, sql);
-
-                                                        try {
-                                                            await command.ExecuteNonQueryAsync();
-                                                        } catch (MySqlException ex) {
-                                                            Console.WriteLine(ex.ToString());
-                                                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                            // Championship Hacking
+                            if ((match.tournamentId == 5) && (match.matchNumber > 100)) {
+                                await AverageChampionshipMatches(match);
+                                await UpdateNextChampionshipRound(match);
                             }
                         }
-
-                        #endregion
-
                     } else {
                         await AddNewMatch(match);
                     }
@@ -380,43 +259,65 @@ namespace YBotSqlWrapper
             }
         }
 
-        /*
+
         public async Task AverageChampionshipMatches(Match match) {
             if (match.matchNumber.ToString().EndsWith("2")) {
-                var query = "SELECT green_score FROM matches " +
+                var query = "SELECT match_id, green_score FROM matches " +
                     string.Format("WHERE tournament_id=5 and match_number={0};", match.matchNumber - 1);
 
                 var command = new MySqlCommand(query, sql);
-                var reader = await command.ExecuteReaderAsync();
+
+                System.Data.Common.DbDataReader reader;
+                try {
+                    reader = await command.ExecuteReaderAsync();
+                } catch (MySqlException ex) {
+                    SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                    return;
+                }
 
                 if (await reader.ReadAsync()) {
-                    var obj = reader[0];
-                    if (obj.GetType() != typeof(System.DBNull)) {
-                        var firstMatchScore = Convert.ToInt32(obj);
-                        reader.Close();
+                    var obj1 = reader[0];
+                    var obj2 = reader[1];
 
-                        var averageScore = (double)(firstMatchScore + match.greenScore) / 2.0;
-
-                        query = "UPDATE matches " +
-                            "SET played = 1, " +
-                            string.Format("green_team = {0}, green_score = {1}, green_result = 'A' ",
-                                match.greenTeam, averageScore) +
-                            string.Format("WHERE match_id = {0};", id - 2);
-
-                        command = new MySqlCommand(query, sql);
+                    if ((obj1.GetType() != typeof(System.DBNull)) && (obj2.GetType() != typeof(System.DBNull))) {
+                        query = string.Empty;
 
                         try {
-                            await command.ExecuteNonQueryAsync();
-                        } catch (MySqlException ex) {
+                            var id = Convert.ToInt32(obj1);
+                            var firstMatchScore = Convert.ToInt32(obj2);
+
+                            var averageScore = (double)(firstMatchScore + match.greenScore) / 2.0;
+
+                            query = "UPDATE matches " +
+                                "SET played = 1, " +
+                                string.Format("green_team = {0}, green_score = {1}, green_result = 'A' ",
+                                    match.greenTeam, averageScore) +
+                                string.Format("WHERE match_id = {0};", id - 1);
+
+                        } catch (Exception ex) {
                             SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                        } finally {
+                            reader.Close();
+                        }
+
+                        if (query.IsNotEmpty()) {
+                            command = new MySqlCommand(query, sql);
+
+                            try {
+                                await command.ExecuteNonQueryAsync();
+                            } catch (MySqlException ex) {
+                                SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                            }
                         }
                     }
                 }
+
+                if (!reader.IsClosed) {
+                    reader.Close();
+                }
             }
         }
-        */
 
-        /*
         public async Task UpdateNextChampionshipRound(Match match) {
             if (match.matchNumber.ToString().EndsWith("2")) {
                 var roundNumber = match.matchNumber / 10;
@@ -428,20 +329,32 @@ namespace YBotSqlWrapper
                         string.Format("WHERE match_number BETWEEN {0} AND {1};", lowerBound, upperBound);
 
                     var command = new MySqlCommand(query, sql);
-                    var reader = await command.ExecuteReaderAsync();
 
-                    List<Match> matches = new List<Match>();
-                    while (await reader.ReadAsync()) {
-                        if (reader[13].ToString() == "S") {
-                            var m = new Match();
-                            m.greenTeam = Convert.ToInt32(reader[9]);
-                            m.greenScore = Convert.ToInt32(reader[10]);
-
-                            matches.Add(m);
-                        }
+                    System.Data.Common.DbDataReader reader;
+                    try {
+                        reader = await command.ExecuteReaderAsync();
+                    } catch (MySqlException ex) {
+                        SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                        return;
                     }
 
-                    reader.Close();
+                    List<Match> matches = new List<Match>();
+
+                    try {
+                        while (await reader.ReadAsync()) {
+                            if (reader[13].ToString() == "S") {
+                                var m = new Match();
+                                m.greenTeam = Convert.ToInt32(reader[9]);
+                                m.greenScore = Convert.ToInt32(reader[10]);
+
+                                matches.Add(m);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                    } finally {
+                        reader.Close();
+                    }
 
                     if (matches.Count == 4) {
                         var team1Score = (double)(matches[0].greenScore + matches[1].greenScore) / 2.0;
@@ -520,10 +433,12 @@ namespace YBotSqlWrapper
                         }
                     }
 
+                    if (!reader.IsClosed) {
+                        reader.Close();
+                    }
                 }
             }
         }
-        */
 
         public async void GetGlobalData() {
             if ((sql != null) && (IsConnected)) {
