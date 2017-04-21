@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace YBOT_Field_Control_2016
+namespace YBotSqlWrapper
 {
     public class ChampionshipMatchMap
     {
@@ -51,6 +51,35 @@ namespace YBOT_Field_Control_2016
             _matchMap[26] = 321;
             _matchMap[27] = 312;
             _matchMap[28] = 322;
+        }
+    }
+
+    public class ChampionshipBracketMap
+    {
+        protected static ChampionshipBracketMap instance = new ChampionshipBracketMap();
+        public static ChampionshipBracketMap Instance {
+            get {
+                return instance;
+            }
+        }
+
+        Dictionary<int, int> _matchMap;
+
+        public int this[int index] {
+            get {
+                return _matchMap[index];
+            }
+        }
+
+        public ChampionshipBracketMap() {
+            _matchMap = new Dictionary<int, int>();
+            _matchMap.Add(12, 220);
+            _matchMap.Add(14, 230);
+            _matchMap.Add(16, 240);
+            _matchMap.Add(22, 310); // winner of finals round 1
+            _matchMap.Add(24, 320); // winder of finals round 2
+            _matchMap.Add(21, 330); // loser of finals round 1
+            _matchMap.Add(23, 340); // loser of finals round 2
         }
     }
 }

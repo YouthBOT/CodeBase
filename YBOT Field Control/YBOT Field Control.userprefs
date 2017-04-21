@@ -1,7 +1,11 @@
 ﻿<Properties StartupConfiguration="{45037B3E-1276-44D3-B4D6-E2C0CE14B681}|Default">
   <MonoDevelop.Ide.Workbench ActiveDocument="YBotSqlWrapper/YBotSql.cs">
     <Files>
-      <File FileName="YBotSqlWrapper/YBotSql.cs" Line="207" Column="29" />
+      <File FileName="YBotSqlWrapper/YBotSql.cs" Line="428" Column="25" />
+      <File FileName="YBotSqlWrapper/ChampionshipMatchMap.cs" Line="82" Column="49" />
+      <File FileName="YBOT Field Control 1-CAN/GUI/Score.cs" Line="45" Column="19" />
+      <File FileName="YBOT Field Control 1-CAN/GUI/GameControl.cs" Line="41" Column="21" />
+      <File FileName="YBOT Field Control 1-CAN/GUI/GameControl.Designer.cs" Line="806" Column="51" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

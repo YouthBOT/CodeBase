@@ -24,6 +24,27 @@ namespace YBOT_Field_Control_2016
             InitializeComponent();
             this.fc = fc;
 
+            /*
+            var btn = new Button();
+            btn.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            btn.Cursor = System.Windows.Forms.Cursors.Default;
+            btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            btn.Location = new System.Drawing.Point(424, 35);
+            btn.Margin = new System.Windows.Forms.Padding(10);
+            btn.Name = "btnAverageGame";
+            btn.Size = new System.Drawing.Size(100, 75);
+            btn.TabIndex = 122;
+            btn.Text = "Average Matches";
+            btn.UseVisualStyleBackColor = true;
+            btn.Visible = false;
+            btn.Click += (sender, args) => {
+                if (IsChampionshipBracketMatch()) {
+                    
+                }
+            };
+            Controls.Add(btn);
+            */
+
 			if (YbotSql.Instance.IsConnected) {
                 InitializeSqlData ();
             } else {
@@ -445,10 +466,10 @@ namespace YBOT_Field_Control_2016
                 Application.DoEvents();
             }
 
-            score.Close ();
+            score.Close();
 
             //ScoreGame(); // not used this year
-            RecordGame ();
+            RecordGame();
 
             btnStop.BackColor = Color.Red;
             btnStartGame.BackColor = DefaultBackColor;
