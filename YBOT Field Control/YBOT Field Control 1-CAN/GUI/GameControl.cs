@@ -16,7 +16,9 @@ using HelpfulUtilites;
 namespace YBOT_Field_Control_2016
 {
     public partial class GameControl : Form
-    {          
+    {
+        Button btnAdvanceTeam;
+
 		public GameControl() : this (new Field_Control ()) { }
 
         public GameControl(Field_Control fc)
@@ -24,26 +26,44 @@ namespace YBOT_Field_Control_2016
             InitializeComponent();
             this.fc = fc;
 
-            /*
-            var btn = new Button();
-            btn.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            btn.Cursor = System.Windows.Forms.Cursors.Default;
-            btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            btn.Location = new System.Drawing.Point(424, 35);
-            btn.Margin = new System.Windows.Forms.Padding(10);
-            btn.Name = "btnAverageGame";
-            btn.Size = new System.Drawing.Size(100, 75);
-            btn.TabIndex = 122;
-            btn.Text = "Average Matches";
-            btn.UseVisualStyleBackColor = true;
-            btn.Visible = false;
-            btn.Click += (sender, args) => {
+            btnAdvanceTeam = new Button();
+            btnAdvanceTeam.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            btnAdvanceTeam.Location = new System.Drawing.Point(895, 125);
+            btnAdvanceTeam.Name = "btnAdvanceTeam";
+            btnAdvanceTeam.Size = new System.Drawing.Size(100, 75);
+            btnAdvanceTeam.Text = "Advance Team";
+            btnAdvanceTeam.UseVisualStyleBackColor = true;
+            btnAdvanceTeam.Visible = false;
+            btnAdvanceTeam.Click += (sender, args) => {
                 if (IsChampionshipBracketMatch()) {
-                    
+                    try {
+                        if (lblGreenTeam.Text != "Green Team") {
+                            var match = new Match();
+                            match.tournamentId = YBotSqlData.Global.tournaments[YBotSqlData.Global.currentTournament].id;
+                            var actualMatchNumber = ChampionshipMatchMap.Instance[matchNumber];
+                            var roundNumber = actualMatchNumber / 10;
+                            if (actualMatchNumber.ToString().EndsWith("2")) {
+                                if (roundNumber % 2 == 0) {
+                                    match.matchNumber = actualMatchNumber;
+                                } else {
+                                    match.matchNumber = actualMatchNumber + 10;
+                                }
+                            } else {
+                                if (roundNumber % 2 == 0) {
+                                    match.matchNumber = actualMatchNumber + 1;
+                                } else {
+                                    match.matchNumber = actualMatchNumber + 11;
+                                }
+                            }
+
+                            YbotSql.Instance.AdvanceTeamChampion(match);
+                        }
+                    } catch {
+                        //
+                    }
                 }
             };
-            Controls.Add(btn);
-            */
+            Controls.Add(btnAdvanceTeam);
 
 			if (YbotSql.Instance.IsConnected) {
                 InitializeSqlData ();
@@ -407,8 +427,8 @@ namespace YBOT_Field_Control_2016
                 matchNumber++;
                 lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
-                GetTeamNames();
                 ClearDisplay();
+                GetTeamNames();
                 YBotSqlData.Global.currentMatchNumber = matchNumber;
             }
         }
@@ -420,8 +440,8 @@ namespace YBOT_Field_Control_2016
                 if (matchNumber > 0) matchNumber--;
                 lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
-                GetTeamNames();
                 ClearDisplay();
+                GetTeamNames();
                 YBotSqlData.Global.currentMatchNumber = matchNumber;
             }
         }
@@ -461,27 +481,30 @@ namespace YBOT_Field_Control_2016
             Score score = new Score(this);
             score.Show();
 
-            while (!score.finalScore)
+            while (!score.done)
             {
                 Application.DoEvents();
             }
 
+            var accept = score.acceptScores;
             score.Close();
 
-            //ScoreGame(); // not used this year
-            RecordGame();
+            if (accept) {
+                //ScoreGame(); // not used this year
+                RecordGame();
 
-            btnStop.BackColor = Color.Red;
-            btnStartGame.BackColor = DefaultBackColor;
-            btnPracticeMode.BackColor = DefaultBackColor;
-            gameMode = fc.ChangeGameMode(GameModes.off);
+                btnStop.BackColor = Color.Red;
+                btnStartGame.BackColor = DefaultBackColor;
+                btnPracticeMode.BackColor = DefaultBackColor;
+                gameMode = fc.ChangeGameMode(GameModes.off);
 
-            lblGreenScore.Text = green.finalScore.ToString();
-            lblRedScore.Text = red.finalScore.ToString();
-            GD.lblGreenScore.Text = green.finalScore.ToString();
-            GD.lblRedScore.Text = red.finalScore.ToString();
+                lblGreenScore.Text = green.finalScore.ToString();
+                lblRedScore.Text = red.finalScore.ToString();
+                GD.lblGreenScore.Text = green.finalScore.ToString();
+                GD.lblRedScore.Text = red.finalScore.ToString();
 
-            btnStop.PerformClick();
+                btnStop.PerformClick();
+            }
         }
 
         private void lblGreenScore_Click(object sender, EventArgs e)
@@ -552,10 +575,7 @@ namespace YBOT_Field_Control_2016
             }
         }
 
-        private void RecordGame()
-        {
-			
-
+        private void RecordGame() {
             string file = @"\Match " + matchNumber.ToString() + " - Score";
             string file2 = @"\Match Scores";
             string folder = @"Matches\" + "Match " + matchNumber.ToString();
@@ -724,6 +744,21 @@ namespace YBOT_Field_Control_2016
 						lblRedTeam.Text = "Red Team";
 						GD.lblRedTeam.Text = "Red Team";
 					}
+
+                    var greenScore = match.Result.greenScore;
+                    var redScore = match.Result.redScore;
+
+                    if (greenScore != 0) {
+                        lblGreenScore.Text = greenScore.ToString();
+                    } else {
+                        lblGreenScore.Text = "000";
+                    }
+
+                    if (redScore != 0) {
+                        lblRedScore.Text = redScore.ToString();
+                    } else {
+                        lblRedScore.Text = "000";
+                    }
 				}
 			} else {
 				string greenTeam = null;
@@ -847,6 +882,7 @@ namespace YBOT_Field_Control_2016
 			lblRedScore.Visible = true;
 			grbRedScore.Visible = true;
 			btnRedMantonomous.Visible = true;
+            btnAdvanceTeam.Visible = false;
 		}
 
 		private void DisableRedTeam() {
@@ -866,13 +902,20 @@ namespace YBOT_Field_Control_2016
 			lblRedScore.Visible = false;
 			grbRedScore.Visible = false;
 			btnRedMantonomous.Visible = false;
+            if (IsChampionshipBracketMatch()) {
+                btnAdvanceTeam.Visible = true;
+            } else {
+                btnAdvanceTeam.Visible = false;
+            }
 		}
 
         private void btnChampionshipRound_Click (object sender, EventArgs e) {
             if (lblChampionshipRounds.Text == "Practice") {
                 lblChampionshipRounds.Text = "Bracket";
+                btnAdvanceTeam.Visible = true;
             } else {
                 lblChampionshipRounds.Text = "Practice";
+                btnAdvanceTeam.Visible = false;
             }
 			GetTeamNames();
         }

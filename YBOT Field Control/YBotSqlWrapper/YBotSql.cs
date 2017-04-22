@@ -214,8 +214,8 @@ namespace YBotSqlWrapper
 
                             // Championship Hacking
                             if ((match.tournamentId == 5) && (match.matchNumber > 100)) {
-                                await AverageChampionshipMatches(match);
-                                await UpdateNextChampionshipRound(match);
+                                await AverageChampionship(match);
+                                await AdvanceTeamChampion(match);
                             }
                         }
                     } else {
@@ -260,7 +260,7 @@ namespace YBotSqlWrapper
         }
 
 
-        public async Task AverageChampionshipMatches(Match match) {
+        public async Task AverageChampionship(Match match) {
             if (match.matchNumber.ToString().EndsWith("2")) {
                 var query = "SELECT match_id, green_score FROM matches " +
                     string.Format("WHERE tournament_id=5 and match_number={0};", match.matchNumber - 1);
@@ -318,7 +318,7 @@ namespace YBotSqlWrapper
             }
         }
 
-        public async Task UpdateNextChampionshipRound(Match match) {
+        public async Task AdvanceTeamChampion(Match match) {
             if (match.matchNumber.ToString().EndsWith("2")) {
                 var roundNumber = match.matchNumber / 10;
                 if ((roundNumber % 2 == 0) && (roundNumber < 30)) {
@@ -326,7 +326,7 @@ namespace YBotSqlWrapper
                     var upperBound = roundNumber * 10 + 9;
 
                     var query = "SELECT * FROM matches " +
-                        string.Format("WHERE match_number BETWEEN {0} AND {1};", lowerBound, upperBound);
+                        string.Format("WHERE tournament_id=5 AND match_number BETWEEN {0} AND {1};", lowerBound, upperBound);
 
                     var command = new MySqlCommand(query, sql);
 
@@ -393,48 +393,133 @@ namespace YBotSqlWrapper
                         }
 
                         if (winningTeam != 0) {
-                            for (int i = 0; i < 3; ++i) {
-                                query = "INSERT INTO matches " +
-                                    "(tournament_id, match_number, played, green_team) " +
-                                    string.Format("VALUES ({0}, {1}, 0, {2});",
-                                                  match.tournamentId,
-                                                  ChampionshipBracketMap.Instance[roundNumber] + i,
-                                                  winningTeam);
+                            query = "SELECT match_id, green_result FROM matches " +
+                                string.Format("WHERE tournament_id=5 AND match_number BETWEEN {0} AND {1};",
+                                             ChampionshipBracketMap.Instance[roundNumber],
+                                             ChampionshipBracketMap.Instance[roundNumber] + 2);
 
-                                command = new MySqlCommand(query, sql);
+                            command = new MySqlCommand(query, sql);
 
-                                try {
-                                    await command.ExecuteNonQueryAsync();
-                                } catch (MySqlException ex) {
-                                    Console.WriteLine(ex.ToString());
-                                    SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                            try {
+                                reader = await command.ExecuteReaderAsync();
+                            } catch (MySqlException ex) {
+                                SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                                if (!reader.IsClosed) {
+                                    reader.Close();
                                 }
+                                return;
+                            }
+
+                            List<int> matchIds = new List<int>();
+
+                            try {
+                                while (await reader.ReadAsync()) {
+                                    if (reader[1].ToString() != "I") {
+                                        Console.WriteLine("Matches already played");
+                                        reader.Close();
+                                        return;
+                                    }
+
+                                    matchIds.Add(Convert.ToInt32(reader[0]));
+                                }
+                            } catch (Exception ex) {
+                                SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                            } finally {
+                                reader.Close();
+                            }
+
+                            if (matchIds.Count == 3) {
+                                await UpdateChampionshipMatches(matchIds.ToArray(), winningTeam);
+                            } else {
+                                await AddChampionshipMatches(match, roundNumber, winningTeam);
                             }
                         }
 
                         if ((roundNumber >= 20) && (losingTeam != 0)) { // finals loser round 3rd and 4th place
-                            for (int i = 0; i < 3; ++i) {
-                                query = "INSERT INTO matches " +
-                                    "(tournament_id, match_number, played, green_team) " +
-                                    string.Format("VALUES ({0}, {1}, 0, {2});",
-                                                  match.tournamentId,
-                                                  ChampionshipBracketMap.Instance[roundNumber - 1] + i,
-                                                  losingTeam);
+                            roundNumber -= 1;
 
-                                command = new MySqlCommand(query, sql);
+                            query = "SELECT match_id, green_result FROM matches " +
+                                string.Format("WHERE tournament_id=5 AND match_number BETWEEN {0} AND {1};",
+                                             ChampionshipBracketMap.Instance[roundNumber],
+                                             ChampionshipBracketMap.Instance[roundNumber] + 2);
 
-                                try {
-                                    await command.ExecuteNonQueryAsync();
-                                } catch (MySqlException ex) {
-                                    Console.WriteLine(ex.ToString());
-                                    SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                            command = new MySqlCommand(query, sql);
+
+                            try {
+                                reader = await command.ExecuteReaderAsync();
+                            } catch (MySqlException ex) {
+                                SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                                if (!reader.IsClosed) {
+                                    reader.Close();
                                 }
+                                return;
+                            }
+
+                            List<int> matchIds = new List<int>();
+
+                            try {
+                                while (await reader.ReadAsync()) {
+                                    if (reader[1].ToString() != "I") {
+                                        Console.WriteLine("Matches already played");
+                                        reader.Close();
+                                        return;
+                                    }
+
+                                    matchIds.Add(Convert.ToInt32(reader[0]));
+                                }
+                            } catch (Exception ex) {
+                                SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                            } finally {
+                                reader.Close();
+                            }
+
+                            if (matchIds.Count == 3) {
+                                await UpdateChampionshipMatches(matchIds.ToArray(), losingTeam);
+                            } else {
+                                await AddChampionshipMatches(match, roundNumber, losingTeam);
                             }
                         }
                     }
 
                     if (!reader.IsClosed) {
                         reader.Close();
+                    }
+                }
+            }
+        }
+
+        private async Task AddChampionshipMatches(Match match, int roundNumber, int team) {
+            for (int i = 0; i < 3; ++i) {
+                var query = "INSERT INTO matches " +
+                    "(tournament_id, match_number, played, green_team, green_result) " +
+                    string.Format("VALUES ({0}, {1}, 0, {2}, 'I');",
+                                  match.tournamentId,
+                                  ChampionshipBracketMap.Instance[roundNumber] + i,
+                                  team);
+
+                var command = new MySqlCommand(query, sql);
+
+                try {
+                    await command.ExecuteNonQueryAsync();
+                } catch (MySqlException ex) {
+                    Console.WriteLine(ex.ToString());
+                    SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                }
+            }
+        }
+
+        private async Task UpdateChampionshipMatches(int[] matchIds, int team) {
+            if (matchIds.Length == 3) {
+                for (int i = 0; i < 3; ++i) {
+                    var query = string.Format("UPDATE matches SET green_team={0} WHERE match_id={1}", team, matchIds[i]);
+
+                    var command = new MySqlCommand(query, sql);
+
+                    try {
+                        await command.ExecuteNonQueryAsync();
+                    } catch (MySqlException ex) {
+                        Console.WriteLine(ex.ToString());
+                        SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
                     }
                 }
             }
@@ -496,7 +581,9 @@ namespace YBotSqlWrapper
                         try {
                             match.matchNumber = Convert.ToInt32(reader[2]);
                             match.greenTeam = Convert.ToInt32(reader[9]);
+                            match.greenScore = Convert.ToInt32(reader[10]);
                             match.redTeam = Convert.ToInt32(reader[4]);
+                            match.redScore = Convert.ToInt32(reader[5]);
                         } catch (Exception ex) {
                             SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
                         }

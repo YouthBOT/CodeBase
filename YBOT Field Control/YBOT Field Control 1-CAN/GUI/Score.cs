@@ -21,8 +21,9 @@ namespace YBOT_Field_Control_2016
             LaunchPosition = 5
         }
 
-        public bool finalScore = false;
+        public bool done = false;
         public bool manualOverride = false;
+        public bool acceptScores = false;
 
         GameControl game;
 
@@ -42,8 +43,8 @@ namespace YBOT_Field_Control_2016
         }
 
         private void Score_FormClosed (object sender, FormClosedEventArgs e) {
-            UpdateScore (true);
-            finalScore = true;
+            //UpdateScore (true);
+            done = true;
         }
 
         private void InitScore () {
@@ -258,7 +259,8 @@ namespace YBOT_Field_Control_2016
 
         private void btnFinalScore_Click (object sender, EventArgs e) {
             UpdateScore (true);
-            finalScore = true;
+            acceptScores = true;
+            done = true;
         }
 
         private void btnUpdateScore_Click (object sender, EventArgs e) {
