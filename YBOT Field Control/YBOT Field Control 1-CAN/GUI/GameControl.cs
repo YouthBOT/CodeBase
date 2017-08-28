@@ -56,7 +56,7 @@ namespace YBOT_Field_Control_2016
                                 }
                             }
 
-                            YbotSql.Instance.AdvanceTeamChampion(match);
+                            YbotSql.Instance.AdvanceTeamChampionship(match);
                         }
                     } catch {
                         //

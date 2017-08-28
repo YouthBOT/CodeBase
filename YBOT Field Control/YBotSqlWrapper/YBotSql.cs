@@ -215,7 +215,7 @@ namespace YBotSqlWrapper
                             // Championship Hacking
                             if ((match.tournamentId == 5) && (match.matchNumber > 100)) {
                                 await AverageChampionship(match);
-                                await AdvanceTeamChampion(match);
+                                await AdvanceTeamChampionship(match);
                             }
                         }
                     } else {
@@ -318,7 +318,7 @@ namespace YBotSqlWrapper
             }
         }
 
-        public async Task AdvanceTeamChampion(Match match) {
+        public async Task AdvanceTeamChampionship(Match match) {
             if (match.matchNumber.ToString().EndsWith("2")) {
                 var roundNumber = match.matchNumber / 10;
                 if ((roundNumber % 2 == 0) && (roundNumber < 30)) {
