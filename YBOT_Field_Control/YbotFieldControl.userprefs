@@ -3,6 +3,18 @@
     <Files>
       <File FileName="YBotSqlWrapper/YBotSql.cs" Line="7" Column="7" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="YbotFieldControl" expanded="True">
+            <Node name="YbotFieldControl" expanded="True">
+              <Node name="References" expanded="True" />
+            </Node>
+            <Node name="YBotSqlWrapper" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.ItemProperties.YbotFieldControl PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
